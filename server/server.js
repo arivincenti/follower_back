@@ -1,8 +1,9 @@
-const PORT = require('./config/config');
+const { PORT } = require('./config/config');
 const express = require('express');
 const app = express();
 const mongoose = require('./database/database');
 const cors = require('cors');
+const routes = require('./routes/routes.routes');
 //Settings
 
 //Middlewares
@@ -14,10 +15,8 @@ var corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-
 //Routes
-app.use('/users', require('./routes/user.routes'));
-
+app.use('/', routes); // Application routes array
 
 //Server
 app.listen(PORT, () => {

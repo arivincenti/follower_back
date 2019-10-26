@@ -1,30 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/user.controller');
+const organizationController = require('../controllers/organization.controller');
 
 // ==================================================
-// Get all users
+// Get all organizations
 // ==================================================
-router.get('/users', userController.getUsers);
+router.get('/organizations', organizationController.getOrganizations);
 
 // ==================================================
-// Get one user
+// Get one organization
 // ==================================================
-router.get('/users/:id', userController.getUser);
+router.get('/organizations/:id', organizationController.getOrganization);
 
 // ==================================================
-// Create a new user
+// Create a new Organization
 // ==================================================
-router.post('/users', userController.createUser);
+router.post('/organizations', organizationController.createOrganization);
 
 // ==================================================
-// Update a user
+// Update a Organization
 // ==================================================
-router.put('/users/:id', userController.updateUser);
+router.put('/organizations/:id', organizationController.updateOrganization);
 
 // ==================================================
-// Delete a user
+// Delete a Organization
 // ==================================================
-router.delete('/users/:id', userController.deleteUser);
+router.delete('/organizations/:id', organizationController.deleteOrganization);
 
 module.exports = router;

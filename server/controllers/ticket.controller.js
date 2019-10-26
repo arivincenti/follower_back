@@ -1,54 +1,51 @@
-const userController = {};
-const bcrypt = require('bcryptjs');
+const ticketController = {};
+const Ticket = require('../models/ticket');
 const User = require('../models/user');
+const Area = require('../models/area');
 
 // ==================================================
-// Get all users
+// Get all ticket
 // ==================================================
-userController.getUsers = async (req, res) => {
+ticketController.getTickets = async (req, res) => {
 
-  var users = await User.find();
+  var ticket = await Ticket.find();
 
   res.json({
     ok: true,
-    data: users
+    data: ticket
   });
 }
 
 // ==================================================
-// Get all users
+// Get all ticket
 // ==================================================
-userController.getUser = async (req, res) => {
-  res.json('Get one user');
+ticketController.getTicket = async (req, res) => {
+  res.json('Get one ticket');
 }
 
 // ==================================================
-// Get all users
+// Get all ticket
 // ==================================================
-userController.createUser = async (req, res) => {
+ticketController.createTicket = async (req, res) => {
 
   try{
     var body = req.body;
   
-    var user = new User({
-      name: body.name,
-      lastName: body.lastName,
-      email: body.email,
-      password: bcrypt.hashSync(body.password, 10),
-      created_by: body.created_by || 'follower'
+    var ticket = new Ticket({
+
     });
   
-    await user.save()
-    .then(user => {
+    await Ticket.save()
+    .then(ticket => {
       res.status(200).json({
         ok: true,
-        data: user
+        data: ticket
       });
     })
     .catch(error => {
       res.status(400).json({
         ok:false,
-        message: 'Error al guardar el usuario',
+        message: 'Error al guardar el ticket',
         error: error
       });
     });
@@ -63,18 +60,18 @@ userController.createUser = async (req, res) => {
 }
 
 // ==================================================
-// Get all users
+// Get all ticket
 // ==================================================
-userController.updateUser = async (req, res) => {
-  res.json('Update a user');
+ticketController.updateTicket = async (req, res) => {
+  res.json('Update a ticket');
 }
 
 // ==================================================
-// Get all users
+// Get all ticket
 // ==================================================
-userController.deleteUser = async (req, res) => {
-  res.json('Delete a user');
+ticketController.deleteTicket = async (req, res) => {
+  res.json('Delete a ticket');
 }
 
 
-module.exports = userController;
+module.exports = ticketController;
