@@ -1,32 +1,28 @@
 const organizationController = {};
 const Organization = require("../models/organization");
+const Area = require("../models/area");
+const ResponseController = require('./response.controller');
 
 // ==================================================
 // Get all organizations
 // ==================================================
 organizationController.getOrganizations = async (req, res) => {
   try {
-    await Organization.find()
-      .populate("created_by")
-      .then(organizations => {
-        res.json({
-          ok: true,
-          data: organizations
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al consultar las organizaciones",
-          error: error
-        });
+    var organizations = await Organization.find()
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
       });
+
+    if (!organizations) {
+      ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
+    }
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
+
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -44,33 +40,16 @@ organizationController.createOrganization = async (req, res) => {
   try {
     var body = req.body;
 
-    organization = new Organization({
+    var organization = new Organization({
       name: body.name,
       created_by: body.user
     });
 
-    await organization
-      .save()
-      .then(organization => {
-        res.status(200).json({
-          ok: true,
-          message: "Organization created",
-          data: organization
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al crear la organización",
-          error: error
-        });
-      });
+    var savedOrganization = await organization.save();
+
+    ResponseController.getResponse(res, 200, true, "La organización '" + savedOrganization.name + "' se creó con éxito", null, savedOrganization);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -86,6 +65,38 @@ organizationController.updateOrganization = async (req, res) => {
 // ==================================================
 organizationController.deleteOrganization = async (req, res) => {
   res.json("Delete a organization");
+};
+
+// ==================================================
+// Get all organization`s areas
+// ==================================================
+organizationController.getOrganizationAreas = async (req, res) => {
+  try {
+    var organizationId = req.params.organization;
+
+    var areas = await Area.find({
+        organization: organizationId
+      })
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      })
+      .populate({
+        path: "members.user",
+        model: "User",
+        select: '-password'
+      });
+
+    if (!areas) {
+      ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos relacionadas a la organización con id '" + organizationId + "'", "No se encontraron datos", null);
+    }
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
 };
 
 module.exports = organizationController;

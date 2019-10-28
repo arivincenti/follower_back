@@ -10,7 +10,7 @@ router.get('/organizations', organizationController.getOrganizations);
 // ==================================================
 // Get one organization
 // ==================================================
-router.get('/organizations/:id', organizationController.getOrganization);
+router.get('/organizations/:organization', organizationController.getOrganization);
 
 // ==================================================
 // Create a new Organization
@@ -20,11 +20,16 @@ router.post('/organizations', organizationController.createOrganization);
 // ==================================================
 // Update a Organization
 // ==================================================
-router.put('/organizations/:id', organizationController.updateOrganization);
+router.put('/organizations/:organization', organizationController.updateOrganization);
 
 // ==================================================
 // Delete a Organization
 // ==================================================
-router.delete('/organizations/:id', organizationController.deleteOrganization);
+router.delete('/organizations/:organization', organizationController.deleteOrganization);
+
+// ==================================================
+// Get all orgsanization areas
+// ==================================================
+router.get('/organizations/:organization/areas', organizationController.getOrganizationAreas);
 
 module.exports = router;

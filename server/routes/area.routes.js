@@ -7,10 +7,11 @@ const areaController = require('../controllers/area.controller');
 // ==================================================
 router.get('/areas', areaController.getAreas);
 
+
 // ==================================================
 // Get one area
 // ==================================================
-router.get('/areas/:id', areaController.getArea);
+router.get('/areas/:area', areaController.getArea);
 
 // ==================================================
 // Create a new area
@@ -20,12 +21,17 @@ router.post('/areas', areaController.createArea);
 // ==================================================
 // Update an area
 // ==================================================
-router.put('/areas/:id', areaController.updateArea);
+router.put('/areas/:area', areaController.updateArea);
 
 // ==================================================
 // Delete an area
 // ==================================================
-router.delete('/areas/:id', areaController.deleteArea);
+router.delete('/areas/:area', areaController.deleteArea);
+
+// ==================================================
+// Get area members
+// ==================================================
+router.get('/areas/:area/members', areaController.getAreaMembers);
 
 // ==================================================
 // Create an area member
@@ -36,5 +42,10 @@ router.put('/areas/:area/members', areaController.createAreaMember);
 // Update an area member
 // ==================================================
 router.put('/areas/:area/members/:member', areaController.updateAreaMember);
+
+// ==================================================
+// Delete an area member
+// ==================================================
+router.delete('/areas/:area/members/:member', areaController.deleteAreaMember);
 
 module.exports = router;

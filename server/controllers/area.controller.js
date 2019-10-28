@@ -1,38 +1,32 @@
 const areaController = {};
 const Area = require("../models/area");
-const Organization = require("../models/organization");
+const ResponseController = require('./response.controller');
 
 // ==================================================
 // Get all areas
 // ==================================================
 areaController.getAreas = async (req, res) => {
   try {
-    await Area.find()
+    var areas = await Area.find()
       .populate("organization")
-      .populate("created_by")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      })
       .populate({
         path: "members.user",
-        model: "User"
-      })
-      .then(areas => {
-        res.status(200).json({
-          ok: true,
-          data: areas
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al consultar todas las areas",
-          error: error
-        });
+        model: "User",
+        select: "-password"
       });
+
+    if (!areas) {
+      ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
+    }
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -41,41 +35,24 @@ areaController.getAreas = async (req, res) => {
 // ==================================================
 areaController.getArea = async (req, res) => {
   try {
-    var areaId = req.params.id;
+    var areaId = req.params.area;
 
     var area = await Area.findById(areaId)
       .populate("organization")
       .populate("created_by")
       .populate({
         path: "members.user",
-        model: "User"
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al consultar todas las areas",
-          error: error
-        });
+        model: "User",
+        select: "-password"
       });
 
     if (!area) {
-      return res.status(404).json({
-        ok: false,
-        message:
-          "El area con id " + areaId + " no se encuentra en la base de datos"
-      });
+      ResponseController.getResponse(res, 404, false, "No existe el área con id '" + areaId + "'", error, null);
     }
 
-    res.status(200).json({
-      ok: true,
-      data: area
-    });
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -92,27 +69,11 @@ areaController.createArea = async (req, res) => {
       created_by: body.user
     });
 
-    await area
-      .save()
-      .then(area => {
-        res.status(200).json({
-          ok: true,
-          data: area
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al guardar el area",
-          error: error
-        });
-      });
+    var savedArea = await area.save();
+
+    ResponseController.getResponse(res, 200, true, "El área '" + savedArea.name + "' se creó con éxito", null, savedArea);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -121,41 +82,22 @@ areaController.createArea = async (req, res) => {
 // ==================================================
 areaController.updateArea = async (req, res) => {
   try {
-    var areaId = req.params.id;
+    var areaId = req.params.area;
     var body = req.body;
+
     var area = await Area.findById(areaId);
 
     if (!area) {
-      return res.status(404).json({
-        ok: false,
-        message:
-          "El area con id " + areaId + " no se encuentra en la base de datos"
-      });
+      ResponseController.getResponse(res, 404, false, "No existe el área con el id '" + areaId + "' en la base de datos", "Área no encontrada", null);
     }
 
     area.name = body.name;
 
-    await area
-      .save()
-      .then(area => {
-        res.status(200).json({
-          ok: true,
-          data: area
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al actualizar el area",
-          error: error
-        });
-      });
+    var savedArea = await area.save();
+
+    ResponseController.getResponse(res, 200, true, "El área '" + area.name + "' fue modificada con éxito", null, savedArea);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
@@ -167,6 +109,37 @@ areaController.deleteArea = async (req, res) => {
 };
 
 // ==================================================
+// Update members area
+// ==================================================
+areaController.getAreaMembers = async (req, res) => {
+  try {
+    var areaId = req.params.area;
+
+    var area = await Area.findById(areaId)
+      .populate({
+        path: "members.user",
+        model: "User",
+        select: '-password'
+      });
+
+    if (!area) {
+      ResponseController.getResponse(res, 404, false, "No existe el área con el id '" + areaId + "' en la base de datos", "Área no encontrada", null);
+    }
+
+
+    if (!area.members) {
+      ResponseController.getResponse(res, 404, false, "No existen el miembros en la base de datos", "Miembro no encontrado", null);
+    }
+
+    //sent respnse to client
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area.members);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
+
+// ==================================================
 // Create members area
 // ==================================================
 areaController.createAreaMember = async (req, res) => {
@@ -174,43 +147,30 @@ areaController.createAreaMember = async (req, res) => {
     var areaId = req.params.area;
     var body = req.body;
 
-    await Area.findById(areaId)
-      .then(area => {
-        var member = {
-          user: body.user,
-          role: body.role
-        };
+    var area = await Area.findById(areaId);
 
-        area.members.push(member);
+    if (!area) {
+      ResponseController.getResponse(res, 404, false, "No existe el área con el id '" + areaId + "' en la base de datos", "Área no encontrada", null);
+    }
 
-        area.save();
+    var member = {
+      user: body.user,
+      role: body.role
+    };
 
-        //sent respnse to client
-        res.status(200).json({
-          ok: true,
-          data: area
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al actualizar el area",
-          error: error
-        });
-      });
+    area.members.push(member);
+
+    var savedArea = await area.save();
+
+    ResponseController.getResponse(res, 200, true, "Área modificada con éxito, se generó un nuevo miembro en '" + area.name + "'", null, savedArea);
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
 // ==================================================
 // Update members area
 // ==================================================
-
 areaController.updateAreaMember = async (req, res) => {
   try {
     var areaId = req.params.area;
@@ -220,47 +180,57 @@ areaController.updateAreaMember = async (req, res) => {
     var area = await Area.findById(areaId);
 
     if (!area) {
-      return res.status(404).json({
-        ok: false,
-        message: "No existe el area con el id " + areaId
-      });
+      ResponseController.getResponse(res, 404, false, "No existe el área con el id '" + areaId + "' en la base de datos", "Área no encontrada", null);
     }
 
     var member = area.members.id(memberId);
 
     if (!member) {
-      return res.status(404).json({
-        ok: false,
-        message: "No existe el miembro con el id " + memberId
-      });
+      ResponseController.getResponse(res, 404, false, "No existe el miembro con el id '" + memberId + "' en la base de datos", "Miembro no encontrado", null);
     }
 
     member["role"] = body.role;
     member["updated_at"] = new Date();
 
-    await area
-      .save()
-      .then(area => {
-        //sent respnse to client
-        res.status(200).json({
-          ok: true,
-          data: area
-        });
-      })
-      .catch(error => {
-        res.status(400).json({
-          ok: false,
-          message: "Error al actualizar el area",
-          error: error
-        });
-      });
+    var savedArea = await area.save();
+
+    //sent respnse to client
+    ResponseController.getResponse(res, 200, true, "Área modificada con éxito, se actualizaron los datos del miembro de '" + area.name + "'", null, savedArea);
 
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: "Error de servidor",
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
+
+// ==================================================
+// Update members area
+// ==================================================
+areaController.deleteAreaMember = async (req, res) => {
+  try {
+    var areaId = req.params.area;
+    var memberId = req.params.member;
+
+    var area = await Area.findById(areaId);
+
+    if (!area) {
+      ResponseController.getResponse(res, 404, false, "No existe el área con el id '" + areaId + "' en la base de datos", "Área no encontrada", null);
+    }
+
+    var member = area.members.id(memberId);
+
+    if (!member) {
+      ResponseController.getResponse(res, 404, false, "No existe el miembro con el id '" + memberId + "' en la base de datos", "Miembro no encontrado", null);
+    }
+
+    member["deleted_at"] = new Date();
+
+    var savedArea = await area.save();
+
+    //sent respnse to client
+    ResponseController.getResponse(res, 200, true, "Área modificada con éxito, se dio de baja el miembro de '" + area.name + "'", null, savedArea);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
 
