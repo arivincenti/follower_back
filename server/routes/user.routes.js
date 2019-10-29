@@ -10,7 +10,7 @@ router.get('/users', userController.getUsers);
 // ==================================================
 // Get one user
 // ==================================================
-router.get('/users/:id', userController.getUser);
+router.get('/users/:user', userController.getUser);
 
 // ==================================================
 // Create a new user
@@ -20,11 +20,16 @@ router.post('/users', userController.createUser);
 // ==================================================
 // Update a user
 // ==================================================
-router.put('/users/:id', userController.updateUser);
+router.put('/users/:user', userController.updateUser);
 
 // ==================================================
 // Delete a user
 // ==================================================
-router.delete('/users/:id', userController.deleteUser);
+router.delete('/users/:user', userController.deleteUser);
+
+// ==================================================
+// Get a user organizations
+// ==================================================
+router.get('/users/:user/organizations', userController.getUserOrganizations);
 
 module.exports = router;

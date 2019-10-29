@@ -7,9 +7,9 @@ const uniqueValidator = require('mongoose-unique-validator');
       type: String,
       required: [true, 'The Name is a required field']
     },
-    lastName: {
+    last_name: {
       type: String,
-      required: [true, 'The LastName field is a required field']
+      required: [true, 'The Last Name field is a required field']
     },
     email:{
       type: String,

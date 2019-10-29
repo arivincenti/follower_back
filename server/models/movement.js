@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const {
+  Schema
+} = mongoose;
 const uniqueValidator = require('mongoose-unique-validator');
 
 var movementSchema = new Schema({
-  area:{
+  area: {
     type: Schema.Types.ObjectId,
     ref: 'Area'
   },
-  member:{
+  member: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },

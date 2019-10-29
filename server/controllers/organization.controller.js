@@ -15,9 +15,7 @@ organizationController.getOrganizations = async (req, res) => {
         select: '-password'
       });
 
-    if (!organizations) {
-      ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
-    }
+    if (!organizations) ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
 
@@ -30,7 +28,22 @@ organizationController.getOrganizations = async (req, res) => {
 // Get an organization
 // ==================================================
 organizationController.getOrganization = async (req, res) => {
-  res.json("Get one organization");
+  try {
+    var organization_id = req.body.organization;
+    var organization = await Organization.find(organization_id)
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      });
+
+    if (!organization) ResponseController.getResponse(res, 404, false, "No existe la organización con id " + organization_id + " en la base de datos", "Error al buscar la organización", null);
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organization);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
 };
 
 // ==================================================

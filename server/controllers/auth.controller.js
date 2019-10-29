@@ -1,31 +1,69 @@
-const userController = {};
+const authController = {};
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const { SEED } = require('../config/config');
+const {
+  SEED
+} = require('../config/config');
+const ResponseController = require('./response.controller');
 
 // ==================================================
 // Login method
 // ==================================================
-userController.login = async (req, res) => {
+authController.login = async (req, res) => {
+  try {
+    let body = req.body;
 
-  try{
-    res.json('login controller');
-
-  }catch(error){
-    res.status(500).json({
-      ok:false,
-      message: 'Error de servidor',
-      error: error
+    let user = await User.findOne({
+      email: body.email
     });
+
+    if (!user) ResponseController.getResponse(res, 404, false, "No se encontró el usuario", "Error en las credenciales", null);
+
+    if (!bcrypt.compareSync(body.password, user.password)) {
+      ResponseController.getResponse(res, 400, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
+    }
+
+    user.password = ":)";
+    //Se crea el token si todo va bien
+    await generateToken(user, res);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
-}
+};
 
 // ==================================================
-// Get all users
+// Refresh Token
 // ==================================================
-userController.refreshToken = async (req, res) => {
-  res.json('Refresh token');
-}
+authController.refreshToken = (req, res) => {
+  try {
+    generateToken(req.user, res);
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
 
-module.exports = userController;
+// ==================================================
+// Generacion de token
+// ==================================================
+async function generateToken(user, res) {
+  try {
+    let token = jwt.sign({
+      user: user
+    }, SEED, {
+      expiresIn: 14000
+    });
+
+    return res.status(200).json({
+      ok: true,
+      data: user,
+      token: token
+    });
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
+
+module.exports = authController;
