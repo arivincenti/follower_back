@@ -18,13 +18,12 @@ authController.login = async (req, res) => {
       email: body.email
     });
 
-    if (!user) ResponseController.getResponse(res, 404, false, "No se encontró el usuario", "Error en las credenciales", null);
+    if (!user) return ResponseController.getResponse(res, 404, false, "Hubo un error al querer inicar sesión", "Error en las credenciales", null);
 
-    if (!bcrypt.compareSync(body.password, user.password)) {
-      ResponseController.getResponse(res, 400, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
-    }
+    if (!bcrypt.compareSync(body.password, user.password)) return ResponseController.getResponse(res, 400, false, "Hubo un error al querer inicar sesión", "Error en las credenciales", null);
 
-    user.password = ":)";
+    user.password = ":)"; //Seteamos el password del usuario para que no se devuelva en el token
+
     //Se crea el token si todo va bien
     await generateToken(user, res);
 

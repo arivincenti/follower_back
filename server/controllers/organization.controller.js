@@ -15,7 +15,7 @@ organizationController.getOrganizations = async (req, res) => {
         select: '-password'
       });
 
-    if (!organizations) ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
+    if (!organizations) return ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
 
@@ -29,15 +29,16 @@ organizationController.getOrganizations = async (req, res) => {
 // ==================================================
 organizationController.getOrganization = async (req, res) => {
   try {
-    var organization_id = req.body.organization;
-    var organization = await Organization.find(organization_id)
+    var organization_id = req.params.organization;
+
+    var organization = await Organization.findById(organization_id)
       .populate({
         path: "created_by",
         model: "User",
         select: '-password'
       });
 
-    if (!organization) ResponseController.getResponse(res, 404, false, "No existe la organización con id " + organization_id + " en la base de datos", "Error al buscar la organización", null);
+    if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organization);
 
@@ -60,7 +61,8 @@ organizationController.createOrganization = async (req, res) => {
 
     var savedOrganization = await organization.save();
 
-    ResponseController.getResponse(res, 200, true, "La organización '" + savedOrganization.name + "' se creó con éxito", null, savedOrganization);
+    ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' se creó con éxito`, null, savedOrganization);
+
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
@@ -70,14 +72,48 @@ organizationController.createOrganization = async (req, res) => {
 // Update an organization
 // ==================================================
 organizationController.updateOrganization = async (req, res) => {
-  res.json("Update a organization");
+  try {
+    var organization_id = req.params.organization;
+    var body = req.body;
+
+    var organization = await Organization.findById(organization_id);
+
+    if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
+
+    if (body.name) {
+      organization.name = body.name;
+      organization.updated_at = new Date();
+    };
+
+    var savedOrganization = await organization.save();
+
+    ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' se actualizó con éxito`, null, savedOrganization);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
 };
 
 // ==================================================
 // Delete an organization
 // ==================================================
 organizationController.deleteOrganization = async (req, res) => {
-  res.json("Delete a organization");
+  try {
+    var organization_id = req.params.organization;
+
+    var organization = await Organization.findById(organization_id);
+
+    if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
+
+    organization.deleted_at = new Date();
+
+    var savedOrganization = await organization.save();
+
+    ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' fue dada de baja con éxito`, null, savedOrganization);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
 };
 
 // ==================================================
@@ -85,10 +121,10 @@ organizationController.deleteOrganization = async (req, res) => {
 // ==================================================
 organizationController.getOrganizationAreas = async (req, res) => {
   try {
-    var organizationId = req.params.organization;
+    var organization_id = req.params.organization;
 
     var areas = await Area.find({
-        organization: organizationId
+        organization: organization_id
       })
       .populate({
         path: "created_by",
@@ -101,11 +137,36 @@ organizationController.getOrganizationAreas = async (req, res) => {
         select: '-password'
       });
 
-    if (!areas) {
-      ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos relacionadas a la organización con id '" + organizationId + "'", "No se encontraron datos", null);
-    }
+    if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
+
+// ==================================================
+// Get all organization`s areas
+// ==================================================
+organizationController.getOrganizationMembers = async (req, res) => {
+  try {
+    var organization_id = req.params.organization;
+
+    var areas = await Area.find({
+        organization: organization_id
+      }, 'members')
+      .populate({
+        path: "members.user",
+        model: "User",
+        select: '-password'
+      });
+
+    if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
+
+    if (!areas[0].members) return ResponseController.getResponse(res, 404, false, `No se encontraron miembros para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas[0].members);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

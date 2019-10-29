@@ -11,7 +11,7 @@ userController.getUsers = async (req, res) => {
   try {
     var users = await User.find();
 
-    if (!users) ResponseController.getResponse(res, 404, false, "No existen usuarios en la base de datos", "Usuarios no encontrados", null);
+    if (!users) return ResponseController.getResponse(res, 404, false, "No existen usuarios en la base de datos", "Usuarios no encontrados", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, users);
 
@@ -29,7 +29,7 @@ userController.getUser = async (req, res) => {
 
     var user = await User.findById(user_id);
 
-    if (!user) ResponseController.getResponse(res, 404, false, "No existe el usuario con id " + user_id + " en la base de datos", "Error al buscar el usuario", null);
+    if (!user) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, user);
 
@@ -53,7 +53,7 @@ userController.getUserOrganizations = async (req, res) => {
         model: "Organization"
       });
 
-    if (!areas) ResponseController.getResponse(res, 404, false, "No existe el usuario con id " + user_id + " en la base de datos", "Error al buscar el usuario", null);
+    if (!areas) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
 
@@ -79,7 +79,7 @@ userController.createUser = async (req, res) => {
 
     var saved_user = await user.save();
 
-    ResponseController.getResponse(res, 200, true, "El usuario '" + saved_user.last_name + " " + saved_user.name + "' se creó con exito", null, saved_user);
+    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name}${saved_user.name}' se creó con exito`, null, saved_user);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
@@ -96,13 +96,18 @@ userController.updateUser = async (req, res) => {
 
     var user = await User.findById(user_id);
 
+    if (!user) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
+
     if (body.name) user.name = body.name;
     if (body.last_name) user.last_name = body.last_name;
     if (body.email) user.email = body.email;
 
+    if(body.name || body.last_name || body.email) user.updated_at = new Date();
+
     var saved_user = await user.save();
 
     ResponseController.getResponse(res, 200, true, "El usuario '" + saved_user.last_name + " " + saved_user.name + "' se actualizó con éxito", null, saved_user);
+
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
@@ -117,11 +122,13 @@ userController.deleteUser = async (req, res) => {
 
     var user = await User.findById(user_id);
 
+    if (!user) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
+
     user.deleted_at = new Date();
 
     var saved_user = await user.save();
 
-    ResponseController.getResponse(res, 200, true, "El usuario '" + saved_user.last_name + " " + saved_user.name + "' se dió de baja con éxito", null, saved_user);
+    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name}${saved_user.name}' se dió de baja con éxito`, null, saved_user);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

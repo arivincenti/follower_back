@@ -32,4 +32,9 @@ router.delete('/organizations/:organization', organizationController.deleteOrgan
 // ==================================================
 router.get('/organizations/:organization/areas', organizationController.getOrganizationAreas);
 
+// ==================================================
+// Get all orgsanization members
+// ==================================================
+router.get('/organizations/:organization/members', organizationController.getOrganizationMembers);
+
 module.exports = router;

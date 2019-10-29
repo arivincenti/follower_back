@@ -20,7 +20,7 @@ areaController.getAreas = async (req, res) => {
         select: "-password"
       });
 
-    if (!areas) ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
+    if (!areas) return ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
 
@@ -45,7 +45,7 @@ areaController.getArea = async (req, res) => {
         select: "-password"
       });
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con id '${area_id}'`, "Área no encontrada", null);
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con id '${area_id}'`, "Área no encontrada", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area);
 
@@ -86,7 +86,7 @@ areaController.updateArea = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
 
     area.name = body.name;
 
@@ -108,7 +108,7 @@ areaController.deleteArea = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
 
     area.deleted_at = new Date();
 
@@ -122,7 +122,7 @@ areaController.deleteArea = async (req, res) => {
 };
 
 // ==================================================
-// Update members area
+// Get area members
 // ==================================================
 areaController.getAreaMembers = async (req, res) => {
   try {
@@ -135,13 +135,10 @@ areaController.getAreaMembers = async (req, res) => {
         select: '-password'
       });
 
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
+    if (!area.members) return ResponseController.getResponse(res, 404, false, `No existen miembros en el area '${area.name}'`, "Miembros no encontrados", null);
 
-
-    if (!area.members) ResponseController.getResponse(res, 404, false, "No existen el miembros en la base de datos", "Miembro no encontrado", null);
-
-    //sent respnse to client
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area.members);
 
   } catch (error) {
@@ -159,7 +156,7 @@ areaController.createAreaMember = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
 
     var member = {
       user: body.user,
@@ -188,11 +185,11 @@ areaController.updateAreaMember = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
 
     var member = area.members.id(member_id);
 
-    if (!member) ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
+    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
 
     member["role"] = body.role;
     member["updated_at"] = new Date();
@@ -217,11 +214,11 @@ areaController.deleteAreaMember = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null); 
+    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null); 
 
     var member = area.members.id(member_id);
 
-    if (!member) ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
+    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
 
     member["deleted_at"] = new Date();
 
