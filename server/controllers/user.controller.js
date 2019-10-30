@@ -79,7 +79,7 @@ userController.createUser = async (req, res) => {
 
     var saved_user = await user.save();
 
-    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name}${saved_user.name}' se creó con exito`, null, saved_user);
+    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name} ${saved_user.name}' se creó con éxito`, null, saved_user);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

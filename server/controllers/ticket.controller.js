@@ -2,25 +2,40 @@ const ticketController = {};
 const Ticket = require('../models/ticket');
 const User = require('../models/user');
 const Area = require('../models/area');
+const ResponseController = require('./response.controller');
 
 // ==================================================
 // Get all ticket
 // ==================================================
 ticketController.getTickets = async (req, res) => {
+ try{
+   var tickets = await Ticket.find();
+ 
+   if (!tickets) return ResponseController.getResponse(res, 404, false, "No existen tickets en la base de datos", "Usuarios no encontrados", null);
 
-  var ticket = await Ticket.find();
+   ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, tickets);
 
-  res.json({
-    ok: true,
-    data: ticket
-  });
+ }catch(error){
+  ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+ }
 }
 
 // ==================================================
 // Get all ticket
 // ==================================================
 ticketController.getTicket = async (req, res) => {
-  res.json('Get one ticket');
+  try{
+    var ticket_id = req.params.ticket;
+
+    var ticket = await Ticket.findById(ticket_id);
+  
+    if (!ticket) return ResponseController.getResponse(res, 404, false, "No existen tickets en la base de datos", "Usuarios no encontrados", null);
+ 
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, ticket);
+ 
+  }catch(error){
+   ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
 }
 
 // ==================================================
@@ -32,30 +47,26 @@ ticketController.createTicket = async (req, res) => {
     var body = req.body;
   
     var ticket = new Ticket({
+      subject: body.subject,
+      issue: body.issue,
+      created_by: body.user,
+      created_at: new Date()
+    });
 
-    });
+    var movement = {
+      area: body.area,
+      responsible: body.responsible,
+      created_at: new Date()
+    }
+
+    ticket.movements.push(movement);
   
-    await Ticket.save()
-    .then(ticket => {
-      res.status(200).json({
-        ok: true,
-        data: ticket
-      });
-    })
-    .catch(error => {
-      res.status(400).json({
-        ok:false,
-        message: 'Error al guardar el ticket',
-        error: error
-      });
-    });
+    var saved_ticket = await ticket.save();
+
+    ResponseController.getResponse(res, 200, true, `El ticket '${saved_ticket._id}' se creó con éxito`, null, saved_ticket);
   
   }catch(error){
-    res.status(500).json({
-      ok:false,
-      message: 'Error de servidor',
-      error: error
-    });
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 }
 
