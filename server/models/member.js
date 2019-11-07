@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var rolesValidos = {
@@ -6,27 +6,24 @@ var rolesValidos = {
   message: "{VALUE} is not a valid role"
 };
 
-var areaSchema = new Schema({
-  name: {
-    type: String,
-    required: [true, "The name is a required field"]
-  },
+var memberSchema = new Schema({
   organization: {
     type: Schema.Types.ObjectId,
-    ref: "Organization"
+    ref: 'Organization'
   },
-  created_by: {
+  area: {
     type: Schema.Types.ObjectId,
-    ref: "User",
-    required: [true, "The area required an owner"]
+    ref: 'Area'
   },
-  updated_by: {
+  user: {
     type: Schema.Types.ObjectId,
-    ref: "User"
+    ref: 'User'
   },
-  deleted_by: {
-    type: Schema.Types.ObjectId,
-    ref: "User"
+  role: {
+    type: String,
+    required: [true, "The Role is a required Field"],
+    default: "ADMIN_ROLE",
+    enum: rolesValidos
   },
   created_at: {
     type: Date,
@@ -41,4 +38,4 @@ var areaSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model("Area", areaSchema);
+module.exports = mongoose.model('Member', memberSchema);

@@ -1,31 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const areaController = require('../controllers/area.controller');
+const memberController = require('../controllers/member.controller');
 
 // ==================================================
-// Get all areas
+// Get all members
 // ==================================================
-router.get('/areas', areaController.getAreas);
+router.get('/members', memberController.getMembers);
 
 // ==================================================
-// Get one area
+// Get one member
 // ==================================================
-router.get('/areas/:area', areaController.getArea);
+router.get('/members/:member', memberController.getMember);
 
 // ==================================================
-// Create a new area
+// Create a new member
 // ==================================================
-router.post('/areas', areaController.createArea);
+router.post('/members', memberController.createMember);
 
 // ==================================================
-// Update an area
+// Delete a member
 // ==================================================
-router.put('/areas/:area', areaController.updateArea);
-
-// ==================================================
-// Delete an area
-// ==================================================
-router.delete('/areas/:area', areaController.deleteArea);
+router.delete('/members/:member', memberController.deleteMember);
 
 
 module.exports = router;

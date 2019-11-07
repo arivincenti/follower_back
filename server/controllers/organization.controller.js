@@ -1,6 +1,7 @@
 const organizationController = {};
 const Organization = require("../models/organization");
 const Area = require("../models/area");
+const Member = require("../models/member");
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -153,20 +154,15 @@ organizationController.getOrganizationMembers = async (req, res) => {
   try {
     var organization_id = req.params.organization;
 
-    var areas = await Area.find({
+    var members = await Member.find({
         organization: organization_id
-      }, 'members')
-      .populate({
-        path: "members.user",
-        model: "User",
-        select: '-password'
       });
 
-    if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
+    // if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
-    if (!areas[0].members) return ResponseController.getResponse(res, 404, false, `No se encontraron miembros para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
+    // if (!areas[0].members) return ResponseController.getResponse(res, 404, false, `No se encontraron miembros para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas[0].members);
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

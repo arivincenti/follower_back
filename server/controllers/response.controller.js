@@ -3,7 +3,7 @@ const responseController = {};
 // ==================================================
 // Get response
 // ==================================================
-responseController.getResponse = async (res, status, ok, message, error, data) => {
+responseController.getResponse = async (res, status, ok, error, message, data) => {
   return res.status(status).json({
     ok: ok,
     status: status,

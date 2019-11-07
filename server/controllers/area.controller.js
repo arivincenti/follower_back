@@ -122,51 +122,44 @@ areaController.deleteArea = async (req, res) => {
 };
 
 // ==================================================
-// Get area members
-// ==================================================
-areaController.getAreaMembers = async (req, res) => {
-  try {
-    var area_id = req.params.area;
-
-    var area = await Area.findById(area_id)
-      .populate({
-        path: "members.user",
-        model: "User",
-        select: '-password'
-      });
-
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
-
-    if (!area.members) return ResponseController.getResponse(res, 404, false, `No existen miembros en el area '${area.name}'`, "Miembros no encontrados", null);
-
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area.members);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-};
-
-// ==================================================
 // Create members area
 // ==================================================
 areaController.createAreaMember = async (req, res) => {
   try {
+    //Recibimos los parametros tanto del body como de la URL
     var area_id = req.params.area;
     var body = req.body;
+    var user_id = body.user;
 
+    //Buscamos el área según el id que viene de la URL
     var area = await Area.findById(area_id);
 
+    //Validamos que el área exista
     if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
 
+    //Con los datos del area encontrada, buscamos la organización y el usuario que se quiere agregar, para ver si ya no existe en alguna otra área de esa organización
+    var organizationMembers = await Area.find().and([{
+      "organization": area.organization
+    }, {
+      "members.user": user_id
+    }]);
+
+    //Si el usuario ya existe en un área, no se va a poder agregar en otra
+    if (organizationMembers[0].members.length) return ResponseController.getResponse(res, 400, false, `Problema al crear un miembro para el area ${area.name}`, `El usuario con id ${user_id} pertenece al área ${organizationMembers[0].name}`, null);
+
+    //En caso de que la validación pase, se crea el miembro nuevo del área
     var member = {
       user: body.user,
       role: body.role
     };
 
+    //Se mete en el array antes de guardar los cambios
     area.members.push(member);
 
+    //Guardamos los cambios del area
     var saved_area = await area.save();
 
+    //Y devolvemos la respuesta
     ResponseController.getResponse(res, 200, true, `Área modificada con éxito, se generó un nuevo miembro en '${area.name}'`, null, saved_area);
 
   } catch (error) {
@@ -174,62 +167,5 @@ areaController.createAreaMember = async (req, res) => {
   }
 };
 
-// ==================================================
-// Update members area
-// ==================================================
-areaController.updateAreaMember = async (req, res) => {
-  try {
-    var area_id = req.params.area;
-    var member_id = req.params.member;
-    var body = req.body;
-
-    var area = await Area.findById(area_id);
-
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
-
-    var member = area.members.id(member_id);
-
-    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
-
-    member["role"] = body.role;
-    member["updated_at"] = new Date();
-
-    var saved_area = await area.save();
-
-    //sent respnse to client
-    ResponseController.getResponse(res, 200, true, `Área modificada con éxito, se actualizaron los datos del miembro de '${area.name}'`, null, saved_area);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-};
-
-// ==================================================
-// Update members area
-// ==================================================
-areaController.deleteAreaMember = async (req, res) => {
-  try {
-    var area_id = req.params.area;
-    var member_id = req.params.member;
-
-    var area = await Area.findById(area_id);
-
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null); 
-
-    var member = area.members.id(member_id);
-
-    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con el id '${member_id}' en la base de datos`, "Miembro no encontrado", null);
-
-    member["deleted_at"] = new Date();
-
-    var saved_area = await area.save();
-
-    //sent respnse to client
-    ResponseController.getResponse(res, 200, true, `Área modificada con éxito, se dio de baja el miembro de '${area.name}'`, null, saved_area);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-};
 
 module.exports = areaController;

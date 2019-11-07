@@ -1,7 +1,8 @@
 const userController = {};
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const Area = require('../models/area');
+const Organization = require('../models/organization');
+const Member = require('../models/member');
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -43,19 +44,20 @@ userController.getUser = async (req, res) => {
 // ==================================================
 userController.getUserOrganizations = async (req, res) => {
   try {
+    //ID del usuario recibido por URL
     var user_id = req.params.user;
 
-    var areas = await Area.find({
-        "members.user": user_id
-      }, "organization")
-      .populate({
-        path: "organization",
-        model: "Organization"
-      });
+    // Busca los ID de las organizaciones en las que el usuario es miembro de algun Área
+    // y trae valores únicos en caso de que vengan repetidas
+    var userIsMember = await Member.find({user: user_id}).distinct('organization');
 
-    if (!areas) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
+    //Busca las organizaciones en base a dos condiciones
+    //1) El usuario puede ser dueño de la organización sin ser usuario
+    //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
+    var userOrganizations = await Organization.find({ $or:[ {'created_by': user_id}, {'_id':{$in : userIsMember}}]})
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
+    //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userOrganizations);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
@@ -102,7 +104,7 @@ userController.updateUser = async (req, res) => {
     if (body.last_name) user.last_name = body.last_name;
     if (body.email) user.email = body.email;
 
-    if(body.name || body.last_name || body.email) user.updated_at = new Date();
+    if (body.name || body.last_name || body.email) user.updated_at = new Date();
 
     var saved_user = await user.save();
 
