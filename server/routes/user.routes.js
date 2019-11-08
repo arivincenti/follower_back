@@ -32,4 +32,9 @@ router.delete('/users/:user', userController.deleteUser);
 // ==================================================
 router.get('/users/:user/organizations', userController.getUserOrganizations);
 
+// ==================================================
+// Get a user organization Areas
+// ==================================================
+router.get('/users/:user/organizations/:organization/areas', userController.getUserOrganizationAreas);
+
 module.exports = router;

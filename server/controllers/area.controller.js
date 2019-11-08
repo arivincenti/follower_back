@@ -1,5 +1,6 @@
 const areaController = {};
 const Area = require("../models/area");
+const Member = require("../models/member");
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -124,43 +125,21 @@ areaController.deleteArea = async (req, res) => {
 // ==================================================
 // Create members area
 // ==================================================
-areaController.createAreaMember = async (req, res) => {
+areaController.getAreaResponsibleMembers = async (req, res) => {
   try {
-    //Recibimos los parametros tanto del body como de la URL
     var area_id = req.params.area;
-    var body = req.body;
-    var user_id = body.user;
 
-    //Buscamos el área según el id que viene de la URL
-    var area = await Area.findById(area_id);
+    var membersResposible = await Member.find({ $and:[ {'area': area_id}, {'role': 'ADMIN_ROLE'}]})
+    .populate({
+      path: 'user',
+      model: 'User'
+    })
+    .populate({
+      path: 'organization',
+      model: 'Organization'
+    });
 
-    //Validamos que el área exista
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id '${area_id}' en la base de datos`, "Área no encontrada", null);
-
-    //Con los datos del area encontrada, buscamos la organización y el usuario que se quiere agregar, para ver si ya no existe en alguna otra área de esa organización
-    var organizationMembers = await Area.find().and([{
-      "organization": area.organization
-    }, {
-      "members.user": user_id
-    }]);
-
-    //Si el usuario ya existe en un área, no se va a poder agregar en otra
-    if (organizationMembers[0].members.length) return ResponseController.getResponse(res, 400, false, `Problema al crear un miembro para el area ${area.name}`, `El usuario con id ${user_id} pertenece al área ${organizationMembers[0].name}`, null);
-
-    //En caso de que la validación pase, se crea el miembro nuevo del área
-    var member = {
-      user: body.user,
-      role: body.role
-    };
-
-    //Se mete en el array antes de guardar los cambios
-    area.members.push(member);
-
-    //Guardamos los cambios del area
-    var saved_area = await area.save();
-
-    //Y devolvemos la respuesta
-    ResponseController.getResponse(res, 200, true, `Área modificada con éxito, se generó un nuevo miembro en '${area.name}'`, null, saved_area);
+    ResponseController.getResponse(res, 200, true, `La busqueda fue un éxito`, null, membersResposible);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

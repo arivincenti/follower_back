@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const Organization = require('../models/organization');
 const Member = require('../models/member');
+const Area = require('../models/area');
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -58,6 +59,31 @@ userController.getUserOrganizations = async (req, res) => {
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userOrganizations);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+}
+
+// ==================================================
+// Get all user organizations
+// ==================================================
+userController.getUserOrganizationAreas = async (req, res) => {
+  try {
+    //ID del usuario recibido por URL
+    var user_id = req.params.user;
+    var organization_id = req.params.organization;
+
+    var userAreas = await Member.find({ $and:[ {'user': user_id}, {'organization': organization_id}]})
+    .populate({
+      path: 'area',
+      model: 'Area'
+    });
+
+    // var userAreas = await Area.find({'_id':{$in : areas_id}})
+
+    //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userAreas);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

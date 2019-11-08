@@ -27,5 +27,10 @@ router.put('/areas/:area', areaController.updateArea);
 // ==================================================
 router.delete('/areas/:area', areaController.deleteArea);
 
+// ==================================================
+// Get Responsible Members
+// ==================================================
+router.get('/areas/:area/responsibleMembers', areaController.getAreaResponsibleMembers);
+
 
 module.exports = router;
