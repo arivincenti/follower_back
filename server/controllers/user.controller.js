@@ -56,6 +56,11 @@ userController.getUserOrganizations = async (req, res) => {
     //1) El usuario puede ser dueño de la organización sin ser usuario
     //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
     var userOrganizations = await Organization.find({ $or:[ {'created_by': user_id}, {'_id':{$in : userIsMember}}]})
+    .populate({
+      path: 'created_by',
+      model: 'User',
+      select: '-password'
+    })
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userOrganizations);
@@ -74,13 +79,13 @@ userController.getUserOrganizationAreas = async (req, res) => {
     var user_id = req.params.user;
     var organization_id = req.params.organization;
 
-    var userAreas = await Member.find({ $and:[ {'user': user_id}, {'organization': organization_id}]})
-    .populate({
-      path: 'area',
-      model: 'Area'
-    });
+    var areas_id = await Member.find({ $and:[ {'user': user_id}, {'organization': organization_id}]}).distinct('area');
 
-    // var userAreas = await Area.find({'_id':{$in : areas_id}})
+    var userAreas = await Area.find({'_id':{$in : areas_id}})
+    .populate({ 
+      path: 'organization',
+      model: 'Organization'
+    });
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userAreas);
