@@ -39,14 +39,18 @@ areaController.getArea = async (req, res) => {
 
     var area = await Area.findById(area_id)
       .populate("organization")
-      .populate("created_by")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      })
       .populate({
         path: "members.user",
         model: "User",
         select: "-password"
       });
 
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con id '${area_id}'`, "Área no encontrada", null);
+    // if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con id '${area_id}'`, "Área no encontrada", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area);
 
@@ -62,15 +66,28 @@ areaController.createArea = async (req, res) => {
   try {
     var body = req.body;
 
-    var area = new Area({
+    // var saved_area = await area.save();
+
+    var saved_area = await Area.create({
       name: body.name,
       organization: body.organization,
       created_by: body.user
-    });
+    })
 
-    var saved_area = await area.save();
+    var area = await Area.findById(saved_area._id)
+      .populate("organization")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      })
+      .populate({
+        path: "members.user",
+        model: "User",
+        select: "-password"
+      });
 
-    ResponseController.getResponse(res, 200, true, `El área '${saved_area.name}' se creó con éxito`, null, saved_area);
+    ResponseController.getResponse(res, 200, true, `El área '${saved_area.name}' se creó con éxito`, null, area);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
@@ -129,15 +146,17 @@ areaController.getAreaResponsibleMembers = async (req, res) => {
   try {
     var area_id = req.params.area;
 
-    var membersResposible = await Member.find({ $and:[ {'area': area_id}, {'role': 'ADMIN_ROLE'}]})
-    .populate({
-      path: 'user',
-      model: 'User'
-    })
-    .populate({
-      path: 'organization',
-      model: 'Organization'
-    });
+    var membersResposible = await Member.find({
+        $and: [{
+          'area': area_id
+        }, {
+          'role': 'ADMIN_ROLE'
+        }]
+      })
+      .populate({
+        path: 'user',
+        model: 'User'
+      });
 
     ResponseController.getResponse(res, 200, true, `La busqueda fue un éxito`, null, membersResposible);
 
