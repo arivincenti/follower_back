@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 var rolesValidos = {
-  values: ["ADMIN_ROLE", "USER_ROLE"],
+  values: ["RESPONSABLE", "MIEMBRO"],
   message: "{VALUE} is not a valid role"
 };
 
@@ -22,7 +22,7 @@ var memberSchema = new Schema({
   role: {
     type: String,
     required: [true, "The Role is a required Field"],
-    default: "ADMIN_ROLE",
+    default: "MIEMBRO",
     enum: rolesValidos
   },
   created_at: {

@@ -28,6 +28,11 @@ router.put('/areas/:area', areaController.updateArea);
 router.delete('/areas/:area', areaController.deleteArea);
 
 // ==================================================
+// Get Area Members
+// ==================================================
+router.get('/areas/:area/members', areaController.getAreaMembers);
+
+// ==================================================
 // Get Responsible Members
 // ==================================================
 router.get('/areas/:area/responsibleMembers', areaController.getAreaResponsibleMembers);

@@ -140,7 +140,30 @@ areaController.deleteArea = async (req, res) => {
 };
 
 // ==================================================
-// Create members area
+// Get Area Members
+// ==================================================
+areaController.getAreaMembers = async (req, res) => {
+  try {
+    var area_id = req.params.area;
+
+    var members = await Member.find({
+        'area': area_id
+      })
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: '-password'
+      });
+
+    ResponseController.getResponse(res, 200, true, `La busqueda fue un éxito`, null, members);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+};
+
+// ==================================================
+// Get members area
 // ==================================================
 areaController.getAreaResponsibleMembers = async (req, res) => {
   try {
@@ -150,7 +173,7 @@ areaController.getAreaResponsibleMembers = async (req, res) => {
         $and: [{
           'area': area_id
         }, {
-          'role': 'ADMIN_ROLE'
+          'role': 'RESPONSABLE'
         }]
       })
       .populate({

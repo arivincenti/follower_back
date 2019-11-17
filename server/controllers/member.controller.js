@@ -10,7 +10,7 @@ memberController.getMembers = async (req, res) => {
   try {
     var members = await Member.find();
 
-    if (!members) return ResponseController.getResponse(res, 404, false, "No existen miembros en la base de datos", "Miembros no encontrados", null);
+    // if (!members) return ResponseController.getResponse(res, 404, false, "No existen miembros en la base de datos", "Miembros no encontrados", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 
@@ -28,7 +28,7 @@ memberController.getMember = async (req, res) => {
 
     var member = await Member.findById(member_id);
 
-    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
+    // if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, member);
 
@@ -71,7 +71,7 @@ memberController.deleteMember = async (req, res) => {
 
     var member = await Member.findById(member_id);
 
-    if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
+    // if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
 
     member.deleted_at = new Date();
 

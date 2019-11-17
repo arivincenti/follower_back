@@ -27,7 +27,12 @@ organizationController.getOrganization = async (req, res) => {
   try {
     var organization_id = req.params.organization;
 
-    var organization = await Organization.findById(organization_id);
+    var organization = await Organization.findById(organization_id)
+      .populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
+      });
 
     if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
 
@@ -118,7 +123,7 @@ organizationController.getOrganizationAreas = async (req, res) => {
       organization: organization_id
     });
 
-    if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
+    // if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
 
