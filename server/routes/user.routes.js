@@ -13,9 +13,10 @@ router.get('/users', userController.getUsers);
 router.get('/users/:user', userController.getUser);
 
 // ==================================================
-// Create a new user
+// Get users by email
 // ==================================================
-router.post('/users', userController.createUser);
+router.post('/users/by_email', userController.getUserByEmail);
+
 
 // ==================================================
 // Update a user

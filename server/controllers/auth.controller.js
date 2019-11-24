@@ -7,6 +7,31 @@ const {
 } = require('../config/config');
 const ResponseController = require('./response.controller');
 
+
+// ==================================================
+// Register
+// ==================================================
+authController.register = async (req, res) => {
+
+  try {
+    var body = req.body;
+
+    var user = new User({
+      name: body.name,
+      last_name: body.last_name,
+      email: body.email,
+      password: bcrypt.hashSync(body.password, 10)
+    });
+
+    var saved_user = await user.save();
+
+    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name} ${saved_user.name}' se creó con éxito`, null, saved_user);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+}
+
 // ==================================================
 // Login method
 // ==================================================

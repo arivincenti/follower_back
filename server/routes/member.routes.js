@@ -18,6 +18,11 @@ router.get('/members/:member', memberController.getMember);
 router.post('/members', memberController.createMember);
 
 // ==================================================
+// Update a member
+// ==================================================
+router.put('/members/:member', memberController.updateMember);
+
+// ==================================================
 // Delete a member
 // ==================================================
 router.delete('/members/:member', memberController.deleteMember);

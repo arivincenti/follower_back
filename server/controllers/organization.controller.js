@@ -74,12 +74,14 @@ organizationController.updateOrganization = async (req, res) => {
 
     var organization = await Organization.findById(organization_id);
 
-    if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
-
     if (body.name) {
       organization.name = body.name;
       organization.updated_at = new Date();
     };
+
+    if(body.deleted_at){
+      organization.deleted_at = undefined;
+    }
 
     var savedOrganization = await organization.save();
 
@@ -99,7 +101,6 @@ organizationController.deleteOrganization = async (req, res) => {
 
     var organization = await Organization.findById(organization_id);
 
-    // if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
 
     organization.deleted_at = new Date();
 
@@ -123,7 +124,6 @@ organizationController.getOrganizationAreas = async (req, res) => {
       organization: organization_id
     });
 
-    // if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
 
@@ -142,10 +142,6 @@ organizationController.getOrganizationMembers = async (req, res) => {
     var members = await Member.find({
       organization: organization_id
     });
-
-    // if (!areas) return ResponseController.getResponse(res, 404, false, `No se encontraron áreas para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
-
-    // if (!areas[0].members) return ResponseController.getResponse(res, 404, false, `No se encontraron miembros para la organización con id ${organization_id} en la base de datos`, "No se encontraron datos", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 

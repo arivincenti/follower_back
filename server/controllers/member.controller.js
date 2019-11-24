@@ -45,17 +45,57 @@ memberController.createMember = async (req, res) => {
   try {
     var body = req.body;
 
-    var member = new Member({
+    var newMember = new Member({
       organization: body.organization,
       area: body.area,
       user: body.user,
-      role: body.role,
+      role: 'MIEMBRO',
       created_at: new Date()
     });
 
+    var saved_member = await newMember.save();
+
+    var member = await Member.findOne({
+        _id: saved_member._id
+      }).and({
+        area: body.area
+      })
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: '-password'
+      });
+
+    ResponseController.getResponse(res, 200, true, `El miembro '${member._id}' se creó con éxito`, null, member);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+}
+
+// ==================================================
+// Update a member
+// ==================================================
+memberController.updateMember = async (req, res) => {
+  try {
+    var member_id = req.params.member;
+    var body = req.body;
+    var memberRole = body.role;
+
+    var member = await Member.findById(member_id)
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: '-_password'
+      });
+
+    member.role = memberRole;
+
+    member.updated_at = new Date();
+
     var saved_member = await member.save();
 
-    ResponseController.getResponse(res, 200, true, `El miembro '${saved_member._id}' se creó con éxito`, null, saved_member);
+    ResponseController.getResponse(res, 200, true, `El miembro '${saved_member._id}' se modificó con éxito`, null, saved_member);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

@@ -104,9 +104,9 @@ areaController.updateArea = async (req, res) => {
 
     var area = await Area.findById(area_id);
 
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
+    if(body.name) area.name = body.name;
 
-    area.name = body.name;
+    if(body.deleted_at) area.deleted_at = undefined;
 
     var saved_area = await area.save();
 
@@ -125,8 +125,6 @@ areaController.deleteArea = async (req, res) => {
     var area_id = req.params.area;
 
     var area = await Area.findById(area_id);
-
-    if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con el id ' ${area_id}' en la base de datos`, "Área no encontrada", null);
 
     area.deleted_at = new Date();
 

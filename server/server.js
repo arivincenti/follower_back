@@ -7,11 +7,15 @@ const routes = require('./routes/routes.routes');
 //Settings
 
 //Middlewares
+
+
 //Cors configuration
 var corsOptions = {
   'origin': '*',
-  'methods': 'GET,HEAD,POST,PUT,DELETE'
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
 }
+
+
 app.use(cors(corsOptions));
 app.use(express.json());
 

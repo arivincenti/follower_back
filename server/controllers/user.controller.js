@@ -1,5 +1,5 @@
 const userController = {};
-const bcrypt = require('bcryptjs');
+
 const User = require('../models/user');
 const Organization = require('../models/organization');
 const Member = require('../models/member');
@@ -34,6 +34,25 @@ userController.getUser = async (req, res) => {
     if (!user) return ResponseController.getResponse(res, 404, false, `No existe el usuario con id '${user_id}' en la base de datos`, "Error al buscar el usuario", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, user);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+}
+
+// ==================================================
+// Get an user
+// ==================================================
+userController.getUserByEmail = async (req, res) => {
+  try {
+    var email= req.body.email;
+    var users = [];
+    if(email){
+      users = await User.find({email: {$regex: email, $options: 'i'}}).limit(5);
+    }
+
+
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, users);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
@@ -100,30 +119,6 @@ userController.getUserOrganizationAreas = async (req, res) => {
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userAreas);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-}
-
-// ==================================================
-// Create an user
-// ==================================================
-userController.createUser = async (req, res) => {
-
-  try {
-    var body = req.body;
-
-    var user = new User({
-      name: body.name,
-      last_name: body.last_name,
-      email: body.email,
-      password: bcrypt.hashSync(body.password, 10)
-    });
-
-    var saved_user = await user.save();
-
-    ResponseController.getResponse(res, 200, true, `El usuario '${saved_user.last_name} ${saved_user.name}' se creó con éxito`, null, saved_user);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
