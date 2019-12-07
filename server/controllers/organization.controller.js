@@ -141,7 +141,14 @@ organizationController.getOrganizationMembers = async (req, res) => {
 
     var members = await Member.find({
       organization: organization_id
-    });
+    })
+    .populate(
+      {
+        path: 'user',
+        model: 'User',
+        select: '-password'
+      }
+    );
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 

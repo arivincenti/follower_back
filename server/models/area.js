@@ -15,6 +15,10 @@ var areaSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Organization"
   },
+  responsible: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
   created_by: {
     type: Schema.Types.ObjectId,
     ref: "User",

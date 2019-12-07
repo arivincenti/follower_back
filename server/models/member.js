@@ -11,20 +11,20 @@ var memberSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Organization'
   },
-  area: {
+  areas: [{
     type: Schema.Types.ObjectId,
     ref: 'Area'
-  },
+  }],
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  role: {
-    type: String,
-    required: [true, "The Role is a required Field"],
-    default: "MIEMBRO",
-    enum: rolesValidos
-  },
+  // role: {
+  //   type: String,
+  //   required: [true, "The Role is a required Field"],
+  //   default: "MIEMBRO",
+  //   enum: rolesValidos
+  // },
   created_at: {
     type: Date,
     required: true,

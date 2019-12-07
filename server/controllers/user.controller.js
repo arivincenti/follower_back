@@ -41,14 +41,21 @@ userController.getUser = async (req, res) => {
 }
 
 // ==================================================
-// Get an user
+// Get an user by email
 // ==================================================
 userController.getUserByEmail = async (req, res) => {
   try {
-    var email= req.body.email;
+    var email = req.body.email;
+    var area = req.body.area;
+
     var users = [];
-    if(email){
-      users = await User.find({email: {$regex: email, $options: 'i'}}).limit(5);
+    if (email) {
+      users = await User.find({
+        email: {
+          $regex: email,
+          $options: 'i'
+        }
+      }).limit(5);
     }
 
 

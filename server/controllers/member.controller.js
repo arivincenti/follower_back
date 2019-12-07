@@ -45,11 +45,15 @@ memberController.createMember = async (req, res) => {
   try {
     var body = req.body;
 
+    var member_exists = await Member.find({user: body.user}).and({organization: body.organization});
+
+    if(member_exists.length) throw new Error('El usuario ya existe');
+
     var newMember = new Member({
       organization: body.organization,
-      area: body.area,
+      // area: body.area,
       user: body.user,
-      role: 'MIEMBRO',
+      // role: 'MIEMBRO',
       created_at: new Date()
     });
 
@@ -57,8 +61,6 @@ memberController.createMember = async (req, res) => {
 
     var member = await Member.findOne({
         _id: saved_member._id
-      }).and({
-        area: body.area
       })
       .populate({
         path: 'user',
@@ -69,7 +71,7 @@ memberController.createMember = async (req, res) => {
     ResponseController.getResponse(res, 200, true, `El miembro '${member._id}' se creó con éxito`, null, member);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -81,6 +83,7 @@ memberController.updateMember = async (req, res) => {
     var member_id = req.params.member;
     var body = req.body;
     var memberRole = body.role;
+    var areas = body.areas;
 
     var member = await Member.findById(member_id)
       .populate({
@@ -89,7 +92,10 @@ memberController.updateMember = async (req, res) => {
         select: '-_password'
       });
 
-    member.role = memberRole;
+    if (body.deleted_at && body.role === member.role) member.deleted_at = undefined;
+
+    // member.role = memberRole;
+    member.areas = areas;
 
     member.updated_at = new Date();
 
@@ -109,7 +115,12 @@ memberController.deleteMember = async (req, res) => {
   try {
     var member_id = req.params.member;
 
-    var member = await Member.findById(member_id);
+    var member = await Member.findById(member_id)
+      .populate({
+        path: 'user',
+        model: 'User',
+        select: '-_password'
+      });;
 
     // if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
 
