@@ -1,5 +1,4 @@
 const memberController = {};
-const bcrypt = require('bcryptjs');
 const Member = require('../models/member');
 const ResponseController = require('./response.controller');
 
@@ -8,9 +7,18 @@ const ResponseController = require('./response.controller');
 // ==================================================
 memberController.getMembers = async (req, res) => {
   try {
-    var members = await Member.find();
+    var organization_id = req.params.organization;
 
-    // if (!members) return ResponseController.getResponse(res, 404, false, "No existen miembros en la base de datos", "Miembros no encontrados", null);
+    var members = await Member.find({
+      organization: organization_id
+    })
+    .populate(
+      {
+        path: 'user',
+        model: 'User',
+        select: '-password'
+      }
+    );
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 
@@ -26,10 +34,21 @@ memberController.getMember = async (req, res) => {
   try {
     var member_id = req.params.member;
 
-    var member = await Member.findById(member_id);
-
-    // if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
-
+    var member = await Member.findById(member_id)
+    .populate(
+      {
+        path: 'user',
+        model: 'User',
+        select: '-password'
+      }
+    ).populate(
+      {
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
+      }
+    );
+    
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, member);
 
   } catch (error) {
@@ -53,7 +72,7 @@ memberController.createMember = async (req, res) => {
       organization: body.organization,
       // area: body.area,
       user: body.user,
-      // role: 'MIEMBRO',
+      created_by: body.created_by,
       created_at: new Date()
     });
 
@@ -82,7 +101,6 @@ memberController.updateMember = async (req, res) => {
   try {
     var member_id = req.params.member;
     var body = req.body;
-    var memberRole = body.role;
     var areas = body.areas;
 
     var member = await Member.findById(member_id)
@@ -90,9 +108,11 @@ memberController.updateMember = async (req, res) => {
         path: 'user',
         model: 'User',
         select: '-_password'
+      })
+      .populate({
+        path: 'organization',
+        model: 'Organization'
       });
-
-    if (body.deleted_at && body.role === member.role) member.deleted_at = undefined;
 
     // member.role = memberRole;
     member.areas = areas;

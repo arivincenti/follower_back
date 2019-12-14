@@ -46,9 +46,8 @@ userController.getUser = async (req, res) => {
 userController.getUserByEmail = async (req, res) => {
   try {
     var email = req.body.email;
-    var area = req.body.area;
-
     var users = [];
+
     if (email) {
       users = await User.find({
         email: {

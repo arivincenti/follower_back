@@ -27,14 +27,5 @@ router.put('/organizations/:organization', organizationController.updateOrganiza
 // ==================================================
 router.delete('/organizations/:organization', organizationController.deleteOrganization);
 
-// ==================================================
-// Get all orgsanization areas
-// ==================================================
-router.get('/organizations/:organization/areas', organizationController.getOrganizationAreas);
-
-// ==================================================
-// Get all orgsanization members
-// ==================================================
-router.get('/organizations/:organization/members', organizationController.getOrganizationMembers);
 
 module.exports = router;

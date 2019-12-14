@@ -1,7 +1,5 @@
 const organizationController = {};
 const Organization = require("../models/organization");
-const Area = require("../models/area");
-const Member = require("../models/member");
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -10,8 +8,6 @@ const ResponseController = require('./response.controller');
 organizationController.getOrganizations = async (req, res) => {
   try {
     var organizations = await Organization.find();
-
-    // if (!organizations) return ResponseController.getResponse(res, 404, false, "No existen organizaciones en la base de datos", "Error al buscar las organizaciones", null);
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
 
@@ -107,50 +103,6 @@ organizationController.deleteOrganization = async (req, res) => {
     var savedOrganization = await organization.save();
 
     ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' fue dada de baja con éxito`, null, savedOrganization);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-};
-
-// ==================================================
-// Get all organization`s areas
-// ==================================================
-organizationController.getOrganizationAreas = async (req, res) => {
-  try {
-    var organization_id = req.params.organization;
-
-    var areas = await Area.find({
-      organization: organization_id
-    });
-
-
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
-
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  }
-};
-
-// ==================================================
-// Get all organization`s areas
-// ==================================================
-organizationController.getOrganizationMembers = async (req, res) => {
-  try {
-    var organization_id = req.params.organization;
-
-    var members = await Member.find({
-      organization: organization_id
-    })
-    .populate(
-      {
-        path: 'user',
-        model: 'User',
-        select: '-password'
-      }
-    );
-
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

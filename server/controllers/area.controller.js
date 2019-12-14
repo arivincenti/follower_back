@@ -8,7 +8,12 @@ const ResponseController = require('./response.controller');
 // ==================================================
 areaController.getAreas = async (req, res) => {
   try {
-    var areas = await Area.find()
+
+    var organization_id = req.params.organization;
+    var since = Number(req.query.since);
+    var size = Number(req.query.size);
+
+    var areas = await Area.find({organization: organization_id})
       .populate("organization")
       .populate({
         path: "created_by",
@@ -19,7 +24,10 @@ areaController.getAreas = async (req, res) => {
         path: "members.user",
         model: "User",
         select: "-password"
-      });
+      })
+      .skip(since)
+      .limit(size)
+      .exec();;
 
     if (!areas) return ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
 
@@ -145,8 +153,8 @@ areaController.getAreaMembers = async (req, res) => {
     var area_id = req.params.area;
 
     var members = await Member.find({
-        'area': area_id
-      })
+      areas: { $in: area_id }
+    })
       .populate({
         path: 'user',
         model: 'User',

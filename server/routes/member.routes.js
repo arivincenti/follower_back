@@ -5,7 +5,7 @@ const memberController = require('../controllers/member.controller');
 // ==================================================
 // Get all members
 // ==================================================
-router.get('/members', memberController.getMembers);
+router.get('/members/organization/:organization', memberController.getMembers);
 
 // ==================================================
 // Get one member

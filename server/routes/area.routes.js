@@ -5,7 +5,7 @@ const areaController = require('../controllers/area.controller');
 // ==================================================
 // Get all areas
 // ==================================================
-router.get('/areas', areaController.getAreas);
+router.get('/areas/organization/:organization', areaController.getAreas);
 
 // ==================================================
 // Get one area

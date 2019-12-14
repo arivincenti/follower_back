@@ -25,6 +25,19 @@ var memberSchema = new Schema({
   //   default: "MIEMBRO",
   //   enum: rolesValidos
   // },
+  created_by: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "The area required an owner"]
+  },
+  updated_by: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
+  deleted_by: {
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  },
   created_at: {
     type: Date,
     required: true,
