@@ -1,15 +1,45 @@
 const organizationController = {};
 const Organization = require("../models/organization");
+const Member = require("../models/member");
 const ResponseController = require('./response.controller');
 
 // ==================================================
 // Get all organizations
 // ==================================================
 organizationController.getOrganizations = async (req, res) => {
-  try {
-    var organizations = await Organization.find();
+  // try {
+  //   var organizations = await Organization.find();
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
+  //   ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
+
+  // } catch (error) {
+  //   ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  // }
+  try {
+    //ID del usuario recibido por URL
+    var user_id = req.params.user;
+
+    // Busca los ID de las organizaciones en las que el usuario es miembro de algun Área
+    // y trae valores únicos en caso de que vengan repetidas
+    var userIsMember = await Member.find({
+      user: user_id
+    }).distinct('organization');
+
+    //Busca las organizaciones en base a dos condiciones
+    //1) El usuario puede ser dueño de la organización sin ser usuario
+    //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
+    var userOrganizations = await Organization.find({
+      $or: [{
+        'created_by': user_id
+      }, {
+        '_id': {
+          $in: userIsMember
+        }
+      }]
+    });
+
+    //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userOrganizations);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

@@ -27,5 +27,10 @@ router.put('/members/:member', memberController.updateMember);
 // ==================================================
 router.delete('/members/:member', memberController.deleteMember);
 
+// ==================================================
+// Get member areas
+// ==================================================
+router.get('/members/user/:user/organization/:organization/areas', memberController.getMemberAreas);
+
 
 module.exports = router;

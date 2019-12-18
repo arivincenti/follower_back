@@ -13,7 +13,9 @@ areaController.getAreas = async (req, res) => {
     var since = Number(req.query.since);
     var size = Number(req.query.size);
 
-    var areas = await Area.find({organization: organization_id})
+    var areas = await Area.find({
+        organization: organization_id
+      })
       .populate("organization")
       .populate({
         path: "created_by",
@@ -24,7 +26,7 @@ areaController.getAreas = async (req, res) => {
         path: "members.user",
         model: "User",
         select: "-password"
-      })
+      }).sort({name: 1})
       .skip(since)
       .limit(size)
       .exec();;
@@ -79,6 +81,7 @@ areaController.createArea = async (req, res) => {
     var saved_area = await Area.create({
       name: body.name,
       organization: body.organization,
+      responsibles: [],
       created_by: body.user
     })
 
@@ -88,11 +91,6 @@ areaController.createArea = async (req, res) => {
         path: "created_by",
         model: "User",
         select: '-password'
-      })
-      .populate({
-        path: "members.user",
-        model: "User",
-        select: "-password"
       });
 
     ResponseController.getResponse(res, 200, true, `El área '${saved_area.name}' se creó con éxito`, null, area);
@@ -110,11 +108,20 @@ areaController.updateArea = async (req, res) => {
     var area_id = req.params.area;
     var body = req.body;
 
-    var area = await Area.findById(area_id);
+    var area = await Area.findById(area_id)
+      .populate("organization")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      });
 
-    if(body.name) area.name = body.name;
+    if (body.name) area.name = body.name;
+    if (body.updated_by) area.updated_by = body.updated_by;
+    if (body.deleted_at) area.deleted_at = undefined;
 
-    if(body.deleted_at) area.deleted_at = undefined;
+    area.updated_at = new Date();
+
 
     var saved_area = await area.save();
 
@@ -132,7 +139,15 @@ areaController.deleteArea = async (req, res) => {
   try {
     var area_id = req.params.area;
 
-    var area = await Area.findById(area_id);
+    var area = await Area.findById(area_id)
+      .populate("organization")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      });
+
+    // if (body.updated_by) area.updated_at = body.user;
 
     area.deleted_at = new Date();
 
@@ -153,8 +168,10 @@ areaController.getAreaMembers = async (req, res) => {
     var area_id = req.params.area;
 
     var members = await Member.find({
-      areas: { $in: area_id }
-    })
+        areas: {
+          $in: area_id
+        }
+      })
       .populate({
         path: 'user',
         model: 'User',

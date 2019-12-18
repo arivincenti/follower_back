@@ -5,7 +5,7 @@ const organizationController = require('../controllers/organization.controller')
 // ==================================================
 // Get all organizations
 // ==================================================
-router.get('/organizations', organizationController.getOrganizations);
+router.get('/organizations/user/:user', organizationController.getOrganizations);
 
 // ==================================================
 // Get one organization

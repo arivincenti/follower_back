@@ -1,5 +1,6 @@
 const memberController = {};
 const Member = require('../models/member');
+const Area = require('../models/area');
 const ResponseController = require('./response.controller');
 
 // ==================================================
@@ -10,15 +11,13 @@ memberController.getMembers = async (req, res) => {
     var organization_id = req.params.organization;
 
     var members = await Member.find({
-      organization: organization_id
-    })
-    .populate(
-      {
+        organization: organization_id
+      })
+      .populate({
         path: 'user',
         model: 'User',
         select: '-password'
-      }
-    );
+      });
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
 
@@ -35,20 +34,16 @@ memberController.getMember = async (req, res) => {
     var member_id = req.params.member;
 
     var member = await Member.findById(member_id)
-    .populate(
-      {
+      .populate({
         path: 'user',
         model: 'User',
         select: '-password'
-      }
-    ).populate(
-      {
+      }).populate({
         path: 'created_by',
         model: 'User',
         select: '-password'
-      }
-    );
-    
+      });
+
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, member);
 
   } catch (error) {
@@ -64,9 +59,13 @@ memberController.createMember = async (req, res) => {
   try {
     var body = req.body;
 
-    var member_exists = await Member.find({user: body.user}).and({organization: body.organization});
+    var member_exists = await Member.find({
+      user: body.user
+    }).and({
+      organization: body.organization
+    });
 
-    if(member_exists.length) throw new Error('El usuario ya existe');
+    if (member_exists.length) throw new Error('El usuario ya existe');
 
     var newMember = new Member({
       organization: body.organization,
@@ -114,8 +113,9 @@ memberController.updateMember = async (req, res) => {
         model: 'Organization'
       });
 
-    // member.role = memberRole;
-    member.areas = areas;
+    if (body.deleted_at) member.deleted_at = undefined;
+
+    if (body.areas) member.areas = areas;
 
     member.updated_at = new Date();
 
@@ -136,19 +136,51 @@ memberController.deleteMember = async (req, res) => {
     var member_id = req.params.member;
 
     var member = await Member.findById(member_id)
-      .populate({
-        path: 'user',
-        model: 'User',
-        select: '-_password'
-      });;
-
-    // if (!member) return ResponseController.getResponse(res, 404, false, `No existe el miembro con id '${member_id}' en la base de datos`, "Error al buscar el miembro", null);
-
+    .populate({
+      path: 'user',
+      model: 'User',
+      select: '-_password'
+    })
+    .populate({
+      path: 'organization',
+      model: 'Organization'
+    });
     member.deleted_at = new Date();
 
     var saved_member = await member.save();
 
     ResponseController.getResponse(res, 200, true, `El miembro '${saved_member._id}' se dió de baja con éxito`, null, saved_member);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  }
+}
+
+// ==================================================
+// Get member areas
+// ==================================================
+memberController.getMemberAreas = async (req, res) => {
+  try {
+    //ID del usuario recibido por URL
+    var user_id = req.params.user;
+    var organization_id = req.params.organization;
+
+    var areas_id = await Member.find({
+      $and: [{
+        'user': user_id
+      }, {
+        'organization': organization_id
+      }]
+    }).distinct('areas');
+
+    var userAreas = await Area.find({
+      '_id': {
+        $in: areas_id
+      }
+    });
+
+    //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
+    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userAreas);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);

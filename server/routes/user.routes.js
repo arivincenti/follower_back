@@ -31,11 +31,11 @@ router.delete('/users/:user', userController.deleteUser);
 // ==================================================
 // Get a user organizations
 // ==================================================
-router.get('/users/:user/organizations', userController.getUserOrganizations);
+// router.get('/users/:user/organizations', userController.getUserOrganizations);
 
 // ==================================================
 // Get a user organization Areas
 // ==================================================
-router.get('/users/:user/organizations/:organization/areas', userController.getUserOrganizationAreas);
+// router.get('/users/:user/organizations/:organization/areas', userController.getUserOrganizationAreas);
 
 module.exports = router;
