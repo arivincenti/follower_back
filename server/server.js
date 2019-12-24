@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('./database/database');
 const cors = require('cors');
 const routes = require('./routes/routes.routes');
+const fileUpload = require('express-fileupload');
 //Settings
 
 //Middlewares
@@ -18,6 +19,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(fileUpload());
 
 //Routes
 app.use('/api', routes); // Application routes array

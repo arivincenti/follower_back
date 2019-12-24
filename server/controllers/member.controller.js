@@ -17,6 +17,10 @@ memberController.getMembers = async (req, res) => {
         path: 'user',
         model: 'User',
         select: '-password'
+      }).populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
       });
 
     ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
@@ -84,6 +88,10 @@ memberController.createMember = async (req, res) => {
         path: 'user',
         model: 'User',
         select: '-password'
+      }).populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
       });
 
     ResponseController.getResponse(res, 200, true, `El miembro '${member._id}' se creó con éxito`, null, member);
@@ -107,6 +115,10 @@ memberController.updateMember = async (req, res) => {
         path: 'user',
         model: 'User',
         select: '-_password'
+      }).populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
       })
       .populate({
         path: 'organization',
@@ -140,6 +152,10 @@ memberController.deleteMember = async (req, res) => {
       path: 'user',
       model: 'User',
       select: '-_password'
+    }).populate({
+      path: 'created_by',
+      model: 'User',
+      select: '-password'
     })
     .populate({
       path: 'organization',
@@ -176,6 +192,21 @@ memberController.getMemberAreas = async (req, res) => {
     var userAreas = await Area.find({
       '_id': {
         $in: areas_id
+      }
+    })
+    .populate("organization")
+    .populate({
+      path: "created_by",
+      model: "User",
+      select: '-password'
+    })
+    .populate({
+      path: "responsible",
+      model: "Member",
+      populate: {
+        path: "user",
+        model: "User",
+        select: '-password'
       }
     });
 

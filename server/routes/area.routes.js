@@ -32,10 +32,6 @@ router.delete('/areas/:area', areaController.deleteArea);
 // ==================================================
 router.get('/areas/:area/members', areaController.getAreaMembers);
 
-// ==================================================
-// Get Responsible Members
-// ==================================================
-// router.get('/areas/:area/responsibleMembers', areaController.getAreaResponsibleMembers);
 
 
 module.exports = router;

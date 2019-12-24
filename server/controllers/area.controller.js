@@ -135,15 +135,13 @@ areaController.updateArea = async (req, res) => {
     if (body.deleted_at) area.deleted_at = undefined;
     if (body.responsible) {
 
-      if(area.responsible){
+      if (area.responsible) {
         if (String(area.responsible) !== body.responsible._id) {
           area.responsible = body.responsible;
-          console.log('entro aca porque son distintos');
-        }else{
+        } else {
           area.responsible = undefined;
-          console.log('entro aca porque es el mismo');
         }
-      }else{
+      } else {
         area.responsible = body.responsible;
       }
     }
@@ -189,6 +187,15 @@ areaController.deleteArea = async (req, res) => {
         path: "created_by",
         model: "User",
         select: '-password'
+      })
+      .populate({
+        path: "responsible",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
       });
 
     // if (body.updated_by) area.updated_at = body.user;
@@ -228,32 +235,6 @@ areaController.getAreaMembers = async (req, res) => {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
   }
 };
-
-// ==================================================
-// Get members area
-// ==================================================
-// areaController.getAreaResponsibleMembers = async (req, res) => {
-//   try {
-//     var area_id = req.params.area;
-
-//     var membersResposible = await Member.find({
-//         $and: [{
-//           'area': area_id
-//         }, {
-//           'role': 'RESPONSABLE'
-//         }]
-//       })
-//       .populate({
-//         path: 'user',
-//         model: 'User'
-//       });
-
-//     ResponseController.getResponse(res, 200, true, `La busqueda fue un éxito`, null, membersResposible);
-
-//   } catch (error) {
-//     ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-//   }
-// };
 
 
 module.exports = areaController;
