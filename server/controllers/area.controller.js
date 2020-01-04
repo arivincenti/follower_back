@@ -37,12 +37,12 @@ areaController.getAreas = async (req, res) => {
       .limit(size)
       .exec();;
 
-    if (!areas) return ResponseController.getResponse(res, 404, false, "No existen áreas en la base de datos", "Error al buscar las áreas", null);
+    if (!areas) throw new Error('No se encontraron áreas');
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, areas);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", areas);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -70,12 +70,12 @@ areaController.getArea = async (req, res) => {
         }
       });
 
-    // if (!area) return ResponseController.getResponse(res, 404, false, `No existe el área con id '${area_id}'`, "Área no encontrada", null);
+    if (!area) throw new Error('No se encontró el área');
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, area);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", area);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -85,8 +85,6 @@ areaController.getArea = async (req, res) => {
 areaController.createArea = async (req, res) => {
   try {
     var body = req.body;
-
-    // var saved_area = await area.save();
 
     var saved_area = await Area.create({
       name: body.name,
@@ -112,10 +110,10 @@ areaController.createArea = async (req, res) => {
         }
       });
 
-    ResponseController.getResponse(res, 200, true, `El área '${saved_area.name}' se creó con éxito`, null, area);
+    ResponseController.getResponse(res, 200, true, null, `El área '${saved_area.name}' se creó con éxito`, area);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -134,7 +132,6 @@ areaController.updateArea = async (req, res) => {
     if (body.updated_by) area.updated_by = body.updated_by;
     if (body.deleted_at) area.deleted_at = undefined;
     if (body.responsible) {
-
       if (area.responsible) {
         if (String(area.responsible) !== body.responsible._id) {
           area.responsible = body.responsible;
@@ -167,10 +164,10 @@ areaController.updateArea = async (req, res) => {
         }
       });
 
-    ResponseController.getResponse(res, 200, true, `El área '${area.name}' fue modificada con éxito`, null, find_area);
+    ResponseController.getResponse(res, 200, true, null, `El área '${area.name}' fue modificada con éxito`, find_area);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -204,10 +201,10 @@ areaController.deleteArea = async (req, res) => {
 
     var deleted_area = await area.save();
 
-    ResponseController.getResponse(res, 200, true, `El área '${area.name}' fue dada de baja con éxito`, null, deleted_area);
+    ResponseController.getResponse(res, 200, true, null, `El área '${area.name}' fue dada de baja con éxito`, deleted_area);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -229,10 +226,10 @@ areaController.getAreaMembers = async (req, res) => {
         select: '-password'
       });
 
-    ResponseController.getResponse(res, 200, true, `La busqueda fue un éxito`, null, members);
+    ResponseController.getResponse(res, 200, true, null, `La busqueda fue un éxito`, members);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 

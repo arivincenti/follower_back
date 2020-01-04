@@ -89,7 +89,7 @@ async function uploadImage(id, model, archivo, nombreArchivo, res) {
     var imgPath = path.resolve(__dirname, `../uploads/${nombreArchivo}`);
     await archivo.mv(imgPath);
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, dataSaved);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", dataSaved);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);

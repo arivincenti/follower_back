@@ -7,14 +7,7 @@ const ResponseController = require('./response.controller');
 // Get all organizations
 // ==================================================
 organizationController.getOrganizations = async (req, res) => {
-  // try {
-  //   var organizations = await Organization.find();
 
-  //   ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organizations);
-
-  // } catch (error) {
-  //   ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
-  // }
   try {
     //ID del usuario recibido por URL
     var user_id = req.params.user;
@@ -39,10 +32,10 @@ organizationController.getOrganizations = async (req, res) => {
     });
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userOrganizations);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", userOrganizations);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -60,12 +53,12 @@ organizationController.getOrganization = async (req, res) => {
         select: '-password'
       });
 
-    if (!organization) return ResponseController.getResponse(res, 404, false, `No existe la organización con id '${organization_id}' en la base de datos`, "Error al buscar la organización", null);
+    if (!organization) throw new Error('No se encontró la organización');
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, organization);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", organization);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -83,10 +76,10 @@ organizationController.createOrganization = async (req, res) => {
 
     var organization = await Organization.findById(savedOrganization._id);
 
-    ResponseController.getResponse(res, 200, true, `La organización '${organization.name}' se creó con éxito`, null, organization);
+    ResponseController.getResponse(res, 200, true, null, `La organización '${organization.name}' se creó con éxito`, organization);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -111,10 +104,10 @@ organizationController.updateOrganization = async (req, res) => {
 
     var savedOrganization = await organization.save();
 
-    ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' se actualizó con éxito`, null, savedOrganization);
+    ResponseController.getResponse(res, 200, true, null, `La organización '${savedOrganization.name}' se actualizó con éxito`, savedOrganization);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
@@ -132,10 +125,10 @@ organizationController.deleteOrganization = async (req, res) => {
 
     var savedOrganization = await organization.save();
 
-    ResponseController.getResponse(res, 200, true, `La organización '${savedOrganization.name}' fue dada de baja con éxito`, null, savedOrganization);
+    ResponseController.getResponse(res, 200, true, null, `La organización '${savedOrganization.name}' fue dada de baja con éxito`, savedOrganization);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 

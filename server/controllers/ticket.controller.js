@@ -11,12 +11,12 @@ ticketController.getTickets = async (req, res) => {
  try{
    var tickets = await Ticket.find();
  
-   if (!tickets) return ResponseController.getResponse(res, 404, false, "No existen tickets en la base de datos", "Usuarios no encontrados", null);
+   if (!tickets) throw new Error('No se encontraron tickets');
 
-   ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, tickets);
+   ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", tickets);
 
  }catch(error){
-  ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+  ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
  }
 }
 
@@ -29,12 +29,12 @@ ticketController.getTicket = async (req, res) => {
 
     var ticket = await Ticket.findById(ticket_id);
   
-    if (!ticket) return ResponseController.getResponse(res, 404, false, "No existen tickets en la base de datos", "Usuarios no encontrados", null);
+    if (!ticket) throw new Error('No se encontró el ticket');
  
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, ticket);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", ticket);
  
   }catch(error){
-   ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+   ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -63,10 +63,10 @@ ticketController.createTicket = async (req, res) => {
   
     var saved_ticket = await ticket.save();
 
-    ResponseController.getResponse(res, 200, true, `El ticket '${saved_ticket._id}' se creó con éxito`, null, saved_ticket);
+    ResponseController.getResponse(res, 200, true, null, `El ticket '${saved_ticket._id}' se creó con éxito`, saved_ticket);
   
   }catch(error){
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 

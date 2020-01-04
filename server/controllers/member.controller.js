@@ -23,10 +23,10 @@ memberController.getMembers = async (req, res) => {
         select: '-password'
       });
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, members);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", members);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -48,10 +48,10 @@ memberController.getMember = async (req, res) => {
         select: '-password'
       });
 
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, member);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", member);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -72,14 +72,10 @@ memberController.createMember = async (req, res) => {
 
     if (member_exists) {
 
-      // var index = member_exists.areas.findIndex(data => data === body.area);
-      // member_exists.areas.splice(index, 1, body.area);
-
       member_exists.areas.push(body.area);
-
       saved_member = await member_exists.save();
 
-    }else{
+    } else {
 
       var newMember = new Member({
         organization: body.organization._id,
@@ -87,8 +83,8 @@ memberController.createMember = async (req, res) => {
         created_by: body.created_by,
         created_at: new Date()
       });
-  
-      if(body.area) newMember.areas.push(body.area);
+
+      if (body.area) newMember.areas.push(body.area);
 
       saved_member = await newMember.save();
 
@@ -107,7 +103,7 @@ memberController.createMember = async (req, res) => {
         select: '-password'
       });
 
-    ResponseController.getResponse(res, 200, true, `El miembro '${member._id}' se creó con éxito`, null, member);
+    ResponseController.getResponse(res, 200, true, null, `El miembro '${member._id}' se creó con éxito`, member);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -146,10 +142,10 @@ memberController.updateMember = async (req, res) => {
 
     var saved_member = await member.save();
 
-    ResponseController.getResponse(res, 200, true, `El miembro '${saved_member._id}' se modificó con éxito`, null, saved_member);
+    ResponseController.getResponse(res, 200, true, null, `El miembro '${saved_member._id}' se modificó con éxito`, saved_member);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -174,14 +170,15 @@ memberController.deleteMember = async (req, res) => {
         path: 'organization',
         model: 'Organization'
       });
+
     member.deleted_at = new Date();
 
     var saved_member = await member.save();
 
-    ResponseController.getResponse(res, 200, true, `El miembro '${saved_member._id}' se dió de baja con éxito`, null, saved_member);
+    ResponseController.getResponse(res, 200, true, null, `El miembro '${saved_member._id}' se dió de baja con éxito`, saved_member);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 }
 
@@ -224,10 +221,10 @@ memberController.getMemberAreas = async (req, res) => {
       });
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
-    ResponseController.getResponse(res, 200, true, "La búsqueda fue un éxito", null, userAreas);
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", userAreas);
 
   } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error, null);
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
 };
 
