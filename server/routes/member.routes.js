@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const memberController = require('../controllers/member.controller');
+const { verifyToken } = require('../middlewares/authentication');
 
 // ==================================================
 // Get all members
@@ -15,17 +16,17 @@ router.get('/members/:member', memberController.getMember);
 // ==================================================
 // Create a new member
 // ==================================================
-router.post('/members', memberController.createMember);
+router.post('/members', verifyToken, memberController.createMember);
 
 // ==================================================
 // Update a member
 // ==================================================
-router.put('/members/:member', memberController.updateMember);
+router.put('/members/:member', verifyToken, memberController.updateMember);
 
 // ==================================================
 // Delete a member
 // ==================================================
-router.delete('/members/:member', memberController.deleteMember);
+router.delete('/members/:member', verifyToken, memberController.deleteMember);
 
 // ==================================================
 // Get member areas

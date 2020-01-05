@@ -60,9 +60,9 @@ authController.login = async (req, res) => {
 // ==================================================
 // Refresh Token
 // ==================================================
-authController.refreshToken = (req, res) => {
+authController.refreshToken = async (req, res) => {
   try {
-    generateToken(req.user, res);
+    await generateToken(req.user, res);
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
   }
@@ -76,7 +76,7 @@ async function generateToken(user, res) {
     let token = jwt.sign({
       user: user
     }, SEED, {
-      expiresIn: 14000
+      expiresIn: 10800 //3 horas
     });
 
     return res.status(200).json({

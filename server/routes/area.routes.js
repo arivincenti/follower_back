@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const areaController = require('../controllers/area.controller');
+const { verifyToken } = require('../middlewares/authentication');
 
 // ==================================================
 // Get all areas
@@ -15,17 +16,17 @@ router.get('/areas/:area', areaController.getArea);
 // ==================================================
 // Create a new area
 // ==================================================
-router.post('/areas', areaController.createArea);
+router.post('/areas', verifyToken, areaController.createArea);
 
 // ==================================================
 // Update an area
 // ==================================================
-router.put('/areas/:area', areaController.updateArea);
+router.put('/areas/:area', verifyToken, areaController.updateArea);
 
 // ==================================================
 // Delete an area
 // ==================================================
-router.delete('/areas/:area', areaController.deleteArea);
+router.delete('/areas/:area', verifyToken, areaController.deleteArea);
 
 // ==================================================
 // Get Area Members
