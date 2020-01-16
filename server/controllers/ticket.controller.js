@@ -73,7 +73,8 @@ ticketController.createTicket = async (req, res) => {
       subject: body.subject,
       issue: body.issue,
       created_by: body.user,
-      created_at: new Date()
+      created_at: new Date(),
+      status: 'ABIERTO'
     });
 
     var movement = {
