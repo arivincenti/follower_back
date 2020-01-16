@@ -8,6 +8,11 @@ const ticketController = require('../controllers/ticket.controller');
 router.get('/tickets', ticketController.getTickets);
 
 // ==================================================
+// Get user tickets
+// ==================================================
+router.get('/tickets/user/:user', ticketController.getTicketsByUser);
+
+// ==================================================
 // Get one ticket
 // ==================================================
 router.get('/tickets/:id', ticketController.getTicket);
