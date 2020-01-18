@@ -32,9 +32,23 @@ ticketController.getTicketsByUser = async (req, res) => {
         created_by: user
       })
       .populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-password'
+      })
+      .populate({
         path: 'movements.area',
         model: 'Area'
+      })
+      .populate({
+        path: 'movements.area',
+        model: 'Area',
+        populate: {
+          path: 'organization',
+          model: 'Organization'
+        }
       });
+
 
     ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", tickets);
 
