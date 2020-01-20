@@ -2,6 +2,10 @@ const organizationController = {};
 const Organization = require("../models/organization");
 const Member = require("../models/member");
 const ResponseController = require('./response.controller');
+const EmailController = require('./email.controller');
+const {
+  mailjet
+} = require('../config/config');
 
 // ==================================================
 // Get all organizations
@@ -29,7 +33,12 @@ organizationController.getOrganizations = async (req, res) => {
           $in: userIsMember
         }
       }]
-    });
+    })
+    .populate({
+      path: 'created_by',
+      model: 'User',
+      select: '-pasword'
+    });;
 
     //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
     ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", userOrganizations);
@@ -74,7 +83,19 @@ organizationController.createOrganization = async (req, res) => {
       created_by: body.user
     });
 
-    var organization = await Organization.findById(savedOrganization._id);
+    var organization = await Organization.findById(savedOrganization._id)
+      .populate({
+        path: 'created_by',
+        model: 'User',
+        select: '-pasword'
+      });
+
+    // var email = `${organization.created_by.email}`;
+    // var name = `${organization.created_by.name} ${organization.created_by.last_name}`;
+    // var subject = `Tu organización se creó con éxito`;
+    // var textPart = `Genial! Creaste a ${organization.name}, buen nombre para tu organización.`;
+
+    // EmailController.sendEmail(email, name, subject, textPart, '');
 
     ResponseController.getResponse(res, 200, true, null, `La organización '${organization.name}' se creó con éxito`, organization);
 
@@ -98,7 +119,7 @@ organizationController.updateOrganization = async (req, res) => {
       organization.updated_at = new Date();
     };
 
-    if(body.deleted_at){
+    if (body.deleted_at) {
       organization.deleted_at = undefined;
     }
 

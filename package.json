@@ -17,7 +17,8 @@
     "express-fileupload": "^1.1.6",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.6",
-    "mongoose-unique-validator": "^2.0.3"
+    "mongoose-unique-validator": "^2.0.3",
+    "node-mailjet": "^3.3.1"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
