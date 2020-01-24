@@ -33,6 +33,10 @@ router.delete('/areas/:area', verifyToken, areaController.deleteArea);
 // ==================================================
 router.get('/areas/:area/members', areaController.getAreaMembers);
 
+// ==================================================
+// Add Area Members
+// ==================================================
+router.post('/areas/add_member', verifyToken, areaController.addAreaMember);
 
 
 module.exports = router;

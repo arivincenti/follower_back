@@ -14,6 +14,11 @@ router.get('/members/organization/:organization', memberController.getMembers);
 router.get('/members/:member', memberController.getMember);
 
 // ==================================================
+// Get member by email
+// ==================================================
+router.post('/members/by_email', verifyToken, memberController.getMemberByEmail);
+
+// ==================================================
 // Create a new member
 // ==================================================
 router.post('/members', verifyToken, memberController.createMember);
@@ -31,7 +36,7 @@ router.delete('/members/:member', verifyToken, memberController.deleteMember);
 // ==================================================
 // Get member areas
 // ==================================================
-router.get('/members/user/:user/organization/:organization/areas', memberController.getMemberAreas);
+// router.get('/members/user/:user/organization/:organization/areas', memberController.getMemberAreas);
 
 
 module.exports = router;

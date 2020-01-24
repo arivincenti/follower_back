@@ -11,10 +11,6 @@ var memberSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Organization'
   },
-  areas: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Area'
-  }],
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'

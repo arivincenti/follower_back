@@ -1,5 +1,6 @@
 const memberController = {};
 const Member = require('../models/member');
+const User = require('../models/user');
 const Area = require('../models/area');
 const ResponseController = require('./response.controller');
 
@@ -31,7 +32,7 @@ memberController.getMembers = async (req, res) => {
 }
 
 // ==================================================
-// Get an member
+// Get a member
 // ==================================================
 memberController.getMember = async (req, res) => {
   try {
@@ -55,6 +56,52 @@ memberController.getMember = async (req, res) => {
   }
 }
 
+
+// ==================================================
+// Get member by email
+// ==================================================
+memberController.getMemberByEmail = async (req, res) => {
+  try {
+    var email = req.body.email;
+    var organization = req.body.organization;
+    var users = [];
+    var members = [];
+
+    if (email) {
+      users = await User.find({
+        email: {
+          $regex: email,
+          $options: 'i'
+        }
+      }).limit(5);
+
+      members = await Member.find({
+          'user': {
+            $in: users
+          }
+        }).and({
+          'organization': organization
+        })
+        .populate({
+          path: 'user',
+          model: 'User',
+          select: '-password'
+        }).populate({
+          path: 'created_by',
+          model: 'User',
+          select: '-password'
+        })
+        .limit(5);
+
+    }
+
+    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", members);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
+  }
+}
+
 // ==================================================
 // Create a member
 // ==================================================
@@ -62,33 +109,15 @@ memberController.createMember = async (req, res) => {
 
   try {
     var body = req.body;
-    var saved_member = null;
 
-    var member_exists = await Member.findOne({
-      user: body.user
-    }).and({
-      organization: body.organization._id
+    var newMember = new Member({
+      organization: body.organization._id,
+      user: body.user,
+      created_by: body.created_by,
+      created_at: new Date()
     });
 
-    if (member_exists) {
-
-      member_exists.areas.push(body.area);
-      saved_member = await member_exists.save();
-
-    } else {
-
-      var newMember = new Member({
-        organization: body.organization._id,
-        user: body.user,
-        created_by: body.created_by,
-        created_at: new Date()
-      });
-
-      if (body.area) newMember.areas.push(body.area);
-
-      saved_member = await newMember.save();
-
-    };
+    saved_member = await newMember.save();
 
     var member = await Member.findOne({
         _id: saved_member._id
@@ -117,7 +146,6 @@ memberController.updateMember = async (req, res) => {
   try {
     var member_id = req.params.member;
     var body = req.body;
-    var areas = body.areas;
 
     var member = await Member.findById(member_id)
       .populate({
@@ -135,8 +163,6 @@ memberController.updateMember = async (req, res) => {
       });
 
     if (body.deleted_at) member.deleted_at = undefined;
-
-    if (body.areas) member.areas = areas;
 
     member.updated_at = new Date();
 
@@ -185,48 +211,47 @@ memberController.deleteMember = async (req, res) => {
 // ==================================================
 // Get member areas
 // ==================================================
-memberController.getMemberAreas = async (req, res) => {
-  try {
-    //ID del usuario recibido por URL
-    var user_id = req.params.user;
-    var organization_id = req.params.organization;
+// memberController.getMemberAreas = async (req, res) => {
+//   try {
 
-    var areas_id = await Member.find({
-      $and: [{
-        'user': user_id
-      }, {
-        'organization': organization_id
-      }]
-    }).distinct('areas');
+//     var user_id = req.params.user;
+//     var organization_id = req.params.organization;
 
-    var userAreas = await Area.find({
-        '_id': {
-          $in: areas_id
-        }
-      })
-      .populate("organization")
-      .populate({
-        path: "created_by",
-        model: "User",
-        select: '-password'
-      })
-      .populate({
-        path: "responsible",
-        model: "Member",
-        populate: {
-          path: "user",
-          model: "User",
-          select: '-password'
-        }
-      });
+//     var areas_id = await Member.find({
+//       $and: [{
+//         'user': user_id
+//       }, {
+//         'organization': organization_id
+//       }]
+//     }).distinct('areas');
 
-    //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
-    ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", userAreas);
+//     var userAreas = await Area.find({
+//         '_id': {
+//           $in: areas_id
+//         }
+//       })
+//       .populate("organization")
+//       .populate({
+//         path: "created_by",
+//         model: "User",
+//         select: '-password'
+//       })
+//       .populate({
+//         path: "responsible",
+//         model: "Member",
+//         populate: {
+//           path: "user",
+//           model: "User",
+//           select: '-password'
+//         }
+//       });
 
-  } catch (error) {
-    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
-  }
-};
+//     ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", userAreas);
+
+//   } catch (error) {
+//     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
+//   }
+// };
 
 
 module.exports = memberController;

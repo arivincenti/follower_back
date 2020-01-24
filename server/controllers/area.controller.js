@@ -30,14 +30,22 @@ areaController.getAreas = async (req, res) => {
           model: "User",
           select: '-password'
         }
-      }).sort({
+      })
+      .populate({
+        path: "members",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
+      })
+      .sort({
         name: 1
       })
       .skip(since)
       .limit(size)
-      .exec();;
-
-    if (!areas) throw new Error('No se encontraron áreas');
+      .exec();
 
     ResponseController.getResponse(res, 200, true, null, "La búsqueda fue un éxito", areas);
 
@@ -68,6 +76,15 @@ areaController.getArea = async (req, res) => {
           model: "User",
           select: '-password'
         }
+      })
+      .populate({
+        path: "members",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
       });
 
     if (!area) throw new Error('No se encontró el área');
@@ -89,6 +106,7 @@ areaController.createArea = async (req, res) => {
     var saved_area = await Area.create({
       name: body.name,
       organization: body.organization,
+      members: [],
       responsibles: [],
       created_by: body.user
     })
@@ -102,6 +120,15 @@ areaController.createArea = async (req, res) => {
       })
       .populate({
         path: "responsible",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
+      })
+      .populate({
+        path: "members",
         model: "Member",
         populate: {
           path: "user",
@@ -125,12 +152,10 @@ areaController.updateArea = async (req, res) => {
     var area_id = req.params.area;
     var body = req.body;
 
-
     var area = await Area.findById(area_id);
 
     if (body.name) area.name = body.name;
     if (body.updated_by) area.updated_by = body.updated_by;
-    if (body.deleted_at) area.deleted_at = undefined;
     if (body.responsible) {
       if (area.responsible) {
         if (String(area.responsible) !== body.responsible._id) {
@@ -144,6 +169,7 @@ areaController.updateArea = async (req, res) => {
     }
 
     area.updated_at = new Date();
+    area.deleted_at = body.deleted_at;
 
     var saved_area = await area.save();
 
@@ -156,6 +182,15 @@ areaController.updateArea = async (req, res) => {
       })
       .populate({
         path: "responsible",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
+      })
+      .populate({
+        path: "members",
         model: "Member",
         populate: {
           path: "user",
@@ -178,7 +213,7 @@ areaController.deleteArea = async (req, res) => {
   try {
     var area_id = req.params.area;
 
-    var area = await Area.findById(area_id)
+    var area = await Area.findByIdAndUpdate(area_id, {deleted_at: new Date()}, {new: true})
       .populate("organization")
       .populate({
         path: "created_by",
@@ -193,15 +228,18 @@ areaController.deleteArea = async (req, res) => {
           model: "User",
           select: '-password'
         }
+      })
+      .populate({
+        path: "members",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
       });
 
-    // if (body.updated_by) area.updated_at = body.user;
-
-    area.deleted_at = new Date();
-
-    var deleted_area = await area.save();
-
-    ResponseController.getResponse(res, 200, true, null, `El área '${area.name}' fue dada de baja con éxito`, deleted_area);
+    ResponseController.getResponse(res, 200, true, null, `El área '${area.name}' fue dada de baja con éxito`, area);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -213,11 +251,14 @@ areaController.deleteArea = async (req, res) => {
 // ==================================================
 areaController.getAreaMembers = async (req, res) => {
   try {
+
     var area_id = req.params.area;
 
+    var area = await Area.findById(area_id);
+
     var members = await Member.find({
-        areas: {
-          $in: area_id
+        _id: {
+          $in: area.members
         }
       })
       .populate({
@@ -227,6 +268,53 @@ areaController.getAreaMembers = async (req, res) => {
       });
 
     ResponseController.getResponse(res, 200, true, null, `La busqueda fue un éxito`, members);
+
+  } catch (error) {
+    ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);
+  }
+};
+
+// ==================================================
+// Add area member
+// ==================================================
+areaController.addAreaMember = async (req, res) => {
+  try {
+    var body = req.body;
+
+    var area = await Area.findById(body.area);
+
+    area.members.push(body.member._id);
+    area.updated_at = new Date();
+
+    var saved_area = await area.save();
+
+    var find_area = await Area.findById(saved_area._id)
+      .populate("organization")
+      .populate({
+        path: "created_by",
+        model: "User",
+        select: '-password'
+      })
+      .populate({
+        path: "responsible",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
+      })
+      .populate({
+        path: "members",
+        model: "Member",
+        populate: {
+          path: "user",
+          model: "User",
+          select: '-password'
+        }
+      });
+
+    ResponseController.getResponse(res, 200, true, null, `El área '${area}' fue modificada con éxito`, find_area);
 
   } catch (error) {
     ResponseController.getResponse(res, 500, false, "Error de servidor", error.message, null);

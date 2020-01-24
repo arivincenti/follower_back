@@ -23,7 +23,7 @@ organizationController.getOrganizations = async (req, res) => {
     }).distinct('organization');
 
     //Busca las organizaciones en base a dos condiciones
-    //1) El usuario puede ser dueño de la organización sin ser usuario
+    //1) El usuario puede ser dueño de la organización sin ser miembro de la misma
     //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
     var userOrganizations = await Organization.find({
       $or: [{
@@ -112,18 +112,22 @@ organizationController.updateOrganization = async (req, res) => {
     var organization_id = req.params.organization;
     var body = req.body;
 
-    var organization = await Organization.findById(organization_id);
-
-    if (body.name) {
-      organization.name = body.name;
-      organization.updated_at = new Date();
-    };
-
-    if (body.deleted_at) {
-      organization.deleted_at = undefined;
+    var object = {
+      deleted_at: body.deleted_at
     }
 
-    var savedOrganization = await organization.save();
+    if (body.name) {
+      object.name = body.name;
+      object.updated_at = new Date();
+    };
+
+    var savedOrganization = await Organization.findByIdAndUpdate(organization_id, object, {new: true})
+    .populate({
+      path: 'created_by',
+      model: 'User',
+      select: '-pasword'
+    });
+    
 
     ResponseController.getResponse(res, 200, true, null, `La organización '${savedOrganization.name}' se actualizó con éxito`, savedOrganization);
 
@@ -139,12 +143,12 @@ organizationController.deleteOrganization = async (req, res) => {
   try {
     var organization_id = req.params.organization;
 
-    var organization = await Organization.findById(organization_id);
-
-
-    organization.deleted_at = new Date();
-
-    var savedOrganization = await organization.save();
+    var savedOrganization = await Organization.findByIdAndUpdate(organization_id, {deleted_at: new Date()}, {new: true})
+    .populate({
+      path: 'created_by',
+      model: 'User',
+      select: '-pasword'
+    });
 
     ResponseController.getResponse(res, 200, true, null, `La organización '${savedOrganization.name}' fue dada de baja con éxito`, savedOrganization);
 
