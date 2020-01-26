@@ -21,15 +21,28 @@ var ticketSchema = new Schema({
     }],
     followers: [{
       type: Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'Member'
     }],
-    created_at: {
-      type: Date,
-      required: true,
-      default: new Date()
+    status: {
+      type: String
     },
     priority: {
       type: String
+    },
+    created_by: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    created_at: {
+      type: Date,
+      required: true,
+      default: Date.now
+    },
+    updated_at: {
+      type: Date
+    },
+    deleted_at: {
+      type: Date
     }
   }],
   comments: [{

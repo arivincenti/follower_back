@@ -6,12 +6,12 @@ const { verifyToken } = require('../middlewares/authentication');
 // ==================================================
 // Get all areas
 // ==================================================
-router.get('/areas/organization/:organization', areaController.getAreas);
+router.get('/areas/organization/:organization', verifyToken, areaController.getAreas);
 
 // ==================================================
 // Get one area
 // ==================================================
-router.get('/areas/:area', areaController.getArea);
+router.get('/areas/:area', verifyToken, areaController.getArea);
 
 // ==================================================
 // Create a new area
@@ -31,7 +31,7 @@ router.delete('/areas/:area', verifyToken, areaController.deleteArea);
 // ==================================================
 // Get Area Members
 // ==================================================
-router.get('/areas/:area/members', areaController.getAreaMembers);
+router.get('/areas/:area/members', verifyToken, areaController.getAreaMembers);
 
 // ==================================================
 // Add Area Members

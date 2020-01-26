@@ -6,12 +6,12 @@ const { verifyToken } = require('../middlewares/authentication');
 // ==================================================
 // Get all members
 // ==================================================
-router.get('/members/organization/:organization', memberController.getMembers);
+router.get('/members/organization/:organization', verifyToken, memberController.getMembers);
 
 // ==================================================
 // Get one member
 // ==================================================
-router.get('/members/:member', memberController.getMember);
+router.get('/members/:member', verifyToken, memberController.getMember);
 
 // ==================================================
 // Get member by email
@@ -32,11 +32,6 @@ router.put('/members/:member', verifyToken, memberController.updateMember);
 // Delete a member
 // ==================================================
 router.delete('/members/:member', verifyToken, memberController.deleteMember);
-
-// ==================================================
-// Get member areas
-// ==================================================
-// router.get('/members/user/:user/organization/:organization/areas', memberController.getMemberAreas);
 
 
 module.exports = router;
