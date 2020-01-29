@@ -59,6 +59,18 @@ ticketController.getTicketsByUser = async (req, res) => {
 					path: 'organization',
 					model: 'Organization'
 				}
+			})
+			.populate({
+				path: 'movements.responsible',
+				model: 'Member'
+			})
+			.populate({
+				path: 'movements.responsible',
+				model: 'Member',
+				populate: {
+					path: 'user',
+					model: 'User'
+				}
 			});
 
 		ResponseController.getResponse(res, 200, true, null, 'La búsqueda fue un éxito', tickets);
@@ -158,6 +170,18 @@ ticketController.createTicket = async (req, res) => {
 					path: 'organization',
 					model: 'Organization'
 				}
+			})
+			.populate({
+				path: 'movements.responsible',
+				model: 'Member'
+			})
+			.populate({
+				path: 'movements.responsible',
+				model: 'Member',
+				populate: {
+					path: 'user',
+					model: 'User'
+				}
 			});
 
 		ResponseController.getResponse(
@@ -177,7 +201,66 @@ ticketController.createTicket = async (req, res) => {
 // Get all ticket
 // ==================================================
 ticketController.updateTicket = async (req, res) => {
-	res.json('Update a ticket');
+	try {
+		var ticket_id = req.params.ticket;
+		var body = req.body;
+
+		var movement = {
+			area: body.area,
+			responsible: [],
+			followers: [],
+			priority: body.priority,
+			status: 'ABIERTO',
+			created_at: new Date(),
+			created_by: body.created_by
+		};
+
+		movement.responsible.push(...body.responsible);
+
+		var ticket = await Ticket.findByIdAndUpdate(ticket_id, {"$push": {
+			"movements": movement}
+	}, {new: true})
+		.populate({
+			path: 'created_by',
+			model: 'User',
+			select: '-password'
+		})
+		.populate({
+			path: 'movements.area',
+			model: 'Area'
+		})
+		.populate({
+			path: 'movements.area',
+			model: 'Area',
+			populate: {
+				path: 'organization',
+				model: 'Organization'
+			}
+		})
+		.populate({
+			path: 'movements.responsible',
+			model: 'Member'
+		})
+		.populate({
+			path: 'movements.responsible',
+			model: 'Member',
+			populate: {
+				path: 'user',
+				model: 'User'
+			}
+		});
+
+		ResponseController.getResponse(
+			res,
+			200,
+			true,
+			null,
+			`El ticket '${ticket._id}' se creó con éxito`,
+			ticket
+		);
+	} catch (error) {
+		ResponseController.getResponse(res, 500, false, 'Error de servidor', error.message, null);
+	}
 };
 
 // ==================================================

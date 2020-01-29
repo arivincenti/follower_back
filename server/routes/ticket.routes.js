@@ -26,7 +26,7 @@ router.post('/tickets', verifyToken, ticketController.createTicket);
 // ==================================================
 // Update a ticket
 // ==================================================
-router.put('/tickets/:id', verifyToken, ticketController.updateTicket);
+router.put('/tickets/:ticket', verifyToken, ticketController.updateTicket);
 
 // ==================================================
 // Delete a ticket
