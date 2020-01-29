@@ -16,7 +16,7 @@ router.get('/tickets/user/:user', verifyToken, ticketController.getTicketsByUser
 // ==================================================
 // Get one ticket
 // ==================================================
-router.get('/tickets/:id', verifyToken, ticketController.getTicket);
+router.get('/tickets/:ticket', verifyToken, ticketController.getTicket);
 
 // ==================================================
 // Create a new ticket
