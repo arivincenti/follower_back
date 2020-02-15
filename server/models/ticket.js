@@ -1,28 +1,46 @@
-const mongoose = require('mongoose');
+const mongoose = require( 'mongoose' );
 const Schema = mongoose.Schema;
 
-var ticketSchema = new Schema({
+var ticketSchema = new Schema( {
   subject: {
     type: String,
-    required: [true, 'El ticket debe contener un asunto']
+    required: [ true, 'El ticket debe contener un asunto' ]
   },
   issue: {
     type: String,
-    required: [true, 'El ticket debe contener un problema']
+    required: [ true, 'El ticket debe contener un problema' ]
   },
-  movements: [{
+  area: {
+    type: Schema.Types.ObjectId,
+    ref: 'Area'
+  },
+  responsible: [ {
+    type: Schema.Types.ObjectId,
+    ref: 'Member'
+  } ],
+  followers: [ {
+    type: Schema.Types.ObjectId,
+    ref: 'Member'
+  } ],
+  status: {
+    type: String
+  },
+  priority: {
+    type: String
+  },
+  movements: [ {
     area: {
       type: Schema.Types.ObjectId,
       ref: 'Area'
     },
-    responsible: [{
+    responsible: [ {
       type: Schema.Types.ObjectId,
       ref: 'Member'
-    }],
-    followers: [{
+    } ],
+    followers: [ {
       type: Schema.Types.ObjectId,
       ref: 'Member'
-    }],
+    } ],
     status: {
       type: String
     },
@@ -37,16 +55,13 @@ var ticketSchema = new Schema({
       type: Date,
       required: true,
       default: Date.now
-    },
-    updated_at: {
-      type: Date
-    },
-    deleted_at: {
-      type: Date
     }
-  }],
-  comments: [{
-    user: {
+  } ],
+  comments: [ {
+    message: {
+      type: String
+    },
+    created_by: {
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
@@ -58,11 +73,11 @@ var ticketSchema = new Schema({
     type: {
       type: String
     }
-  }],
+  } ],
   created_by: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'An ticket required an owner']
+    required: [ true, 'An ticket required an owner' ]
   },
   updated_by: {
     type: Schema.Types.ObjectId,
@@ -83,6 +98,6 @@ var ticketSchema = new Schema({
   deleted_at: {
     type: Date
   }
-});
+} );
 
-module.exports = mongoose.model('Ticket', ticketSchema);
+module.exports = mongoose.model( 'Ticket', ticketSchema );
