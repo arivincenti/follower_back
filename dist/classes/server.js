@@ -45,7 +45,7 @@ class Server {
         this.app.set("port", this.port);
     }
     middlewares() {
-        this.app.use(cors_1.default({ origin: true, credentials: true }));
+        this.app.use(cors_1.default({ origin: 'https://arivincenti.github.io', credentials: true }));
         this.app.use(express_1.default.json());
         this.app.use(express_fileupload_1.default());
     }
@@ -53,17 +53,17 @@ class Server {
         this.app.use("/api", routes_1.default);
     }
     escucharSocket() {
-        this.io.on("connection", cliente => {
+        this.io.on("connection", socket => {
             //Conect client
-            clientsSocket.connectClient(cliente);
+            clientsSocket.connectClient(socket);
             //Confi Client
-            clientsSocket.config_client(cliente);
+            clientsSocket.config_client(socket);
             //Join client ticket
-            clientsSocket.joinTicket(cliente, this.io);
+            clientsSocket.joinTicket(socket, this.io);
             //Leave client ticket
-            clientsSocket.leaveTicket(cliente, this.io);
+            clientsSocket.leaveTicket(socket, this.io);
             //Disconnect client
-            clientsSocket.desconectar(cliente);
+            clientsSocket.desconectar(socket);
         });
     }
     start() {
