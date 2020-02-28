@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ticket_1 = __importDefault(require("../models/ticket"));
 const member_1 = __importDefault(require("../models/member"));
+const area_1 = __importDefault(require("../models/area"));
 const response_controller_1 = require("./response.controller");
 const server_1 = __importDefault(require("../classes/server"));
 // ==================================================
@@ -85,10 +86,15 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
 // ==================================================
 exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        var user = req.params.user;
-        var members = yield member_1.default.find({ user: user });
+        var userId = req.params.user;
+        var members = yield member_1.default.find({ user: userId });
+        var areas = yield area_1.default.find({ members: { $in: members } });
         var tickets = yield ticket_1.default.find({
-            $or: [{ created_by: user }, { responsible: { $in: members } }]
+            $or: [
+                { created_by: userId },
+                { responsible: { $in: members } },
+                { area: { $in: areas } }
+            ]
         })
             .populate({
             path: "created_by",
@@ -241,7 +247,6 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             created_at: new Date(),
             created_by: body.created_by
         };
-        // movement.responsible.push(body.responsible);
         ticket.movements.push(movement);
         var saved_ticket = yield ticket.save();
         ticket = yield ticket_1.default.findById(saved_ticket._id)
@@ -385,7 +390,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "User"
             }
         });
-        server_1.default.instance.io.emit("update-ticket");
+        server_1.default.instance.io.emit("update-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
     }
     catch (error) {

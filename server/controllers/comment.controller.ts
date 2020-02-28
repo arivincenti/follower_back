@@ -69,19 +69,10 @@ export const addComment = async (req: Request, res: Response) => {
                 select: "-password"
             });
 
-        const server = Server.instance;
+        var comment: any = await ticket.comments.pop(); //Con pop devuelvo el ultimo elemento del arreglo
 
-        server.io.to(ticket._id).emit("new-comment");
-
-        getResponse(
-            res,
-            200,
-            true,
-            "",
-            `El ticket '${ticket._id}' se creó con éxito`,
-            ticket.comments.pop() //Con pop devuelvo el ultimo elemento del arreglo
-        );
+        Server.instance.io.to(ticket._id).emit("new-comment", comment);
     } catch (error) {
-        getResponse(res, 500, false, "Error de servidor", error.message, null);
+        res.status(500).json({ error: error.message });
     }
 };

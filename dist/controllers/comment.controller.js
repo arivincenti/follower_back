@@ -62,12 +62,10 @@ exports.addComment = (req, res) => __awaiter(this, void 0, void 0, function* () 
             model: "User",
             select: "-password"
         });
-        const server = server_1.default.instance;
-        server.io.to(ticket._id).emit("new-comment");
-        response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket.comments.pop() //Con pop devuelvo el ultimo elemento del arreglo
-        );
+        var comment = yield ticket.comments.pop(); //Con pop devuelvo el ultimo elemento del arreglo
+        server_1.default.instance.io.to(ticket._id).emit("new-comment", comment);
     }
     catch (error) {
-        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+        res.status(500).json({ error: error.message });
     }
 });

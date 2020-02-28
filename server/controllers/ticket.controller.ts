@@ -1,5 +1,7 @@
 import Ticket, { ITicket } from "../models/ticket";
 import Member, { IMember } from "../models/member";
+import User, { IUser } from "../models/user";
+import Area, { IArea } from "../models/area";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import Server from "../classes/server";
@@ -76,12 +78,17 @@ export const getTickets = async (req: Request, res: Response) => {
 // ==================================================
 export const getTicketsByUser = async (req: Request, res: Response) => {
     try {
-        var user = req.params.user;
+        var userId = req.params.user;
 
-        var members = await Member.find({ user: user });
+        var members = await Member.find({ user: userId });
+        var areas = await Area.find({ members: { $in: members } });
 
         var tickets = await Ticket.find({
-            $or: [{ created_by: user }, { responsible: { $in: members } }]
+            $or: [
+                { created_by: userId },
+                { responsible: { $in: members } },
+                { area: { $in: areas } }
+            ]
         })
             .populate({
                 path: "created_by",
@@ -239,8 +246,6 @@ export const createTicket = async (req: Request, res: Response) => {
             created_at: new Date(),
             created_by: body.created_by
         };
-
-        // movement.responsible.push(body.responsible);
 
         ticket.movements.push(movement);
 
@@ -406,7 +411,7 @@ export const updateTicket = async (req: Request, res: Response) => {
                 }
             });
 
-        Server.instance.io.emit("update-ticket");
+        Server.instance.io.emit("update-ticket", ticket);
 
         getResponse(
             res,
