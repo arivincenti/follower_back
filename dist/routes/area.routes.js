@@ -9,6 +9,10 @@ const areaRouter = express_1.Router();
 // ==================================================
 areaRouter.get("/areas/organization/:organization", authentication_1.verifyToken, area_controller_1.getAreas);
 // ==================================================
+// Get all areas
+// ==================================================
+areaRouter.get("/areas/user/:user", area_controller_1.getAreasByUser);
+// ==================================================
 // Get one area
 // ==================================================
 areaRouter.get("/areas/:area", authentication_1.verifyToken, area_controller_1.getArea);

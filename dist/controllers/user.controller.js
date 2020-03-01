@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("../models/user"));
 const response_controller_1 = require("./response.controller");
-const clientsSocket_1 = require("../sockets/clientsSocket");
+const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 // ==================================================
 // Get all Users
 // ==================================================

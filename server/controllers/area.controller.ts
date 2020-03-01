@@ -53,6 +53,27 @@ export const getAreas = async (req: Request, res: Response) => {
 };
 
 // ==================================================
+// Get all areas
+// ==================================================
+export const getAreasByUser = async (req: Request, res: Response) => {
+    try {
+        var user = req.params.user;
+
+        var memers = await Member.find({
+            user: user
+        });
+
+        var areas = await Area.find({
+            members: { $in: memers }
+        });
+
+        getResponse(res, 200, true, "", "La búsqueda fue un éxito", areas);
+    } catch (error) {
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
 // Get an area
 // ==================================================
 export const getArea = async (req: Request, res: Response) => {

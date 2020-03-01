@@ -62,6 +62,24 @@ exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
     }
 });
 // ==================================================
+// Get all areas
+// ==================================================
+exports.getAreasByUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var user = req.params.user;
+        var memers = yield member_1.default.find({
+            user: user
+        });
+        var areas = yield area_1.default.find({
+            members: { $in: memers }
+        });
+        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", areas);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
 // Get an area
 // ==================================================
 exports.getArea = (req, res) => __awaiter(this, void 0, void 0, function* () {

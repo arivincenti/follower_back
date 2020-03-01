@@ -5,7 +5,7 @@ import Area, { IArea } from "../models/area";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import Server from "../classes/server";
-import { clientsSocketController } from "../sockets/clientsSocket";
+import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 
 // ==================================================
 // Get all ticket
@@ -306,6 +306,8 @@ export const createTicket = async (req: Request, res: Response) => {
                 }
             });
 
+        Server.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
+
         getResponse(
             res,
             200,
@@ -411,7 +413,7 @@ export const updateTicket = async (req: Request, res: Response) => {
                 }
             });
 
-        Server.instance.io.emit("update-ticket", ticket);
+        Server.instance.io.to(ticket.area._id).emit("update-ticket", ticket);
 
         getResponse(
             res,

@@ -6,7 +6,9 @@ import Database from "../database/database";
 import socketIO from "socket.io";
 import http from "http";
 import { SERVER_PORT } from "../config/environment";
-import * as clientsSocket from "../sockets/clientsSocket";
+import * as clientsSocket from "../sockets/clientsSockets/clientsSocket";
+import * as ticketSocket from "../sockets/ticketSockets/ticketSocket";
+import * as areaSocket from "../sockets/areaSockets/areaSocket";
 
 export default class Server {
     private app: express.Application;
@@ -37,10 +39,10 @@ export default class Server {
     }
 
     middlewares() {
-        this.app.use(
-            cors({ origin: "https://arivincenti.github.io", credentials: true })
-        );
-        // this.app.use( cors( { origin: true, credentials: true } ) );
+        // this.app.use(
+        //     cors({ origin: "https://arivincenti.github.io", credentials: true })
+        // );
+        this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express.json());
         this.app.use(fileUpload());
     }
@@ -51,16 +53,20 @@ export default class Server {
 
     private escucharSocket() {
         this.io.on("connection", socket => {
-            //Conect client
+            //Connect client
             clientsSocket.connectClient(socket);
-            //Confi Client
+            //Config Client
             clientsSocket.config_client(socket);
-            //Join client ticket
-            clientsSocket.joinTicket(socket, this.io);
-            //Leave client ticket
-            clientsSocket.leaveTicket(socket, this.io);
             //Disconnect client
             clientsSocket.desconectar(socket);
+
+            //Tickets
+            ticketSocket.joinTicket(socket, this.io);
+            ticketSocket.leaveTicket(socket, this.io);
+
+            //Areas
+            areaSocket.joinAllAreas(socket, this.io);
+            areaSocket.leaveArea(socket, this.io);
         });
     }
 

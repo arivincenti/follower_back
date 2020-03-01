@@ -26,7 +26,9 @@ const database_1 = __importDefault(require("../database/database"));
 const socket_io_1 = __importDefault(require("socket.io"));
 const http_1 = __importDefault(require("http"));
 const environment_1 = require("../config/environment");
-const clientsSocket = __importStar(require("../sockets/clientsSocket"));
+const clientsSocket = __importStar(require("../sockets/clientsSockets/clientsSocket"));
+const ticketSocket = __importStar(require("../sockets/ticketSockets/ticketSocket"));
+const areaSocket = __importStar(require("../sockets/areaSockets/areaSocket"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -45,8 +47,10 @@ class Server {
         this.app.set("port", this.port);
     }
     middlewares() {
-        this.app.use(cors_1.default({ origin: "https://arivincenti.github.io", credentials: true }));
-        // this.app.use( cors( { origin: true, credentials: true } ) );
+        // this.app.use(
+        //     cors({ origin: "https://arivincenti.github.io", credentials: true })
+        // );
+        this.app.use(cors_1.default({ origin: true, credentials: true }));
         this.app.use(express_1.default.json());
         this.app.use(express_fileupload_1.default());
     }
@@ -55,16 +59,18 @@ class Server {
     }
     escucharSocket() {
         this.io.on("connection", socket => {
-            //Conect client
+            //Connect client
             clientsSocket.connectClient(socket);
-            //Confi Client
+            //Config Client
             clientsSocket.config_client(socket);
-            //Join client ticket
-            clientsSocket.joinTicket(socket, this.io);
-            //Leave client ticket
-            clientsSocket.leaveTicket(socket, this.io);
             //Disconnect client
             clientsSocket.desconectar(socket);
+            //Tickets
+            ticketSocket.joinTicket(socket, this.io);
+            ticketSocket.leaveTicket(socket, this.io);
+            //Areas
+            areaSocket.joinAllAreas(socket, this.io);
+            areaSocket.leaveArea(socket, this.io);
         });
     }
     start() {

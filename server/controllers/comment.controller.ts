@@ -3,7 +3,7 @@ import Comment, { IComment } from "../models/comment";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import Server from "../classes/server";
-import { clientsSocketController } from "../sockets/clientsSocket";
+import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 
 // ==================================================
 // get comments

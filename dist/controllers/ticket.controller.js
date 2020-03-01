@@ -303,6 +303,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "User"
             }
         });
+        server_1.default.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
     }
     catch (error) {
@@ -390,7 +391,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "User"
             }
         });
-        server_1.default.instance.io.emit("update-ticket", ticket);
+        server_1.default.instance.io.to(ticket.area._id).emit("update-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
     }
     catch (error) {

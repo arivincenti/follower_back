@@ -1,7 +1,7 @@
 import User, { IUser } from "../models/user";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
-import { clientsSocketController } from "../sockets/clientsSocket";
+import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 
 // ==================================================
 // Get all Users

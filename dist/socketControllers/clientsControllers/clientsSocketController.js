@@ -1,22 +1,20 @@
-import { Client } from "../classes/client";
-
-export class ClientsSocketController {
-    private list: Client[] = [];
-
-    constructor() {}
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class ClientsSocketController {
+    constructor() {
+        this.list = [];
+    }
     // ==================================================
     // Add new Client
     // ==================================================
-    public addClient(client: Client) {
+    addClient(client) {
         this.list.push(client);
         return client;
     }
-
     // ==================================================
     // Update Client
     // ==================================================
-    public updateClient(id: string, user: any) {
+    updateClient(id, user) {
         for (let client of this.list) {
             if (client.id === id) {
                 client.user = user;
@@ -24,29 +22,46 @@ export class ClientsSocketController {
             }
         }
     }
-
     // ==================================================
     // Get List
     // ==================================================
-    public getList() {
+    getList() {
         return this.list.filter(client => client.user !== null);
     }
-
     // ==================================================
     // Get a Client
     // ==================================================
-    public getClient(id: string) {
+    getClient(id) {
         return this.list.find(client => client.id === id);
     }
-
+    // ==================================================
+    // Get a Client
+    // ==================================================
+    getClients(ids) {
+        var clients = [];
+        for (let client of this.list) {
+            for (let user of ids) {
+                if (client.id === user) {
+                    clients.push(client.user);
+                    break;
+                }
+            }
+        }
+        return clients;
+    }
+    // ==================================================
+    // Get a Client by User
+    // ==================================================
+    getClientByUser(id) {
+        return this.list.find(client => client.user._id === id);
+    }
     // ==================================================
     // Delete Client
     // ==================================================
-    public deleteClient(id: string) {
+    deleteClient(id) {
         const tempClient = this.getClient(id);
-
         this.list = this.list.filter(client => client.id !== id);
-
         return tempClient;
     }
 }
+exports.ClientsSocketController = ClientsSocketController;

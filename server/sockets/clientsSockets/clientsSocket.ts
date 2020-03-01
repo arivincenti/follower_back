@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { ClientsSocketController } from "../socketControllers/clientsSocketController";
-import { Client } from "../classes/client";
+import { ClientsSocketController } from "../../socketControllers/clientsControllers/clientsSocketController";
+import { Client } from "../../classes/client";
 
 export const clientsSocketController = new ClientsSocketController();
 
@@ -19,17 +19,5 @@ export const desconectar = (socket: Socket) => {
 export const config_client = (socket: Socket) => {
     socket.on("config-client", payload => {
         clientsSocketController.updateClient(socket.id, payload);
-    });
-};
-
-export const joinTicket = (socket: Socket, io: SocketIO.Server) => {
-    socket.on("join-ticket", payload => {
-        socket.join(payload);
-    });
-};
-
-export const leaveTicket = (socket: Socket, io: SocketIO.Server) => {
-    socket.on("leave-ticket", payload => {
-        socket.leave(payload);
     });
 };

@@ -7,7 +7,8 @@ import {
     updateArea,
     deleteArea,
     getAreaMembers,
-    addAreaMember
+    addAreaMember,
+    getAreasByUser
 } from "../controllers/area.controller";
 
 const areaRouter = Router();
@@ -16,6 +17,11 @@ const areaRouter = Router();
 // Get all areas
 // ==================================================
 areaRouter.get("/areas/organization/:organization", verifyToken, getAreas);
+
+// ==================================================
+// Get all areas
+// ==================================================
+areaRouter.get("/areas/user/:user", getAreasByUser);
 
 // ==================================================
 // Get one area
