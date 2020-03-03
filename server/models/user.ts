@@ -6,6 +6,7 @@ export interface IUser extends Document {
     email?: string;
     password?: string;
     img?: string;
+    notifications?: any[];
     created_at?: Date;
     updated_at?: Date;
     deleted_at?: Date;
@@ -33,6 +34,30 @@ const userSchema = new Schema({
         type: String,
         required: false
     },
+    notifications: [
+        {
+            notification: {
+                type: String
+            },
+            object: {
+                type: String
+            },
+            objectType: {
+                type: String
+            },
+            readed: {
+                type: Boolean
+            },
+            created_at: {
+                type: Date,
+                required: true,
+                default: Date.now
+            },
+            deleted_at: {
+                type: Date
+            }
+        }
+    ],
     created_at: {
         type: Date,
         required: true,

@@ -23,6 +23,30 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: false
     },
+    notifications: [
+        {
+            notification: {
+                type: String
+            },
+            object: {
+                type: String
+            },
+            objectType: {
+                type: String
+            },
+            readed: {
+                type: Boolean
+            },
+            created_at: {
+                type: Date,
+                required: true,
+                default: Date.now
+            },
+            deleted_at: {
+                type: Date
+            }
+        }
+    ],
     created_at: {
         type: Date,
         required: true,

@@ -16,6 +16,7 @@ const member_1 = __importDefault(require("../models/member"));
 const area_1 = __importDefault(require("../models/area"));
 const response_controller_1 = require("./response.controller");
 const server_1 = __importDefault(require("../classes/server"));
+const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 // ==================================================
 // Get all ticket
 // ==================================================
@@ -345,7 +346,15 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "area",
-            model: "Area"
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            }
         })
             .populate({
             path: "area",
@@ -391,7 +400,8 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "User"
             }
         });
-        server_1.default.instance.io.to(ticket.area._id).emit("update-ticket", ticket);
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.created_by);
+        server_1.default.instance.io.to(client.id).emit("update-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
     }
     catch (error) {

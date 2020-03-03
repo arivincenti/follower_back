@@ -78,6 +78,7 @@ exports.updateUser = (req, res) => __awaiter(this, void 0, void 0, function* () 
             user.last_name = body.last_name;
         if (body.email)
             user.email = body.email;
+        // if (body.notification) user.notifications.push(body.notification);
         if (body.name || body.last_name || body.email)
             user.updated_at = new Date();
         var saved_user = yield user.save();

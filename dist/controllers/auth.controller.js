@@ -26,7 +26,8 @@ exports.register = (req, res) => __awaiter(this, void 0, void 0, function* () {
             name: body.name,
             last_name: body.last_name,
             email: body.email,
-            password: bcryptjs_1.default.hashSync(body.password, 10)
+            password: bcryptjs_1.default.hashSync(body.password, 10),
+            notifications: []
         });
         var saved_user = yield user.save();
         response_controller_1.getResponse(res, 200, true, "", `El usuario '${saved_user.last_name} ${saved_user.name}' se creó con éxito`, saved_user);

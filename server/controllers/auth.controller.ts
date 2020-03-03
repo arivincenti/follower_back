@@ -17,7 +17,8 @@ export const register = async (req: Request, res: Response) => {
             name: body.name,
             last_name: body.last_name,
             email: body.email,
-            password: bcrypt.hashSync(body.password, 10)
+            password: bcrypt.hashSync(body.password, 10),
+            notifications: []
         });
 
         var saved_user: IUser = await user.save();

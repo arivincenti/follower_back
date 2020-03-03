@@ -71,6 +71,7 @@ export const updateUser = async (req: Request, res: Response) => {
         if (body.name) user.name = body.name;
         if (body.last_name) user.last_name = body.last_name;
         if (body.email) user.email = body.email;
+        // if (body.notification) user.notifications.push(body.notification);
 
         if (body.name || body.last_name || body.email)
             user.updated_at = new Date();

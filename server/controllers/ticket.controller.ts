@@ -366,7 +366,15 @@ export const updateTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "area",
-                model: "Area"
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User"
+                    }
+                }
             })
             .populate({
                 path: "area",
@@ -413,7 +421,11 @@ export const updateTicket = async (req: Request, res: Response) => {
                 }
             });
 
-        Server.instance.io.to(ticket.area._id).emit("update-ticket", ticket);
+        var client: any = clientsSocketController.getClientByUser(
+            body.created_by
+        );
+
+        Server.instance.io.to(client.id).emit("update-ticket", ticket);
 
         getResponse(
             res,
