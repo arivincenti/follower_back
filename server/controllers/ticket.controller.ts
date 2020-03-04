@@ -349,7 +349,37 @@ export const updateTicket = async (req: Request, res: Response) => {
             created_by: body.created_by
         };
 
-        ticket = await Ticket.findByIdAndUpdate(
+        var oldTicket: any = await Ticket.findById(ticket_id)
+            .populate({
+                path: "movements.area",
+                model: "Area"
+            })
+            .populate({
+                path: "movements.area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization"
+                }
+            })
+            .populate({
+                path: "movements.responsible",
+                model: "Member"
+            })
+            .populate({
+                path: "movements.responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
+            });
+
+        var newTicket: any = await Ticket.findByIdAndUpdate(
             ticket_id,
             {
                 ...ticket,
@@ -419,21 +449,33 @@ export const updateTicket = async (req: Request, res: Response) => {
                     path: "user",
                     model: "User"
                 }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
             });
 
         var client: any = clientsSocketController.getClientByUser(
             body.created_by
         );
 
-        Server.instance.io.to(client.id).emit("update-ticket", ticket);
+        var movements = {
+            ticket: newTicket,
+            old: oldTicket.movements.pop(),
+            new: newTicket.movements.pop()
+        };
+
+        console.log(oldTicket.movements.pop());
+
+        Server.instance.io.to(client.id).emit("update-ticket", movements);
 
         getResponse(
             res,
             200,
             true,
             "",
-            `El ticket '${ticket._id}' se creó con éxito`,
-            ticket
+            `El ticket '${newTicket._id}' se creó con éxito`,
+            newTicket
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);

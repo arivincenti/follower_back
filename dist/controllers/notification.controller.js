@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_1 = __importDefault(require("../models/notification"));
 const response_controller_1 = require("./response.controller");
-const server_1 = __importDefault(require("../classes/server"));
 // ==================================================
 // Get all Notifications
 // ==================================================
@@ -37,7 +36,6 @@ exports.getUnreadNotifications = (req, res) => __awaiter(this, void 0, void 0, f
     try {
         //ID del usuario recibido por URL
         var user_id = [req.params.user];
-        console.log(user_id);
         var userNotifications = yield notification_1.default.find({
             $and: [
                 { users: { $in: user_id } },
@@ -45,29 +43,6 @@ exports.getUnreadNotifications = (req, res) => __awaiter(this, void 0, void 0, f
             ]
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userNotifications);
-    }
-    catch (error) {
-        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-});
-// ==================================================
-// Get unread Notifications
-// ==================================================
-exports.createNotification = (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        //ID del usuario recibido por URL
-        var body = req.body;
-        console.log("llegamos al controller");
-        var newNotification = {
-            notification: body.notification,
-            object: body.object,
-            objectType: body.objectType,
-            users: [...body.users],
-            readed_by: []
-        };
-        var notification = yield notification_1.default.create(newNotification);
-        server_1.default.instance.io.to(body.area).emit("new-notification", notification);
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", notification);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

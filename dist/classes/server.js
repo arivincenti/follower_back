@@ -29,6 +29,7 @@ const environment_1 = require("../config/environment");
 const clientsSocket = __importStar(require("../sockets/clientsSockets/clientsSocket"));
 const ticketSocket = __importStar(require("../sockets/ticketSockets/ticketSocket"));
 const areaSocket = __importStar(require("../sockets/areaSockets/areaSocket"));
+const notificationSocket = __importStar(require("../sockets/notificationSockets/notificationSockets"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -75,6 +76,8 @@ class Server {
             //Areas
             areaSocket.joinAllAreas(socket, this.io);
             areaSocket.leaveArea(socket, this.io);
+            //Notifications
+            notificationSocket.createNotification(socket, this.io);
         });
     }
     start() {

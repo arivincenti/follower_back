@@ -9,6 +9,7 @@ import { SERVER_PORT } from "../config/environment";
 import * as clientsSocket from "../sockets/clientsSockets/clientsSocket";
 import * as ticketSocket from "../sockets/ticketSockets/ticketSocket";
 import * as areaSocket from "../sockets/areaSockets/areaSocket";
+import * as notificationSocket from "../sockets/notificationSockets/notificationSockets";
 
 export default class Server {
     private app: express.Application;
@@ -73,6 +74,9 @@ export default class Server {
             //Areas
             areaSocket.joinAllAreas(socket, this.io);
             areaSocket.leaveArea(socket, this.io);
+
+            //Notifications
+            notificationSocket.createNotification(socket, this.io);
         });
     }
 

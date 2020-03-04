@@ -10,14 +10,23 @@ export interface INotification extends Document {
 }
 
 var notificationSchema = new Schema({
-    notification: {
-        type: String
-    },
+    changes: [
+        {
+            type: String
+        }
+    ],
     object: {
         type: String
     },
     objectType: {
         type: String
+    },
+    objectName: {
+        type: String
+    },
+    updated_by: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
     },
     users: [
         {

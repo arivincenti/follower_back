@@ -2,14 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 var notificationSchema = new mongoose_1.Schema({
-    notification: {
-        type: String
-    },
+    changes: [
+        {
+            type: String
+        }
+    ],
     object: {
         type: String
     },
     objectType: {
         type: String
+    },
+    objectName: {
+        type: String
+    },
+    updated_by: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User"
     },
     users: [
         {

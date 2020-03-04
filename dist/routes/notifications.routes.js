@@ -12,8 +12,4 @@ notificationsRouter.get("/notifications/all/:user", authentication_1.verifyToken
 // Get one member
 // ==================================================
 notificationsRouter.get("/notifications/unread/:user", authentication_1.verifyToken, notification_controller_1.getUnreadNotifications);
-// ==================================================
-// Get member by email
-// ==================================================
-notificationsRouter.post("/notifications", authentication_1.verifyToken, notification_controller_1.createNotification);
 exports.default = notificationsRouter;

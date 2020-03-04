@@ -2,8 +2,7 @@ import { Router } from "express";
 import { verifyToken } from "../middlewares/authentication";
 import {
     getAllNotifications,
-    getUnreadNotifications,
-    createNotification
+    getUnreadNotifications
 } from "../controllers/notification.controller";
 
 const notificationsRouter = Router();
@@ -25,10 +24,5 @@ notificationsRouter.get(
     verifyToken,
     getUnreadNotifications
 );
-
-// ==================================================
-// Get member by email
-// ==================================================
-notificationsRouter.post("/notifications", verifyToken, createNotification);
 
 export default notificationsRouter;

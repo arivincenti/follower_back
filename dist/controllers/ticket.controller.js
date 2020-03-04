@@ -336,7 +336,36 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             created_at: new Date(),
             created_by: body.created_by
         };
-        ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, ticket, { $push: {
+        var oldTicket = yield ticket_1.default.findById(ticket_id)
+            .populate({
+            path: "movements.area",
+            model: "Area"
+        })
+            .populate({
+            path: "movements.area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization"
+            }
+        })
+            .populate({
+            path: "movements.responsible",
+            model: "Member"
+        })
+            .populate({
+            path: "movements.responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User"
+            }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
+        });
+        var newTicket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, ticket, { $push: {
                 movements: movement
             } }), { new: true })
             .populate({
@@ -399,10 +428,20 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 path: "user",
                 model: "User"
             }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.created_by);
-        server_1.default.instance.io.to(client.id).emit("update-ticket", ticket);
-        response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
+        var movements = {
+            ticket: newTicket,
+            old: oldTicket.movements.pop(),
+            new: newTicket.movements.pop()
+        };
+        console.log(oldTicket.movements.pop());
+        server_1.default.instance.io.to(client.id).emit("update-ticket", movements);
+        response_controller_1.getResponse(res, 200, true, "", `El ticket '${newTicket._id}' se creó con éxito`, newTicket);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
