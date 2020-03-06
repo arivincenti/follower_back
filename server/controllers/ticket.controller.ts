@@ -349,36 +349,6 @@ export const updateTicket = async (req: Request, res: Response) => {
             created_by: body.created_by
         };
 
-        var oldTicket: any = await Ticket.findById(ticket_id)
-            .populate({
-                path: "movements.area",
-                model: "Area"
-            })
-            .populate({
-                path: "movements.area",
-                model: "Area",
-                populate: {
-                    path: "organization",
-                    model: "Organization"
-                }
-            })
-            .populate({
-                path: "movements.responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "movements.responsible",
-                model: "Member",
-                populate: {
-                    path: "user",
-                    model: "User"
-                }
-            })
-            .populate({
-                path: "movements.created_by",
-                model: "User"
-            });
-
         var newTicket: any = await Ticket.findByIdAndUpdate(
             ticket_id,
             {
@@ -459,15 +429,19 @@ export const updateTicket = async (req: Request, res: Response) => {
             body.created_by
         );
 
-        var movements = {
+        var newMovement = newTicket.movements.pop();
+        var oldMovement = newTicket.movements.splice(
+            newTicket.movements.length - 1,
+            1
+        );
+
+        var payload = {
             ticket: newTicket,
-            old: oldTicket.movements.pop(),
-            new: newTicket.movements.pop()
+            old: oldMovement[0],
+            new: newMovement
         };
 
-        console.log(oldTicket.movements.pop());
-
-        Server.instance.io.to(client.id).emit("update-ticket", movements);
+        Server.instance.io.to(client.id).emit("update-ticket", payload);
 
         getResponse(
             res,

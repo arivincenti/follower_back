@@ -72,6 +72,8 @@ export const addComment = async (req: Request, res: Response) => {
         var comment: any = await ticket.comments.pop(); //Con pop devuelvo el ultimo elemento del arreglo
 
         Server.instance.io.to(ticket._id).emit("new-comment", comment);
+
+        getResponse(res, 200, true, "", "La búsqueda fue un éxito", comment);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

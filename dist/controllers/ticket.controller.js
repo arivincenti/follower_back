@@ -336,35 +336,6 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             created_at: new Date(),
             created_by: body.created_by
         };
-        var oldTicket = yield ticket_1.default.findById(ticket_id)
-            .populate({
-            path: "movements.area",
-            model: "Area"
-        })
-            .populate({
-            path: "movements.area",
-            model: "Area",
-            populate: {
-                path: "organization",
-                model: "Organization"
-            }
-        })
-            .populate({
-            path: "movements.responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "movements.responsible",
-            model: "Member",
-            populate: {
-                path: "user",
-                model: "User"
-            }
-        })
-            .populate({
-            path: "movements.created_by",
-            model: "User"
-        });
         var newTicket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, ticket, { $push: {
                 movements: movement
             } }), { new: true })
@@ -434,13 +405,14 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             model: "User"
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.created_by);
-        var movements = {
+        var newMovement = newTicket.movements.pop();
+        var oldMovement = newTicket.movements.splice(newTicket.movements.length - 1, 1);
+        var payload = {
             ticket: newTicket,
-            old: oldTicket.movements.pop(),
-            new: newTicket.movements.pop()
+            old: oldMovement[0],
+            new: newMovement
         };
-        console.log(oldTicket.movements.pop());
-        server_1.default.instance.io.to(client.id).emit("update-ticket", movements);
+        server_1.default.instance.io.to(client.id).emit("update-ticket", payload);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${newTicket._id}' se creó con éxito`, newTicket);
     }
     catch (error) {
