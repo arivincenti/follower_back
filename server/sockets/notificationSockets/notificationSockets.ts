@@ -3,8 +3,11 @@ import { NotificationSocketController } from "../../socketControllers/notificati
 
 export const notificationSocketController = new NotificationSocketController();
 
+// ==================================================
+// Create notification
+// ==================================================
 export const createNotification = (socket: Socket, io: SocketIO.Server) => {
     socket.on("create-notification", payload => {
-        notificationSocketController.createNotification(payload);
+        notificationSocketController.createNotification(payload, io);
     });
 };

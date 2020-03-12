@@ -7,6 +7,7 @@ import areaRouter from "./area.routes";
 import ticketRouter from "./ticket.routes";
 import commentsRouter from "./comments.routes";
 import notificationsRouter from "./notifications.routes";
+import socketRouter from "./socket.routes";
 
 const routes = [
     userRouter,
@@ -18,7 +19,8 @@ const routes = [
     ticketRouter,
     commentsRouter,
     imageRouter,
-    notificationsRouter
+    notificationsRouter,
+    socketRouter
 ];
 
 export default routes;

@@ -21,9 +21,9 @@ var notificationSchema = new Schema({
     objectType: {
         type: String
     },
-    objectName: {
-        type: String
-    },
+    // objectName: {
+    //     type: String
+    // },
     updated_by: {
         type: Schema.Types.ObjectId,
         ref: "User"

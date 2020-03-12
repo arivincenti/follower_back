@@ -1,19 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.joinArea = (socket, io) => {
+const areaSocketController_1 = require("../../socketControllers/areaControllers.ts/areaSocketController");
+const areaSocketController = new areaSocketController_1.AreaSocketController();
+// ==================================================
+// Join to area
+// ==================================================
+exports.joinToArea = (socket) => {
     socket.on("join-area", payload => {
-        socket.join(payload);
+        areaSocketController.joinArea(payload, socket);
     });
 };
-exports.joinAllAreas = (socket, io) => {
+// ==================================================
+// Join to all areas
+// ==================================================
+exports.joinAllAreas = (socket) => {
     socket.on("join-all-areas", payload => {
-        for (let area of payload) {
-            socket.join(area._id);
-        }
+        areaSocketController.joinAllAreas(payload, socket);
     });
 };
-exports.leaveArea = (socket, io) => {
+// ==================================================
+// Leave an area
+// ==================================================
+exports.leaveAnArea = (socket) => {
     socket.on("leave-area", payload => {
-        socket.leave(payload);
+        areaSocketController.leaveAnArea(payload, socket);
     });
 };

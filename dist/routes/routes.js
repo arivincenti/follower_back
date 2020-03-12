@@ -12,6 +12,7 @@ const area_routes_1 = __importDefault(require("./area.routes"));
 const ticket_routes_1 = __importDefault(require("./ticket.routes"));
 const comments_routes_1 = __importDefault(require("./comments.routes"));
 const notifications_routes_1 = __importDefault(require("./notifications.routes"));
+const socket_routes_1 = __importDefault(require("./socket.routes"));
 const routes = [
     user_routes_1.default,
     auth_routes_1.default,
@@ -22,6 +23,7 @@ const routes = [
     ticket_routes_1.default,
     comments_routes_1.default,
     images_routes_1.default,
-    notifications_routes_1.default
+    notifications_routes_1.default,
+    socket_routes_1.default
 ];
 exports.default = routes;

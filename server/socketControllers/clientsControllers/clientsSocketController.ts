@@ -1,4 +1,5 @@
 import { Client } from "../../classes/client";
+import { Socket } from "socket.io";
 
 export class ClientsSocketController {
     private list: Client[] = [];
@@ -72,5 +73,17 @@ export class ClientsSocketController {
         this.list = this.list.filter(client => client.id !== id);
 
         return tempClient;
+    }
+
+    // ==================================================
+    // Count room clients
+    // ==================================================
+    public countClients(room: string, event: string, io: SocketIO.Server) {
+        io.in(room).clients((err: any, clients: Socket) => {
+            if (err) console.error(err);
+
+            var res = this.getClients(clients);
+            io.to(room).emit(event, res);
+        });
     }
 }

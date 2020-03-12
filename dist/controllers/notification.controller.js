@@ -14,33 +14,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const notification_1 = __importDefault(require("../models/notification"));
 const response_controller_1 = require("./response.controller");
 // ==================================================
-// Get all Notifications
-// ==================================================
-exports.getAllNotifications = (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        //ID del usuario recibido por URL
-        var user_id = req.params.user;
-        var userNotifications = yield notification_1.default.find({
-            users: { $in: user_id }
-        });
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userNotifications);
-    }
-    catch (error) {
-        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-});
-// ==================================================
 // Get unread Notifications
 // ==================================================
-exports.getUnreadNotifications = (req, res) => __awaiter(this, void 0, void 0, function* () {
+exports.getNotifications = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         //ID del usuario recibido por URL
         var user_id = [req.params.user];
         var userNotifications = yield notification_1.default.find({
-            $and: [
-                { users: { $in: user_id } },
-                { readed_by: { $not: { $all: user_id } } }
-            ]
+            users: { $in: user_id }
+        })
+            .populate({
+            path: "updated_by",
+            model: "User"
+        })
+            .populate({
+            path: "object",
+            model: "Area"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userNotifications);
     }

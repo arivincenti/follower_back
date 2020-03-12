@@ -5,11 +5,7 @@ const authentication_1 = require("../middlewares/authentication");
 const notification_controller_1 = require("../controllers/notification.controller");
 const notificationsRouter = express_1.Router();
 // ==================================================
-// Get all members
-// ==================================================
-notificationsRouter.get("/notifications/all/:user", authentication_1.verifyToken, notification_controller_1.getAllNotifications);
-// ==================================================
 // Get one member
 // ==================================================
-notificationsRouter.get("/notifications/unread/:user", authentication_1.verifyToken, notification_controller_1.getUnreadNotifications);
+notificationsRouter.get("/notifications/:user", authentication_1.verifyToken, notification_controller_1.getNotifications);
 exports.default = notificationsRouter;

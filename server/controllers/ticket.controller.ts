@@ -1,6 +1,5 @@
 import Ticket, { ITicket } from "../models/ticket";
 import Member, { IMember } from "../models/member";
-import User, { IUser } from "../models/user";
 import Area, { IArea } from "../models/area";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
@@ -20,7 +19,11 @@ export const getTickets = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "area",
-                model: "Area"
+                model: "Area",
+                populate: {
+                    path: "area.members",
+                    model: "Member"
+                }
             })
             .populate({
                 path: "area",
@@ -32,19 +35,11 @@ export const getTickets = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
-            })
-            .populate({
-                path: "movements.area",
-                model: "Area"
             })
             .populate({
                 path: "movements.area",
@@ -56,15 +51,15 @@ export const getTickets = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -97,7 +92,15 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "area",
-                model: "Area"
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User"
+                    }
+                }
             })
             .populate({
                 path: "area",
@@ -109,19 +112,11 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
-            })
-            .populate({
-                path: "movements.area",
-                model: "Area"
             })
             .populate({
                 path: "movements.area",
@@ -133,15 +128,15 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -165,7 +160,15 @@ export const getTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "area",
-                model: "Area"
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User"
+                    }
+                }
             })
             .populate({
                 path: "area",
@@ -177,19 +180,11 @@ export const getTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
-            })
-            .populate({
-                path: "movements.area",
-                model: "Area"
             })
             .populate({
                 path: "movements.area",
@@ -201,15 +196,15 @@ export const getTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
@@ -259,7 +254,15 @@ export const createTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "area",
-                model: "Area"
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User"
+                    }
+                }
             })
             .populate({
                 path: "area",
@@ -271,19 +274,11 @@ export const createTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
-            })
-            .populate({
-                path: "movements.area",
-                model: "Area"
             })
             .populate({
                 path: "movements.area",
@@ -295,15 +290,15 @@ export const createTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
                     model: "User"
                 }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
             });
 
         Server.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
@@ -386,10 +381,6 @@ export const updateTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "responsible",
-                model: "Member"
-            })
-            .populate({
-                path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
@@ -398,19 +389,11 @@ export const updateTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.area",
-                model: "Area"
-            })
-            .populate({
-                path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
                     model: "Organization"
                 }
-            })
-            .populate({
-                path: "movements.responsible",
-                model: "Member"
             })
             .populate({
                 path: "movements.responsible",

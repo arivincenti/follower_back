@@ -13,9 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 class Database {
+    // private URI =
+    //     "mongodb+srv://follower:amFjt2afBZ4wj5ru@cluster0-jfhtw.mongodb.net/follower?retryWrites=true&w=majority";
     constructor() {
-        // private URI: string = "mongodb://localhost:27017/follower";
-        this.URI = "mongodb+srv://follower:amFjt2afBZ4wj5ru@cluster0-jfhtw.mongodb.net/follower?retryWrites=true&w=majority";
+        this.URI = "mongodb://localhost:27017/follower";
         this.settings();
         this.connect();
     }

@@ -30,7 +30,11 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
         })
             .populate({
             path: "area",
-            model: "Area"
+            model: "Area",
+            populate: {
+                path: "area.members",
+                model: "Member"
+            }
         })
             .populate({
             path: "area",
@@ -42,19 +46,11 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
         })
             .populate({
             path: "responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
-        })
-            .populate({
-            path: "movements.area",
-            model: "Area"
         })
             .populate({
             path: "movements.area",
@@ -66,15 +62,15 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
         })
             .populate({
             path: "movements.responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -104,7 +100,15 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
         })
             .populate({
             path: "area",
-            model: "Area"
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            }
         })
             .populate({
             path: "area",
@@ -116,19 +120,11 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
         })
             .populate({
             path: "responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
-        })
-            .populate({
-            path: "movements.area",
-            model: "Area"
         })
             .populate({
             path: "movements.area",
@@ -140,15 +136,15 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
         })
             .populate({
             path: "movements.responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -170,7 +166,15 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
         })
             .populate({
             path: "area",
-            model: "Area"
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            }
         })
             .populate({
             path: "area",
@@ -182,19 +186,11 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
         })
             .populate({
             path: "responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
-        })
-            .populate({
-            path: "movements.area",
-            model: "Area"
         })
             .populate({
             path: "movements.area",
@@ -206,15 +202,15 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
         })
             .populate({
             path: "movements.responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
     }
@@ -258,7 +254,15 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "area",
-            model: "Area"
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            }
         })
             .populate({
             path: "area",
@@ -270,19 +274,11 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
-        })
-            .populate({
-            path: "movements.area",
-            model: "Area"
         })
             .populate({
             path: "movements.area",
@@ -294,15 +290,15 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "movements.responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
                 model: "User"
             }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
         });
         server_1.default.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
@@ -366,10 +362,6 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "responsible",
-            model: "Member"
-        })
-            .populate({
-            path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
@@ -378,19 +370,11 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "movements.area",
-            model: "Area"
-        })
-            .populate({
-            path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
                 model: "Organization"
             }
-        })
-            .populate({
-            path: "movements.responsible",
-            model: "Member"
         })
             .populate({
             path: "movements.responsible",

@@ -1,28 +1,12 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/authentication";
-import {
-    getAllNotifications,
-    getUnreadNotifications
-} from "../controllers/notification.controller";
+import { getNotifications } from "../controllers/notification.controller";
 
 const notificationsRouter = Router();
 
 // ==================================================
-// Get all members
-// ==================================================
-notificationsRouter.get(
-    "/notifications/all/:user",
-    verifyToken,
-    getAllNotifications
-);
-
-// ==================================================
 // Get one member
 // ==================================================
-notificationsRouter.get(
-    "/notifications/unread/:user",
-    verifyToken,
-    getUnreadNotifications
-);
+notificationsRouter.get("/notifications/:user", verifyToken, getNotifications);
 
 export default notificationsRouter;

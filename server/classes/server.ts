@@ -68,12 +68,14 @@ export default class Server {
             clientsSocket.desconectar(socket);
 
             //Tickets
-            ticketSocket.joinTicket(socket, this.io);
-            ticketSocket.leaveTicket(socket, this.io);
+            ticketSocket.joinToTicket(socket);
+            ticketSocket.joinAllTickets(socket);
+            ticketSocket.leaveATicket(socket);
+            ticketSocket.leaveAllTickets(socket);
 
             //Areas
-            areaSocket.joinAllAreas(socket, this.io);
-            areaSocket.leaveArea(socket, this.io);
+            areaSocket.joinAllAreas(socket);
+            areaSocket.leaveAnArea(socket);
 
             //Notifications
             notificationSocket.createNotification(socket, this.io);

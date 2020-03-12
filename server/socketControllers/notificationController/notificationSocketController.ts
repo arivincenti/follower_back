@@ -1,18 +1,17 @@
 import Notification, { INotification } from "../../models/notification";
-import Server from "../../classes/server";
 
 export class NotificationSocketController {
     constructor() {}
 
     // ==================================================
-    // Add new Client
+    // Create notification
     // ==================================================
-    public async createNotification(payload: any) {
+    public async createNotification(payload: any, io: SocketIO.Server) {
         var newNotification = {
             changes: [...payload.changes],
-            object: payload.object,
+            object: payload.object._id,
             objectType: payload.objectType,
-            objectName: payload.objectName,
+            objectName: payload.object.subject,
             updated_by: payload.updated_by,
             users: [...payload.users],
             readed_by: []
@@ -20,15 +19,43 @@ export class NotificationSocketController {
 
         var pre_notification = await Notification.create(newNotification);
 
-        var notification = await Notification.findById(
-            pre_notification._id
-        ).populate({
-            path: "updated_by",
-            model: "User"
-        });
+        switch (payload.objectType) {
+            case "ticket":
+                var notification = await Notification.findById(
+                    pre_notification._id
+                )
+                    .populate({
+                        path: "updated_by",
+                        model: "User"
+                    })
+                    .populate({
+                        path: "object",
+                        model: "Ticket"
+                    });
 
-        Server.instance.io
-            .to(payload.area)
-            .emit("new-notification", notification);
+                io.to(payload.object._id) //Ticket room
+                    .emit("new-notification", notification);
+                break;
+
+            case "área":
+                var notification = await Notification.findById(
+                    pre_notification._id
+                )
+                    .populate({
+                        path: "updated_by",
+                        model: "User"
+                    })
+                    .populate({
+                        path: "object",
+                        model: "Area"
+                    });
+
+                io.to(payload.object._id) //Area room
+                    .emit("new-notification", notification);
+                break;
+
+            default:
+                break;
+        }
     }
 }

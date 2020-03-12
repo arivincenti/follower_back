@@ -1,33 +1,42 @@
 import { Socket } from "socket.io";
 import { clientsSocketController } from "../../sockets/clientsSockets/clientsSocket";
+import { TicketSocketController } from "../../socketControllers/ticketControllers.ts/ticketSocketController";
+import ticket from "../../models/ticket";
 
-export const joinTicket = (socket: Socket, io: SocketIO.Server) => {
+const ticketSocketController = new TicketSocketController();
+
+// ==================================================
+// Join to ticket
+// ==================================================
+export const joinToTicket = (socket: Socket) => {
     socket.on("join-ticket", payload => {
-        socket.join(payload);
-        io.sockets.in(payload).clients((err: any, clients: Socket) => {
-            if (err) console.log(err);
-            var res = clientsSocketController.getClients(clients);
-            io.to(payload).emit("ticket-clients-count", res);
-        });
+        ticketSocketController.joinToTicket(payload, socket);
     });
 };
 
-export const joinAllTickets = (socket: Socket, io: SocketIO.Server) => {
+// ==================================================
+// Join to all tickets
+// ==================================================
+export const joinAllTickets = (socket: Socket) => {
     socket.on("join-all-tickets", payload => {
-        for (let ticket of payload) {
-            console.log(ticket);
-        }
-        // socket.join(payload);
+        ticketSocketController.joinAllTickets(payload, socket);
     });
 };
 
-export const leaveTicket = (socket: Socket, io: SocketIO.Server) => {
+// ==================================================
+// Leave a ticket
+// ==================================================
+export const leaveATicket = (socket: Socket) => {
     socket.on("leave-ticket", payload => {
-        socket.leave(payload);
-        io.sockets.in(payload).clients((err: any, clients: Socket) => {
-            if (err) console.log(err);
-            var res = clientsSocketController.getClients(clients);
-            io.to(payload).emit("ticket-clients-count", res);
-        });
+        ticketSocketController.leaveATicket(payload, socket);
+    });
+};
+
+// ==================================================
+// Leave a ticket
+// ==================================================
+export const leaveAllTickets = (socket: Socket) => {
+    socket.on("leave-all-tickets", payload => {
+        ticketSocketController.leaveAllTickets(payload, socket);
     });
 };

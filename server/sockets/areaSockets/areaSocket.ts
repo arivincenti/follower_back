@@ -1,21 +1,31 @@
 import { Socket } from "socket.io";
+import { AreaSocketController } from "../../socketControllers/areaControllers.ts/areaSocketController";
 
-export const joinArea = (socket: Socket, io: SocketIO.Server) => {
+const areaSocketController = new AreaSocketController();
+
+// ==================================================
+// Join to area
+// ==================================================
+export const joinToArea = (socket: Socket) => {
     socket.on("join-area", payload => {
-        socket.join(payload);
+        areaSocketController.joinArea(payload, socket);
     });
 };
 
-export const joinAllAreas = (socket: Socket, io: SocketIO.Server) => {
+// ==================================================
+// Join to all areas
+// ==================================================
+export const joinAllAreas = (socket: Socket) => {
     socket.on("join-all-areas", payload => {
-        for (let area of payload) {
-            socket.join(area._id);
-        }
+        areaSocketController.joinAllAreas(payload, socket);
     });
 };
 
-export const leaveArea = (socket: Socket, io: SocketIO.Server) => {
+// ==================================================
+// Leave an area
+// ==================================================
+export const leaveAnArea = (socket: Socket) => {
     socket.on("leave-area", payload => {
-        socket.leave(payload);
+        areaSocketController.leaveAnArea(payload, socket);
     });
 };

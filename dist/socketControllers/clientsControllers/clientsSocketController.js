@@ -63,5 +63,16 @@ class ClientsSocketController {
         this.list = this.list.filter(client => client.id !== id);
         return tempClient;
     }
+    // ==================================================
+    // Count room clients
+    // ==================================================
+    countClients(room, event, io) {
+        io.in(room).clients((err, clients) => {
+            if (err)
+                console.error(err);
+            var res = this.getClients(clients);
+            io.to(room).emit(event, res);
+        });
+    }
 }
 exports.ClientsSocketController = ClientsSocketController;
