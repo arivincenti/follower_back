@@ -40,16 +40,16 @@ export default class Server {
     }
 
     middlewares() {
-        this.app.use(
-            cors({
-                origin: [
-                    "https://arivincenti.github.io/"
-                    // "http://localhost:4200"
-                ],
-                credentials: true
-            })
-        );
-        // this.app.use(cors({ origin: true, credentials: true }));
+        // this.app.use(
+        //     cors({
+        //         origin: [
+        //             "https://arivincenti.github.io/",
+        //             "http://localhost:4200"
+        //         ],
+        //         credentials: true
+        //     })
+        // );
+        this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express.json());
         this.app.use(fileUpload());
     }

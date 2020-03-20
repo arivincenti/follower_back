@@ -48,14 +48,16 @@ class Server {
         this.app.set("port", this.port);
     }
     middlewares() {
-        this.app.use(cors_1.default({
-            origin: [
-                "https://arivincenti.github.io/"
-                // "http://localhost:4200"
-            ],
-            credentials: true
-        }));
-        // this.app.use(cors({ origin: true, credentials: true }));
+        // this.app.use(
+        //     cors({
+        //         origin: [
+        //             "https://arivincenti.github.io/",
+        //             "http://localhost:4200"
+        //         ],
+        //         credentials: true
+        //     })
+        // );
+        this.app.use(cors_1.default({ origin: true, credentials: true }));
         this.app.use(express_1.default.json());
         this.app.use(express_fileupload_1.default());
     }
