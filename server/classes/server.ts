@@ -43,7 +43,7 @@ export default class Server {
         this.app.use(
             cors({
                 origin: [
-                    "https://follower-api.herokuapp.com/",
+                    "https://follower-api.herokuapp.com",
                     "http://localhost:4200"
                 ],
                 credentials: true
