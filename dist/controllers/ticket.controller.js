@@ -231,7 +231,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             responsible: null,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: "PENDIENTE",
             created_by: body.created_by,
             created_at: new Date()
         });
@@ -240,7 +240,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             responsible: null,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: "PENDIENTE",
             created_at: new Date(),
             created_by: body.created_by
         };
@@ -319,7 +319,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: body.status,
             updated_by: body.created_by,
             updated_at: new Date()
         };
@@ -328,7 +328,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: body.status,
             created_at: new Date(),
             created_by: body.created_by
         };

@@ -227,7 +227,7 @@ export const createTicket = async (req: Request, res: Response) => {
             responsible: null,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: "PENDIENTE",
             created_by: body.created_by,
             created_at: new Date()
         });
@@ -237,7 +237,7 @@ export const createTicket = async (req: Request, res: Response) => {
             responsible: null,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: "PENDIENTE",
             created_at: new Date(),
             created_by: body.created_by
         };
@@ -329,7 +329,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: body.status,
             updated_by: body.created_by,
             updated_at: new Date()
         };
@@ -339,7 +339,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
-            status: "ABIERTO",
+            status: body.status,
             created_at: new Date(),
             created_by: body.created_by
         };
