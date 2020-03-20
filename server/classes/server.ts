@@ -42,7 +42,10 @@ export default class Server {
     middlewares() {
         this.app.use(
             cors({
-                origin: "http://localhost:4200",
+                origin: [
+                    "https://follower-api.herokuapp.com/",
+                    "http://localhost:4200"
+                ],
                 credentials: true
             })
         );
