@@ -14,7 +14,7 @@ const userRouter = Router();
 // ==================================================
 // Get all users
 // ==================================================
-userRouter.get("/users", verifyToken, getUsers);
+userRouter.get("/users", getUsers);
 
 // ==================================================
 // Get one user

@@ -7,7 +7,7 @@ const userRouter = express_1.Router();
 // ==================================================
 // Get all users
 // ==================================================
-userRouter.get("/users", authentication_1.verifyToken, user_controller_1.getUsers);
+userRouter.get("/users", user_controller_1.getUsers);
 // ==================================================
 // Get one user
 // ==================================================
