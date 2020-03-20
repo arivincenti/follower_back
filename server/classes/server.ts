@@ -42,7 +42,8 @@ export default class Server {
     middlewares() {
         this.app.use(
             cors({
-                origin: "*",
+                origin: true,
+                methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
                 credentials: true
             })
         );
