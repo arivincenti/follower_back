@@ -43,7 +43,7 @@ export default class Server {
         this.app.use(
             cors({
                 origin: [
-                    "https://arivincenti.github.io",
+                    "https://arivincenti.github.io/",
                     "http://localhost:4200"
                 ],
                 credentials: true
