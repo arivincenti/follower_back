@@ -50,8 +50,8 @@ class Server {
     middlewares() {
         this.app.use(cors_1.default({
             origin: [
-                "https://arivincenti.github.io/",
-                "http://localhost:4200"
+                "https://arivincenti.github.io/"
+                // "http://localhost:4200"
             ],
             credentials: true
         }));
