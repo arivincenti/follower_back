@@ -49,8 +49,7 @@ class Server {
     }
     middlewares() {
         this.app.use(cors_1.default({
-            origin: true,
-            methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+            origin: "http://localhost:4200",
             credentials: true
         }));
         // this.app.use(cors({ origin: true, credentials: true }));

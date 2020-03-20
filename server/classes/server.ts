@@ -42,8 +42,7 @@ export default class Server {
     middlewares() {
         this.app.use(
             cors({
-                origin: true,
-                methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+                origin: "http://localhost:4200",
                 credentials: true
             })
         );
