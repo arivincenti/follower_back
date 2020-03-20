@@ -49,7 +49,7 @@ class Server {
     }
     middlewares() {
         this.app.use(cors_1.default({
-            origin: "https://arivincenti.github.io/",
+            origin: "*",
             credentials: true
         }));
         // this.app.use(cors({ origin: true, credentials: true }));

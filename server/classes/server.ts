@@ -42,7 +42,7 @@ export default class Server {
     middlewares() {
         this.app.use(
             cors({
-                origin: "https://arivincenti.github.io/",
+                origin: "*",
                 credentials: true
             })
         );
