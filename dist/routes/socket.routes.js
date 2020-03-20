@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Express_1 = require("Express");
+const express_1 = require("express");
 const socket_controller_1 = require("../controllers/socket.controller");
-const socketRouter = Express_1.Router();
+const socketRouter = express_1.Router();
 // ==================================================
 // Count room clients
 // ==================================================
