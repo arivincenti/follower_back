@@ -13,10 +13,10 @@
     "dependencies": {
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
-        "express": "*",
+        "express": "^4.17.1",
         "express-fileupload": "^1.1.6",
         "jsonwebtoken": "^8.5.1",
-        "mongoose": "^5.7.6",
+        "mongoose": "^5.9.5",
         "mongoose-unique-validator": "^2.0.3",
         "node-mailjet": "^3.3.1",
         "socket.io": "^2.3.0"
@@ -24,10 +24,10 @@
     "devDependencies": {
         "@types/bcryptjs": "^2.4.2",
         "@types/cors": "^2.8.6",
-        "@types/express": "^4.17.2",
+        "@types/express": "^4.17.3",
         "@types/express-fileupload": "^1.1.2",
-        "@types/jsonwebtoken": "^8.3.7",
-        "@types/mongoose": "^5.7.1",
+        "@types/jsonwebtoken": "^8.3.8",
+        "@types/mongoose": "^5.7.7",
         "@types/socket.io": "^2.1.4",
         "nodemon": "^1.19.4"
     }
