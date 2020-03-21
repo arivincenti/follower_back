@@ -76,6 +76,7 @@ export default class Server {
             //Areas
             areaSocket.joinAllAreas(socket);
             areaSocket.leaveAnArea(socket);
+            areaSocket.leaveAllAreas(socket);
 
             //Notifications
             notificationSocket.createNotification(socket, this.io);

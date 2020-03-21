@@ -29,3 +29,12 @@ export const leaveAnArea = (socket: Socket) => {
         areaSocketController.leaveAnArea(payload, socket);
     });
 };
+
+// ==================================================
+// Leave an area
+// ==================================================
+export const leaveAllAreas = (socket: Socket) => {
+    socket.on("leave-all-areas", payload => {
+        areaSocketController.leaveAllAreas(payload, socket);
+    });
+};

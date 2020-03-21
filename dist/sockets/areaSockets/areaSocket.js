@@ -26,3 +26,11 @@ exports.leaveAnArea = (socket) => {
         areaSocketController.leaveAnArea(payload, socket);
     });
 };
+// ==================================================
+// Leave an area
+// ==================================================
+exports.leaveAllAreas = (socket) => {
+    socket.on("leave-all-areas", payload => {
+        areaSocketController.leaveAllAreas(payload, socket);
+    });
+};

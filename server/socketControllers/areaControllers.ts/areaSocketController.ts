@@ -25,4 +25,13 @@ export class AreaSocketController {
     leaveAnArea(payload: any, socket: Socket) {
         socket.leave(payload);
     }
+
+    // ==================================================
+    // Leave to all areas
+    // ==================================================
+    leaveAllAreas(payload: any, socket: Socket) {
+        for (let area of payload) {
+            socket.leave(area._id);
+        }
+    }
 }
