@@ -290,11 +290,12 @@ exports.getAreaMembers = (req, res) => __awaiter(this, void 0, void 0, function*
 exports.addAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var body = req.body;
-        var area = yield area_1.default.findById(body.area);
-        area.members.push(body.member._id);
-        area.updated_at = new Date();
-        var saved_area = yield area.save();
-        var find_area = yield area_1.default.findById(saved_area._id)
+        var find_area = yield area_1.default.findByIdAndUpdate(body.area, {
+            $push: {
+                members: body.member._id
+            },
+            updated_at: new Date()
+        }, { new: true })
             .populate("organization")
             .populate({
             path: "created_by",
@@ -319,7 +320,50 @@ exports.addAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* 
                 select: "-password"
             }
         });
-        response_controller_1.getResponse(res, 200, true, "", `El área '${area}' fue modificada con éxito`, find_area);
+        response_controller_1.getResponse(res, 200, true, "", `El área '${body.area}' fue modificada con éxito`, find_area);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Delete area member
+// ==================================================
+exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var area = req.body.area;
+        var member = req.body.member;
+        var find_area = yield area_1.default.findByIdAndUpdate(area._id, {
+            $pull: {
+                members: member._id
+            },
+            updated_at: new Date()
+        }, { new: true })
+            .populate("organization")
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password"
+            }
+        })
+            .populate({
+            path: "members",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password"
+            }
+        });
+        response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' fue modificada con éxito`, find_area);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

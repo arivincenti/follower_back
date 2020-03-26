@@ -5,7 +5,8 @@ import {
     getTicketsByUser,
     getTicket,
     createTicket,
-    updateTicket
+    updateTicket,
+    getTicketsByResponsible
 } from "../controllers/ticket.controller";
 
 const ticketRouter = Router();
@@ -19,6 +20,15 @@ ticketRouter.get("/tickets", verifyToken, getTickets);
 // Get user tickets
 // ==================================================
 ticketRouter.get("/tickets/user/:user", verifyToken, getTicketsByUser);
+
+// ==================================================
+// Get responsible tickets
+// ==================================================
+ticketRouter.get(
+    "/tickets/responsible/:responsible",
+    verifyToken,
+    getTicketsByResponsible
+);
 
 // ==================================================
 // Get one ticket

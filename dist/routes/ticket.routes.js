@@ -13,6 +13,10 @@ ticketRouter.get("/tickets", authentication_1.verifyToken, ticket_controller_1.g
 // ==================================================
 ticketRouter.get("/tickets/user/:user", authentication_1.verifyToken, ticket_controller_1.getTicketsByUser);
 // ==================================================
+// Get responsible tickets
+// ==================================================
+ticketRouter.get("/tickets/responsible/:responsible", authentication_1.verifyToken, ticket_controller_1.getTicketsByResponsible);
+// ==================================================
 // Get one ticket
 // ==================================================
 ticketRouter.get("/tickets/:ticket", authentication_1.verifyToken, ticket_controller_1.getTicket);

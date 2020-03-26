@@ -153,7 +153,73 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
     }
 });
 // ==================================================
-// Get all ticket
+// Get user ticket
+// ==================================================
+exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var responsible = req.params.responsible;
+        var tickets = yield ticket_1.default.find({ responsible: responsible })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            }
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization"
+            }
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User"
+            }
+        })
+            .populate({
+            path: "movements.area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization"
+            }
+        })
+            .populate({
+            path: "movements.responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User"
+            }
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User"
+        });
+        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Get a ticket
 // ==================================================
 exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {

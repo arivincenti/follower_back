@@ -2,6 +2,7 @@ import Area, { IArea } from "../models/area";
 import Member, { IMember } from "../models/member";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
+import member from "../models/member";
 
 // ==================================================
 // Get all areas
@@ -322,14 +323,16 @@ export const addAreaMember = async (req: Request, res: Response) => {
     try {
         var body = req.body;
 
-        var area: any = await Area.findById(body.area);
-
-        area.members.push(body.member._id);
-        area.updated_at = new Date();
-
-        var saved_area = await area.save();
-
-        var find_area = await Area.findById(saved_area._id)
+        var find_area = await Area.findByIdAndUpdate(
+            body.area,
+            {
+                $push: {
+                    members: body.member._id
+                },
+                updated_at: new Date()
+            },
+            { new: true }
+        )
             .populate("organization")
             .populate({
                 path: "created_by",
@@ -360,7 +363,63 @@ export const addAreaMember = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            `El área '${area}' fue modificada con éxito`,
+            `El área '${body.area}' fue modificada con éxito`,
+            find_area
+        );
+    } catch (error) {
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
+// Delete area member
+// ==================================================
+export const deleteAreaMember = async (req: Request, res: Response) => {
+    try {
+        var area = req.body.area;
+        var member = req.body.member;
+
+        var find_area = await Area.findByIdAndUpdate(
+            area._id,
+            {
+                $pull: {
+                    members: member._id
+                },
+                updated_at: new Date()
+            },
+            { new: true }
+        )
+            .populate("organization")
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                    select: "-password"
+                }
+            })
+            .populate({
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                    select: "-password"
+                }
+            });
+
+        getResponse(
+            res,
+            200,
+            true,
+            "",
+            `El área '${area.name}' fue modificada con éxito`,
             find_area
         );
     } catch (error) {

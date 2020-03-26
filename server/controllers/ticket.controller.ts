@@ -146,7 +146,75 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
 };
 
 // ==================================================
-// Get all ticket
+// Get user ticket
+// ==================================================
+export const getTicketsByResponsible = async (req: Request, res: Response) => {
+    try {
+        var responsible = req.params.responsible;
+
+        var tickets = await Ticket.find({ responsible: responsible })
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User"
+                    }
+                }
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization"
+                }
+            })
+            .populate({
+                path: "responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            })
+            .populate({
+                path: "movements.area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization"
+                }
+            })
+            .populate({
+                path: "movements.responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User"
+                }
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User"
+            });
+
+        getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
+    } catch (error) {
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
+// Get a ticket
 // ==================================================
 export const getTicket = async (req: Request, res: Response) => {
     try {
