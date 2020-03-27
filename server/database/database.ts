@@ -1,9 +1,9 @@
 import Mongoose from "mongoose";
 
 export default class Database {
-    private URI: string = "mongodb://localhost:27017/follower";
-    // private URI: string =
-    //     "mongodb+srv://follower:amFjt2afBZ4wj5ru@cluster0-jfhtw.mongodb.net/follower?retryWrites=true&w=majority";
+    // private URI: string = "mongodb://localhost:27017/follower";
+    private URI: string =
+        "mongodb+srv://follower:amFjt2afBZ4wj5ru@cluster0-jfhtw.mongodb.net/follower?retryWrites=true&w=majority";
     constructor() {
         this.settings();
         this.connect();

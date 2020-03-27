@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("../models/user"));
 const response_controller_1 = require("./response.controller");
-const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 // ==================================================
 // Get all Users
 // ==================================================
@@ -100,18 +99,6 @@ exports.deleteUser = (req, res) => __awaiter(this, void 0, void 0, function* () 
         user.deleted_at = new Date();
         let saved_user = yield user.save();
         response_controller_1.getResponse(res, 200, true, "", `El usuario '${saved_user.last_name}${saved_user.name}' se dió de baja con éxito`, saved_user);
-    }
-    catch (error) {
-        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-});
-// ==================================================
-// Get all Users
-// ==================================================
-exports.getClients = (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        var users = clientsSocket_1.clientsSocketController.getList();
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", users);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

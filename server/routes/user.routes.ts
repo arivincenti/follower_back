@@ -14,12 +14,12 @@ const userRouter = Router();
 // ==================================================
 // Get all users
 // ==================================================
-userRouter.get("/users", getUsers);
+userRouter.get("/users", verifyToken, getUsers);
 
 // ==================================================
 // Get one user
 // ==================================================
-userRouter.get("/users/:user", getUser);
+userRouter.get("/users/:user", verifyToken, getUser);
 
 // ==================================================
 // Get users by email
@@ -35,10 +35,5 @@ userRouter.put("/users/:user", verifyToken, updateUser);
 // Delete a user
 // ==================================================
 userRouter.delete("/users/:user", verifyToken, deleteUser);
-
-// ==================================================
-// Clients
-// ==================================================
-userRouter.get("/clients", getClients);
 
 export default userRouter;

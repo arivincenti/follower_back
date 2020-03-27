@@ -7,11 +7,11 @@ const userRouter = express_1.Router();
 // ==================================================
 // Get all users
 // ==================================================
-userRouter.get("/users", user_controller_1.getUsers);
+userRouter.get("/users", authentication_1.verifyToken, user_controller_1.getUsers);
 // ==================================================
 // Get one user
 // ==================================================
-userRouter.get("/users/:user", user_controller_1.getUser);
+userRouter.get("/users/:user", authentication_1.verifyToken, user_controller_1.getUser);
 // ==================================================
 // Get users by email
 // ==================================================
@@ -24,8 +24,4 @@ userRouter.put("/users/:user", authentication_1.verifyToken, user_controller_1.u
 // Delete a user
 // ==================================================
 userRouter.delete("/users/:user", authentication_1.verifyToken, user_controller_1.deleteUser);
-// ==================================================
-// Clients
-// ==================================================
-userRouter.get("/clients", user_controller_1.getClients);
 exports.default = userRouter;

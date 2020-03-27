@@ -118,16 +118,3 @@ export const deleteUser = async (req: Request, res: Response) => {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };
-
-// ==================================================
-// Get all Users
-// ==================================================
-export const getClients = async (req: Request, res: Response) => {
-    try {
-        var users = clientsSocketController.getList();
-
-        getResponse(res, 200, true, "", "La búsqueda fue un éxito", users);
-    } catch (error) {
-        getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-};
