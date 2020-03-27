@@ -4,8 +4,7 @@ import {
     getUser,
     getUserByEmail,
     updateUser,
-    deleteUser,
-    getClients
+    deleteUser
 } from "../controllers/user.controller";
 import { verifyToken } from "../middlewares/authentication";
 
