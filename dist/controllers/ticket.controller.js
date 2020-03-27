@@ -386,6 +386,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             followers: [],
             priority: body.priority,
             status: body.status,
+            date: body.date,
             updated_by: body.created_by,
             updated_at: new Date()
         };
@@ -395,6 +396,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             followers: [],
             priority: body.priority,
             status: body.status,
+            date: body.date,
             created_at: new Date(),
             created_by: body.created_by
         };

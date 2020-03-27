@@ -7,6 +7,7 @@ export interface ITicket extends Document {
     responsible?: string[];
     followers?: string[];
     status?: string;
+    date?: Date;
     priority?: string;
     movements?: any[];
     comments?: any[];
@@ -44,6 +45,9 @@ var ticketSchema = new Schema({
     status: {
         type: String
     },
+    date: {
+        type: Date
+    },
     priority: {
         type: String
     },
@@ -65,6 +69,9 @@ var ticketSchema = new Schema({
             ],
             status: {
                 type: String
+            },
+            date: {
+                type: Date
             },
             priority: {
                 type: String

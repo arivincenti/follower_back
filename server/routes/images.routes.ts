@@ -7,7 +7,7 @@ const imageRouter = Router();
 // ==================================================
 // Obtener imagenes
 // ==================================================
-imageRouter.get("/images/:img", getImage);
+imageRouter.get("/images/:genre/:img", getImage);
 
 // ==================================================
 // Subir archivos al server

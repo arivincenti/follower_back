@@ -3,6 +3,7 @@ import { Schema, model, Document } from "mongoose";
 export interface IUser extends Document {
     name?: string;
     last_name?: string;
+    genre?: string;
     email?: string;
     password?: string;
     img?: string;
@@ -19,6 +20,9 @@ const userSchema = new Schema({
     last_name: {
         type: String,
         required: [true, "The Last Name field is a required field"]
+    },
+    genre: {
+        type: String
     },
     email: {
         type: String,

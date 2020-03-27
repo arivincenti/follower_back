@@ -7,7 +7,7 @@ const imageRouter = express_1.Router();
 // ==================================================
 // Obtener imagenes
 // ==================================================
-imageRouter.get("/images/:img", images_controller_1.getImage);
+imageRouter.get("/images/:genre/:img", images_controller_1.getImage);
 // ==================================================
 // Subir archivos al server
 // ==================================================

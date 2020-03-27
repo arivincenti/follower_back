@@ -27,6 +27,9 @@ var ticketSchema = new mongoose_1.Schema({
     status: {
         type: String
     },
+    date: {
+        type: Date
+    },
     priority: {
         type: String
     },
@@ -48,6 +51,9 @@ var ticketSchema = new mongoose_1.Schema({
             ],
             status: {
                 type: String
+            },
+            date: {
+                type: Date
             },
             priority: {
                 type: String

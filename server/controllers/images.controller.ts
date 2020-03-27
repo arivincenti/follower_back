@@ -10,14 +10,20 @@ import { getResponse } from "./response.controller";
 export const getImage = (req: Request, res: Response) => {
     try {
         var img = req.params.img;
+        var genre = req.params.genre;
         var pathImage = path.resolve(__dirname, `../uploads/${img}`);
 
         if (fs.existsSync(pathImage)) {
             res.sendFile(pathImage);
         } else {
+            var genre_temp = "male";
+
+            if (genre === "female") {
+                genre_temp = "female";
+            }
             var pathNoImgae = path.resolve(
                 __dirname,
-                `../assets/images/no-img.jpg`
+                `../assets/images/${genre_temp}.jpg`
             );
             res.sendFile(pathNoImgae);
         }

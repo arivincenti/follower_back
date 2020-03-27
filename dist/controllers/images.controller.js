@@ -21,12 +21,17 @@ const response_controller_1 = require("./response.controller");
 exports.getImage = (req, res) => {
     try {
         var img = req.params.img;
+        var genre = req.params.genre;
         var pathImage = path_1.default.resolve(__dirname, `../uploads/${img}`);
         if (fs_1.default.existsSync(pathImage)) {
             res.sendFile(pathImage);
         }
         else {
-            var pathNoImgae = path_1.default.resolve(__dirname, `../assets/images/no-img.jpg`);
+            var genre_temp = "male";
+            if (genre === "female") {
+                genre_temp = "female";
+            }
+            var pathNoImgae = path_1.default.resolve(__dirname, `../assets/images/${genre_temp}.jpg`);
             res.sendFile(pathNoImgae);
         }
     }

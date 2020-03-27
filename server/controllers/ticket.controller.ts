@@ -398,6 +398,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             followers: [],
             priority: body.priority,
             status: body.status,
+            date: body.date,
             updated_by: body.created_by,
             updated_at: new Date()
         };
@@ -408,6 +409,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             followers: [],
             priority: body.priority,
             status: body.status,
+            date: body.date,
             created_at: new Date(),
             created_by: body.created_by
         };

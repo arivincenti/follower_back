@@ -10,6 +10,9 @@ const userSchema = new mongoose_1.Schema({
         type: String,
         required: [true, "The Last Name field is a required field"]
     },
+    genre: {
+        type: String
+    },
     email: {
         type: String,
         unique: true,
