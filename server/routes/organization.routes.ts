@@ -45,8 +45,8 @@ organizationRouter.put(
 // ==================================================
 // Delete a Organization
 // ==================================================
-organizationRouter.delete(
-    "/organizations/:organization",
+organizationRouter.put(
+    "/organizations/delete/:organization",
     verifyToken,
     deleteOrganization
 );

@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { NotificationSocketController } from "../../socketControllers/notificationController/notificationSocketController";
+import { NotificationSocketController } from "../../socketControllers/notificationControllers/notificationSocketController";
 
 export const notificationSocketController = new NotificationSocketController();
 

@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { AreaSocketController } from "../../socketControllers/areaControllers.ts/areaSocketController";
+import { AreaSocketController } from "../../socketControllers/areaControllers/areaSocketController";
 
 const areaSocketController = new AreaSocketController();
 

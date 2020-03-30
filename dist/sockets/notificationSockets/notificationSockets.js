@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const notificationSocketController_1 = require("../../socketControllers/notificationController/notificationSocketController");
+const notificationSocketController_1 = require("../../socketControllers/notificationControllers/notificationSocketController");
 exports.notificationSocketController = new notificationSocketController_1.NotificationSocketController();
 // ==================================================
 // Create notification

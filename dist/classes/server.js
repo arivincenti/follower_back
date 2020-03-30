@@ -21,6 +21,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const routes_1 = __importDefault(require("../routes/routes"));
 const cors_1 = __importDefault(require("cors"));
+const morgan_1 = __importDefault(require("morgan"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const database_1 = __importDefault(require("../database/database"));
 const socket_io_1 = __importDefault(require("socket.io"));
@@ -30,6 +31,7 @@ const clientsSocket = __importStar(require("../sockets/clientsSockets/clientsSoc
 const ticketSocket = __importStar(require("../sockets/ticketSockets/ticketSocket"));
 const areaSocket = __importStar(require("../sockets/areaSockets/areaSocket"));
 const notificationSocket = __importStar(require("../sockets/notificationSockets/notificationSockets"));
+const organizationsSocket = __importStar(require("../sockets/organizationSockets/organizationSockets"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -58,6 +60,7 @@ class Server {
         // this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express_1.default.json());
         this.app.use(express_fileupload_1.default());
+        this.app.use(morgan_1.default("dev"));
     }
     routes() {
         this.app.use("/api", routes_1.default);
@@ -70,6 +73,11 @@ class Server {
             clientsSocket.config_client(socket);
             //Disconnect client
             clientsSocket.desconectar(socket);
+            //Organizations
+            organizationsSocket.joinToOrganization(socket);
+            organizationsSocket.joinAllOrganizations(socket);
+            organizationsSocket.leaveAnOrganization(socket);
+            organizationsSocket.leaveAllOrganizations(socket);
             //Tickets
             ticketSocket.joinToTicket(socket);
             ticketSocket.joinAllTickets(socket);

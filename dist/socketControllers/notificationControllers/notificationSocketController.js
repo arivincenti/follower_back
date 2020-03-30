@@ -31,7 +31,8 @@ class NotificationSocketController {
             var pre_notification = yield notification_1.default.create(newNotification);
             var notification = yield notification_1.default.findById(pre_notification._id).populate({
                 path: "updated_by",
-                model: "User"
+                model: "User",
+                select: "-password"
             });
             let socketTicketPayload = {
                 object: payload.object,

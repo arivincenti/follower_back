@@ -437,6 +437,11 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             }
         })
             .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
             path: "movements.area",
             model: "Area",
             populate: {
@@ -460,11 +465,13 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         var newMovement = newTicket.movements.pop();
         var oldMovement = newTicket.movements.splice(newTicket.movements.length - 1, 1);
         var payload = {
-            ticket: newTicket,
+            objectType: "ticket",
+            object: newTicket,
+            members: [...newTicket.area.members],
             old: oldMovement[0],
             new: newMovement
         };
-        server_1.default.instance.io.to(client.id).emit("update-ticket", payload);
+        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${newTicket._id}' se creó con éxito`, newTicket);
     }
     catch (error) {

@@ -458,6 +458,11 @@ export const updateTicket = async (req: Request, res: Response) => {
                 }
             })
             .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
@@ -489,12 +494,14 @@ export const updateTicket = async (req: Request, res: Response) => {
         );
 
         var payload = {
-            ticket: newTicket,
+            objectType: "ticket",
+            object: newTicket,
+            members: [...newTicket.area.members],
             old: oldMovement[0],
             new: newMovement
         };
 
-        Server.instance.io.to(client.id).emit("update-ticket", payload);
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,

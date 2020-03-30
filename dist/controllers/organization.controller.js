@@ -15,6 +15,7 @@ const organization_1 = __importDefault(require("../models/organization"));
 const member_1 = __importDefault(require("../models/member"));
 const response_controller_1 = require("./response.controller");
 const server_1 = __importDefault(require("../classes/server"));
+const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 // const EmailController = require('./email.controller');
 // const {
 //   mailjet
@@ -107,20 +108,46 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
     try {
         var organization_id = req.params.organization;
         var body = req.body;
+        var members = yield member_1.default.find({
+            organization: organization_id
+        })
+            .populate({
+            path: "user",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        });
+        //Actualiza la fecha de borrado con undefined para eliminarla cuanod se reactiva la organizacion
         var object = {
             deleted_at: body.deleted_at
         };
         if (body.name) {
             object.name = body.name;
-            object.updated_at = new Date();
         }
-        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, object, { new: true }).populate({
+        object.updated_by = body.updated_by;
+        object.updated_at = new Date();
+        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, object, { new: true })
+            .populate({
             path: "created_by",
             model: "User",
             select: "-pasword"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-pasword"
         });
-        const server = server_1.default.instance;
-        server.io.emit("organization-update");
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        var payload = {
+            objectType: "organization",
+            object: savedOrganization,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `La organización '${savedOrganization.name}' se actualizó con éxito`, savedOrganization);
     }
     catch (error) {
@@ -133,11 +160,38 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
 exports.deleteOrganization = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var organization_id = req.params.organization;
-        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: new Date() }, { new: true }).populate({
+        var body = req.body;
+        var members = yield member_1.default.find({
+            organization: organization_id
+        })
+            .populate({
+            path: "user",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        });
+        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: new Date(), updated_by: body.updated_by }, { new: true })
+            .populate({
             path: "created_by",
             model: "User",
             select: "-pasword"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-pasword"
         });
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        var payload = {
+            objectType: "organization",
+            object: savedOrganization,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `La organización '${savedOrganization.name}' fue dada de baja con éxito`, savedOrganization);
     }
     catch (error) {

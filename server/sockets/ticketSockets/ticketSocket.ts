@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { clientsSocketController } from "../../sockets/clientsSockets/clientsSocket";
-import { TicketSocketController } from "../../socketControllers/ticketControllers.ts/ticketSocketController";
+import { TicketSocketController } from "../../socketControllers/ticketControllers/ticketSocketController";
 import ticket from "../../models/ticket";
 
 const ticketSocketController = new TicketSocketController();

@@ -3,6 +3,7 @@ import Member, { IMember } from "../models/member";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import Server from "../classes/server";
+import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 // const EmailController = require('./email.controller');
 // const {
 //   mailjet
@@ -132,28 +133,59 @@ export const updateOrganization = async (req: Request, res: Response) => {
         var organization_id = req.params.organization;
         var body = req.body;
 
+        var members = await Member.find({
+            organization: organization_id
+        })
+            .populate({
+                path: "user",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            });
+
+        //Actualiza la fecha de borrado con undefined para eliminarla cuanod se reactiva la organizacion
         var object: any = {
             deleted_at: body.deleted_at
         };
 
         if (body.name) {
             object.name = body.name;
-            object.updated_at = new Date();
         }
+
+        object.updated_by = body.updated_by;
+        object.updated_at = new Date();
 
         var savedOrganization: any = await Organization.findByIdAndUpdate(
             organization_id,
             object,
             { new: true }
-        ).populate({
-            path: "created_by",
-            model: "User",
-            select: "-pasword"
-        });
+        )
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-pasword"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-pasword"
+            });
 
-        const server = Server.instance;
+        var client: any = clientsSocketController.getClientByUser(
+            body.updated_by._id
+        );
 
-        server.io.emit("organization-update");
+        var payload = {
+            objectType: "organization",
+            object: savedOrganization,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,
@@ -174,16 +206,49 @@ export const updateOrganization = async (req: Request, res: Response) => {
 export const deleteOrganization = async (req: Request, res: Response) => {
     try {
         var organization_id = req.params.organization;
+        var body = req.body;
+
+        var members = await Member.find({
+            organization: organization_id
+        })
+            .populate({
+                path: "user",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            });
 
         var savedOrganization: any = await Organization.findByIdAndUpdate(
             organization_id,
-            { deleted_at: new Date() },
+            { deleted_at: new Date(), updated_by: body.updated_by },
             { new: true }
-        ).populate({
-            path: "created_by",
-            model: "User",
-            select: "-pasword"
-        });
+        )
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-pasword"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-pasword"
+            });
+
+        var client: any = clientsSocketController.getClientByUser(
+            body.updated_by._id
+        );
+
+        var payload = {
+            objectType: "organization",
+            object: savedOrganization,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,

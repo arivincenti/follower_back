@@ -1,6 +1,7 @@
 import express from "express";
 import routes from "../routes/routes";
 import cors from "cors";
+import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import Database from "../database/database";
 import socketIO from "socket.io";
@@ -10,6 +11,7 @@ import * as clientsSocket from "../sockets/clientsSockets/clientsSocket";
 import * as ticketSocket from "../sockets/ticketSockets/ticketSocket";
 import * as areaSocket from "../sockets/areaSockets/areaSocket";
 import * as notificationSocket from "../sockets/notificationSockets/notificationSockets";
+import * as organizationsSocket from "../sockets/organizationSockets/organizationSockets";
 
 export default class Server {
     private app: express.Application;
@@ -52,6 +54,7 @@ export default class Server {
         // this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express.json());
         this.app.use(fileUpload());
+        this.app.use(morgan("dev"));
     }
 
     routes() {
@@ -66,6 +69,12 @@ export default class Server {
             clientsSocket.config_client(socket);
             //Disconnect client
             clientsSocket.desconectar(socket);
+
+            //Organizations
+            organizationsSocket.joinToOrganization(socket);
+            organizationsSocket.joinAllOrganizations(socket);
+            organizationsSocket.leaveAnOrganization(socket);
+            organizationsSocket.leaveAllOrganizations(socket);
 
             //Tickets
             ticketSocket.joinToTicket(socket);

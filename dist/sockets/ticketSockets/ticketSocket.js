@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ticketSocketController_1 = require("../../socketControllers/ticketControllers.ts/ticketSocketController");
+const ticketSocketController_1 = require("../../socketControllers/ticketControllers/ticketSocketController");
 const ticketSocketController = new ticketSocketController_1.TicketSocketController();
 // ==================================================
 // Join to ticket

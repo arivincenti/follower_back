@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const areaSocketController_1 = require("../../socketControllers/areaControllers.ts/areaSocketController");
+const areaSocketController_1 = require("../../socketControllers/areaControllers/areaSocketController");
 const areaSocketController = new areaSocketController_1.AreaSocketController();
 // ==================================================
 // Join to area

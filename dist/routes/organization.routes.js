@@ -23,5 +23,5 @@ organizationRouter.put("/organizations/:organization", authentication_1.verifyTo
 // ==================================================
 // Delete a Organization
 // ==================================================
-organizationRouter.delete("/organizations/:organization", authentication_1.verifyToken, organization_controller_1.deleteOrganization);
+organizationRouter.put("/organizations/delete/:organization", authentication_1.verifyToken, organization_controller_1.deleteOrganization);
 exports.default = organizationRouter;
