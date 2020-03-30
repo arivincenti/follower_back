@@ -1,7 +1,6 @@
 import express from "express";
 import routes from "../routes/routes";
 import cors from "cors";
-import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import Database from "../database/database";
 import socketIO from "socket.io";
@@ -45,8 +44,8 @@ export default class Server {
         this.app.use(
             cors({
                 origin: [
-                    "https://arivincenti.github.io/#/",
-                    "http://localhost:4200/#"
+                    "https://arivincenti.github.io",
+                    "http://localhost:4200"
                 ],
                 credentials: true
             })
@@ -54,7 +53,6 @@ export default class Server {
         // this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express.json());
         this.app.use(fileUpload());
-        this.app.use(morgan("dev"));
     }
 
     routes() {

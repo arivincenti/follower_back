@@ -21,7 +21,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const routes_1 = __importDefault(require("../routes/routes"));
 const cors_1 = __importDefault(require("cors"));
-const morgan_1 = __importDefault(require("morgan"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const database_1 = __importDefault(require("../database/database"));
 const socket_io_1 = __importDefault(require("socket.io"));
@@ -52,15 +51,14 @@ class Server {
     middlewares() {
         this.app.use(cors_1.default({
             origin: [
-                "https://arivincenti.github.io/#/",
-                "http://localhost:4200/#"
+                "https://arivincenti.github.io",
+                "http://localhost:4200"
             ],
             credentials: true
         }));
         // this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express_1.default.json());
         this.app.use(express_fileupload_1.default());
-        this.app.use(morgan_1.default("dev"));
     }
     routes() {
         this.app.use("/api", routes_1.default);
