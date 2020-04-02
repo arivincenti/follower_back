@@ -82,6 +82,7 @@ class Server {
             ticketSocket.leaveATicket(socket);
             ticketSocket.leaveAllTickets(socket);
             //Areas
+            areaSocket.joinArea(socket);
             areaSocket.joinAllAreas(socket);
             areaSocket.leaveAnArea(socket);
             areaSocket.leaveAllAreas(socket);

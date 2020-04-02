@@ -5,7 +5,8 @@ import {
     getOrganization,
     createOrganization,
     updateOrganization,
-    deleteOrganization
+    activateOrganization,
+    desactivateOrganization
 } from "../controllers/organization.controller";
 
 const organizationRouter = Router();
@@ -45,10 +46,19 @@ organizationRouter.put(
 // ==================================================
 // Delete a Organization
 // ==================================================
-organizationRouter.put(
-    "/organizations/delete/:organization",
+organizationRouter.patch(
+    "/organizations/activate_organization/:organization",
     verifyToken,
-    deleteOrganization
+    activateOrganization
+);
+
+// ==================================================
+// Delete a Organization
+// ==================================================
+organizationRouter.patch(
+    "/organizations/desactivate_organization/:organization",
+    verifyToken,
+    desactivateOrganization
 );
 
 export default organizationRouter;

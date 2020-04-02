@@ -5,8 +5,8 @@ import {
     getMember,
     getMemberByEmail,
     createMember,
-    updateMember,
-    deleteMember
+    activateMember,
+    desactivateMember
 } from "../controllers/member.controller";
 
 const memberRouter = Router();
@@ -38,11 +38,19 @@ memberRouter.post("/members", verifyToken, createMember);
 // ==================================================
 // Update a member
 // ==================================================
-memberRouter.put("/members/:member", verifyToken, updateMember);
+memberRouter.patch(
+    "/members/activate_member/:member",
+    verifyToken,
+    activateMember
+);
 
 // ==================================================
 // Delete a member
 // ==================================================
-memberRouter.delete("/members/:member", verifyToken, deleteMember);
+memberRouter.patch(
+    "/members/desactivate_member/:member",
+    verifyToken,
+    desactivateMember
+);
 
 export default memberRouter;

@@ -6,6 +6,7 @@ export interface INotification extends Document {
     objectType: string;
     users: any[];
     readed_by: any[];
+    created_by: string;
     created_at: Date;
 }
 
@@ -24,7 +25,7 @@ var notificationSchema = new Schema({
     // objectName: {
     //     type: String
     // },
-    updated_by: {
+    created_by: {
         type: Schema.Types.ObjectId,
         ref: "User"
     },

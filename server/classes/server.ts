@@ -81,6 +81,7 @@ export default class Server {
             ticketSocket.leaveAllTickets(socket);
 
             //Areas
+            areaSocket.joinArea(socket);
             areaSocket.joinAllAreas(socket);
             areaSocket.leaveAnArea(socket);
             areaSocket.leaveAllAreas(socket);

@@ -392,14 +392,14 @@ export const updateTicket = async (req: Request, res: Response) => {
         var ticket_id = req.params.ticket;
         var body = req.body;
 
-        var ticket: any = {
+        var payload_ticket: any = {
             area: body.area,
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
             status: body.status,
             date: body.date,
-            updated_by: body.created_by,
+            updated_by: body.updated_by,
             updated_at: new Date()
         };
 
@@ -411,13 +411,13 @@ export const updateTicket = async (req: Request, res: Response) => {
             status: body.status,
             date: body.date,
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.updated_by
         };
 
-        var newTicket: any = await Ticket.findByIdAndUpdate(
+        var new_ticket: any = await Ticket.findByIdAndUpdate(
             ticket_id,
             {
-                ...ticket,
+                ...payload_ticket,
                 $push: {
                     movements: movement
                 }
@@ -484,21 +484,41 @@ export const updateTicket = async (req: Request, res: Response) => {
             });
 
         var client: any = clientsSocketController.getClientByUser(
-            body.created_by
+            body.updated_by
         );
 
-        var newMovement = newTicket.movements.pop();
-        var oldMovement = newTicket.movements.splice(
-            newTicket.movements.length - 1,
-            1
-        );
+        var oldMovement = body.ticket;
+
+        console.log(body.ticket.responsible);
+        console.log("----------------------------------");
+        console.log("----------------------------------");
+        console.log(new_ticket.responsible);
+
+        var changes: any = [];
+        var message = "";
+        if (new_ticket.status !== oldMovement.status) {
+            message = `El estado del ticket "${new_ticket.subject}" pasó de "${oldMovement.status}" a "${new_ticket.status}"`;
+            changes.push(message);
+        }
+
+        if (new_ticket.priority !== oldMovement.priority) {
+            message = `La prioridad del ticket "${new_ticket.subject}" pasó de "${oldMovement.priority}" a "${new_ticket.priority}"`;
+            changes.push(message);
+        }
+
+        if (
+            String(new_ticket.responsible._id) !==
+            String(body.ticket.responsible._id)
+        ) {
+            message = `El responsable del ticket "${new_ticket.subject}" pasó de "${body.ticket.responsible.user.name} ${body.ticket.responsible.user.last_name}" a "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+            changes.push(message);
+        }
 
         var payload = {
             objectType: "ticket",
-            object: newTicket,
-            members: [...newTicket.area.members],
-            old: oldMovement[0],
-            new: newMovement
+            object: new_ticket,
+            changes,
+            members: [...new_ticket.area.members]
         };
 
         Server.instance.io.to(client.id).emit("update", payload);
@@ -508,10 +528,11 @@ export const updateTicket = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            `El ticket '${newTicket._id}' se creó con éxito`,
-            newTicket
+            `El ticket '${new_ticket._id}' se modificó con éxito`,
+            new_ticket
         );
     } catch (error) {
+        console.error(error);
         getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };

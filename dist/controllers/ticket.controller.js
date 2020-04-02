@@ -380,14 +380,14 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
     try {
         var ticket_id = req.params.ticket;
         var body = req.body;
-        var ticket = {
+        var payload_ticket = {
             area: body.area,
             responsible: body.responsible,
             followers: [],
             priority: body.priority,
             status: body.status,
             date: body.date,
-            updated_by: body.created_by,
+            updated_by: body.updated_by,
             updated_at: new Date()
         };
         var movement = {
@@ -398,9 +398,9 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             status: body.status,
             date: body.date,
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.updated_by
         };
-        var newTicket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, ticket, { $push: {
+        var new_ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, payload_ticket, { $push: {
                 movements: movement
             } }), { new: true })
             .populate({
@@ -461,20 +461,38 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             path: "movements.created_by",
             model: "User"
         });
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.created_by);
-        var newMovement = newTicket.movements.pop();
-        var oldMovement = newTicket.movements.splice(newTicket.movements.length - 1, 1);
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
+        var oldMovement = body.ticket;
+        console.log(body.ticket.responsible);
+        console.log("----------------------------------");
+        console.log("----------------------------------");
+        console.log(new_ticket.responsible);
+        var changes = [];
+        var message = "";
+        if (new_ticket.status !== oldMovement.status) {
+            message = `El estado del ticket "${new_ticket.subject}" pasó de "${oldMovement.status}" a "${new_ticket.status}"`;
+            changes.push(message);
+        }
+        if (new_ticket.priority !== oldMovement.priority) {
+            message = `La prioridad del ticket "${new_ticket.subject}" pasó de "${oldMovement.priority}" a "${new_ticket.priority}"`;
+            changes.push(message);
+        }
+        if (String(new_ticket.responsible._id) !==
+            String(body.ticket.responsible._id)) {
+            message = `El responsable del ticket "${new_ticket.subject}" pasó de "${body.ticket.responsible.user.name} ${body.ticket.responsible.user.last_name}" a "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+            changes.push(message);
+        }
         var payload = {
             objectType: "ticket",
-            object: newTicket,
-            members: [...newTicket.area.members],
-            old: oldMovement[0],
-            new: newMovement
+            object: new_ticket,
+            changes,
+            members: [...new_ticket.area.members]
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
-        response_controller_1.getResponse(res, 200, true, "", `El ticket '${newTicket._id}' se creó con éxito`, newTicket);
+        response_controller_1.getResponse(res, 200, true, "", `El ticket '${new_ticket._id}' se modificó con éxito`, new_ticket);
     }
     catch (error) {
+        console.error(error);
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 });

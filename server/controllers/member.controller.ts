@@ -2,6 +2,8 @@ import User, { IUser } from "../models/user";
 import Member, { IMember } from "../models/member";
 import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
+import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
+import Server from "../classes/server";
 
 // ==================================================
 // Get all members
@@ -16,12 +18,21 @@ export const getMembers = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-_password"
             })
             .populate({
                 path: "created_by",
                 model: "User",
                 select: "-password"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "organization",
+                model: "Organization"
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
@@ -41,12 +52,21 @@ export const getMember = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-_password"
             })
             .populate({
                 path: "created_by",
                 model: "User",
                 select: "-password"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "organization",
+                model: "Organization"
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", member);
@@ -86,12 +106,21 @@ export const getMemberByEmail = async (req: Request, res: Response) => {
                 .populate({
                     path: "user",
                     model: "User",
-                    select: "-password"
+                    select: "-_password"
                 })
                 .populate({
                     path: "created_by",
                     model: "User",
                     select: "-password"
+                })
+                .populate({
+                    path: "updated_by",
+                    model: "User",
+                    select: "-password"
+                })
+                .populate({
+                    path: "organization",
+                    model: "Organization"
                 })
                 .limit(5);
         }
@@ -124,12 +153,21 @@ export const createMember = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-_password"
             })
             .populate({
                 path: "created_by",
                 model: "User",
                 select: "-password"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "organization",
+                model: "Organization"
             });
 
         getResponse(
@@ -148,12 +186,22 @@ export const createMember = async (req: Request, res: Response) => {
 // ==================================================
 // Update a member
 // ==================================================
-export const updateMember = async (req: Request, res: Response) => {
+export const activateMember = async (req: Request, res: Response) => {
     try {
         var member_id = req.params.member;
         var body = req.body;
 
-        var member: any = await Member.findById(member_id)
+        var member_payload = {
+            deleted_at: body.deleted_at,
+            updated_at: new Date(),
+            updated_by: body.updated_by
+        };
+
+        var member: any = await Member.findByIdAndUpdate(
+            member_id,
+            member_payload,
+            { new: true }
+        )
             .populate({
                 path: "user",
                 model: "User",
@@ -165,23 +213,42 @@ export const updateMember = async (req: Request, res: Response) => {
                 select: "-password"
             })
             .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
                 path: "organization",
                 model: "Organization"
             });
 
-        if (body.deleted_at) member.deleted_at = undefined;
+        var members = [];
+        members.push(member);
 
-        member.updated_at = new Date();
+        var changes = [
+            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`
+        ];
 
-        var saved_member = await member.save();
+        var client: any = clientsSocketController.getClientByUser(
+            body.updated_by._id
+        );
+
+        var payload = {
+            objectType: "member",
+            changes,
+            object: member,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,
             200,
             true,
             "",
-            `El miembro '${saved_member._id}' se modificó con éxito`,
-            saved_member
+            `El miembro '${member._id}' se modificó con éxito`,
+            member
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -191,11 +258,22 @@ export const updateMember = async (req: Request, res: Response) => {
 // ==================================================
 // Delete a member
 // ==================================================
-export const deleteMember = async (req: Request, res: Response) => {
+export const desactivateMember = async (req: Request, res: Response) => {
     try {
         var member_id = req.params.member;
+        var body = req.body;
 
-        var member: any = await Member.findById(member_id)
+        var member_payload = {
+            deleted_at: body.deleted_at,
+            updated_at: body.deleted_at,
+            updated_by: body.updated_by
+        };
+
+        var member: any = await Member.findByIdAndUpdate(
+            member_id,
+            member_payload,
+            { new: true }
+        )
             .populate({
                 path: "user",
                 model: "User",
@@ -207,21 +285,42 @@ export const deleteMember = async (req: Request, res: Response) => {
                 select: "-password"
             })
             .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
                 path: "organization",
                 model: "Organization"
             });
 
-        member.deleted_at = new Date();
+        var members = [];
+        members.push(member);
 
-        var saved_member = await member.save();
+        var changes = [
+            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`
+        ];
+
+        var client: any = clientsSocketController.getClientByUser(
+            body.updated_by._id
+        );
+
+        var payload = {
+            objectType: "member",
+            changes,
+            object: member,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,
             200,
             true,
             "",
-            `El miembro '${saved_member._id}' se dió de baja con éxito`,
-            saved_member
+            `El miembro '${member._id}' se modificó con éxito`,
+            member
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);

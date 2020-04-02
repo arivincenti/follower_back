@@ -14,6 +14,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("../models/user"));
 const member_1 = __importDefault(require("../models/member"));
 const response_controller_1 = require("./response.controller");
+const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
+const server_1 = __importDefault(require("../classes/server"));
 // ==================================================
 // Get all members
 // ==================================================
@@ -26,12 +28,21 @@ exports.getMembers = (req, res) => __awaiter(this, void 0, void 0, function* () 
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-_password"
         })
             .populate({
             path: "created_by",
             model: "User",
             select: "-password"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "organization",
+            model: "Organization"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
     }
@@ -49,12 +60,21 @@ exports.getMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-_password"
         })
             .populate({
             path: "created_by",
             model: "User",
             select: "-password"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "organization",
+            model: "Organization"
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", member);
     }
@@ -91,12 +111,21 @@ exports.getMemberByEmail = (req, res) => __awaiter(this, void 0, void 0, functio
                 .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-_password"
             })
                 .populate({
                 path: "created_by",
                 model: "User",
                 select: "-password"
+            })
+                .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-password"
+            })
+                .populate({
+                path: "organization",
+                model: "Organization"
             })
                 .limit(5);
         }
@@ -125,12 +154,21 @@ exports.createMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-_password"
         })
             .populate({
             path: "created_by",
             model: "User",
             select: "-password"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "organization",
+            model: "Organization"
         });
         response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se creó con éxito`, member);
     }
@@ -141,11 +179,16 @@ exports.createMember = (req, res) => __awaiter(this, void 0, void 0, function* (
 // ==================================================
 // Update a member
 // ==================================================
-exports.updateMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
+exports.activateMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var member_id = req.params.member;
         var body = req.body;
-        var member = yield member_1.default.findById(member_id)
+        var member_payload = {
+            deleted_at: body.deleted_at,
+            updated_at: new Date(),
+            updated_by: body.updated_by
+        };
+        var member = yield member_1.default.findByIdAndUpdate(member_id, member_payload, { new: true })
             .populate({
             path: "user",
             model: "User",
@@ -157,14 +200,28 @@ exports.updateMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             select: "-password"
         })
             .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
             path: "organization",
             model: "Organization"
         });
-        if (body.deleted_at)
-            member.deleted_at = undefined;
-        member.updated_at = new Date();
-        var saved_member = yield member.save();
-        response_controller_1.getResponse(res, 200, true, "", `El miembro '${saved_member._id}' se modificó con éxito`, saved_member);
+        var members = [];
+        members.push(member);
+        var changes = [
+            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`
+        ];
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        var payload = {
+            objectType: "member",
+            changes,
+            object: member,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se modificó con éxito`, member);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -173,10 +230,16 @@ exports.updateMember = (req, res) => __awaiter(this, void 0, void 0, function* (
 // ==================================================
 // Delete a member
 // ==================================================
-exports.deleteMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
+exports.desactivateMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var member_id = req.params.member;
-        var member = yield member_1.default.findById(member_id)
+        var body = req.body;
+        var member_payload = {
+            deleted_at: body.deleted_at,
+            updated_at: body.deleted_at,
+            updated_by: body.updated_by
+        };
+        var member = yield member_1.default.findByIdAndUpdate(member_id, member_payload, { new: true })
             .populate({
             path: "user",
             model: "User",
@@ -188,12 +251,28 @@ exports.deleteMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             select: "-password"
         })
             .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
             path: "organization",
             model: "Organization"
         });
-        member.deleted_at = new Date();
-        var saved_member = yield member.save();
-        response_controller_1.getResponse(res, 200, true, "", `El miembro '${saved_member._id}' se dió de baja con éxito`, saved_member);
+        var members = [];
+        members.push(member);
+        var changes = [
+            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`
+        ];
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        var payload = {
+            objectType: "member",
+            changes,
+            object: member,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se modificó con éxito`, member);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

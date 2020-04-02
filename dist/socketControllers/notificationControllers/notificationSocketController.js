@@ -24,13 +24,13 @@ class NotificationSocketController {
                 object: payload.object._id,
                 objectType: payload.objectType,
                 objectName: payload.object.subject,
-                updated_by: payload.updated_by,
+                created_by: payload.created_by,
                 users: [...payload.users],
                 readed_by: []
             };
             var pre_notification = yield notification_1.default.create(newNotification);
             var notification = yield notification_1.default.findById(pre_notification._id).populate({
-                path: "updated_by",
+                path: "created_by",
                 model: "User",
                 select: "-password"
             });
@@ -38,7 +38,16 @@ class NotificationSocketController {
                 object: payload.object,
                 notification
             };
-            io.to(payload.object._id) //Ticket room
+            var room = "";
+            switch (payload.objectType) {
+                case "member":
+                    room = payload.object.organization._id;
+                    break;
+                default:
+                    room = payload.object._id;
+                    break;
+            }
+            io.to(room) //Ticket room
                 .emit("new-notification", socketTicketPayload);
         });
     }

@@ -6,7 +6,7 @@ const areaSocketController = new AreaSocketController();
 // ==================================================
 // Join to area
 // ==================================================
-export const joinToArea = (socket: Socket) => {
+export const joinArea = (socket: Socket) => {
     socket.on("join-area", payload => {
         areaSocketController.joinArea(payload, socket);
     });

@@ -23,9 +23,9 @@ memberRouter.post("/members", authentication_1.verifyToken, member_controller_1.
 // ==================================================
 // Update a member
 // ==================================================
-memberRouter.put("/members/:member", authentication_1.verifyToken, member_controller_1.updateMember);
+memberRouter.patch("/members/activate_member/:member", authentication_1.verifyToken, member_controller_1.activateMember);
 // ==================================================
 // Delete a member
 // ==================================================
-memberRouter.delete("/members/:member", authentication_1.verifyToken, member_controller_1.deleteMember);
+memberRouter.patch("/members/desactivate_member/:member", authentication_1.verifyToken, member_controller_1.desactivateMember);
 exports.default = memberRouter;

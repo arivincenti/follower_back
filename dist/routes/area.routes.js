@@ -35,7 +35,7 @@ areaRouter.get("/areas/:area/members", authentication_1.verifyToken, area_contro
 // ==================================================
 // Add Area Members
 // ==================================================
-areaRouter.post("/areas/add_member", authentication_1.verifyToken, area_controller_1.addAreaMember);
+areaRouter.post("/areas/create_member", authentication_1.verifyToken, area_controller_1.createAreaMember);
 // ==================================================
 // Delete Area Members
 // ==================================================

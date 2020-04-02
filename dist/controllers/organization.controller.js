@@ -121,16 +121,12 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
             model: "User",
             select: "-password"
         });
-        //Actualiza la fecha de borrado con undefined para eliminarla cuanod se reactiva la organizacion
-        var object = {
-            deleted_at: body.deleted_at
+        var organization_payload = {
+            name: body.name,
+            updated_at: new Date(),
+            updated_by: body.updated_by
         };
-        if (body.name) {
-            object.name = body.name;
-        }
-        object.updated_by = body.updated_by;
-        object.updated_at = new Date();
-        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, object, { new: true })
+        var organization = yield organization_1.default.findByIdAndUpdate(organization_id, organization_payload, { new: true })
             .populate({
             path: "created_by",
             model: "User",
@@ -141,23 +137,27 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
             model: "User",
             select: "-pasword"
         });
+        var changes = [
+            `La organización ${body.organization.name} ahora se llama ${organization.name}`
+        ];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
-            object: savedOrganization,
+            object: organization,
+            changes,
             members
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
-        response_controller_1.getResponse(res, 200, true, "", `La organización '${savedOrganization.name}' se actualizó con éxito`, savedOrganization);
+        response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' se actualizó con éxito`, organization);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 });
 // ==================================================
-// Delete an organization
+// Activate an organization
 // ==================================================
-exports.deleteOrganization = (req, res) => __awaiter(this, void 0, void 0, function* () {
+exports.activateOrganization = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var organization_id = req.params.organization;
         var body = req.body;
@@ -174,7 +174,7 @@ exports.deleteOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
             model: "User",
             select: "-password"
         });
-        var savedOrganization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: new Date(), updated_by: body.updated_by }, { new: true })
+        var organization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: body.deleted_at, updated_by: body.updated_by }, { new: true })
             .populate({
             path: "created_by",
             model: "User",
@@ -185,14 +185,62 @@ exports.deleteOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
             model: "User",
             select: "-pasword"
         });
+        var changes = [`La organización ${organization.name} se activó`];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
-            object: savedOrganization,
+            object: organization,
+            changes,
             members
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
-        response_controller_1.getResponse(res, 200, true, "", `La organización '${savedOrganization.name}' fue dada de baja con éxito`, savedOrganization);
+        response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' fue dada de baja con éxito`, organization);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Desactivate an organization
+// ==================================================
+exports.desactivateOrganization = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var organization_id = req.params.organization;
+        var body = req.body;
+        var members = yield member_1.default.find({
+            organization: organization_id
+        })
+            .populate({
+            path: "user",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        });
+        var organization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: body.deleted_at, updated_by: body.updated_by }, { new: true })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-pasword"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-pasword"
+        });
+        var changes = [`La organización ${organization.name} se desactivó`];
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        var payload = {
+            objectType: "organization",
+            object: organization,
+            changes,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' fue dada de baja con éxito`, organization);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

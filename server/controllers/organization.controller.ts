@@ -147,21 +147,15 @@ export const updateOrganization = async (req: Request, res: Response) => {
                 select: "-password"
             });
 
-        //Actualiza la fecha de borrado con undefined para eliminarla cuanod se reactiva la organizacion
-        var object: any = {
-            deleted_at: body.deleted_at
+        var organization_payload = {
+            name: body.name,
+            updated_at: new Date(),
+            updated_by: body.updated_by
         };
 
-        if (body.name) {
-            object.name = body.name;
-        }
-
-        object.updated_by = body.updated_by;
-        object.updated_at = new Date();
-
-        var savedOrganization: any = await Organization.findByIdAndUpdate(
+        var organization: any = await Organization.findByIdAndUpdate(
             organization_id,
-            object,
+            organization_payload,
             { new: true }
         )
             .populate({
@@ -175,13 +169,18 @@ export const updateOrganization = async (req: Request, res: Response) => {
                 select: "-pasword"
             });
 
+        var changes = [
+            `La organización ${body.organization.name} ahora se llama ${organization.name}`
+        ];
+
         var client: any = clientsSocketController.getClientByUser(
             body.updated_by._id
         );
 
         var payload = {
             objectType: "organization",
-            object: savedOrganization,
+            object: organization,
+            changes,
             members
         };
 
@@ -192,8 +191,8 @@ export const updateOrganization = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            `La organización '${savedOrganization.name}' se actualizó con éxito`,
-            savedOrganization
+            `La organización '${organization.name}' se actualizó con éxito`,
+            organization
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -201,9 +200,9 @@ export const updateOrganization = async (req: Request, res: Response) => {
 };
 
 // ==================================================
-// Delete an organization
+// Activate an organization
 // ==================================================
-export const deleteOrganization = async (req: Request, res: Response) => {
+export const activateOrganization = async (req: Request, res: Response) => {
     try {
         var organization_id = req.params.organization;
         var body = req.body;
@@ -222,9 +221,9 @@ export const deleteOrganization = async (req: Request, res: Response) => {
                 select: "-password"
             });
 
-        var savedOrganization: any = await Organization.findByIdAndUpdate(
+        var organization: any = await Organization.findByIdAndUpdate(
             organization_id,
-            { deleted_at: new Date(), updated_by: body.updated_by },
+            { deleted_at: body.deleted_at, updated_by: body.updated_by },
             { new: true }
         )
             .populate({
@@ -238,13 +237,16 @@ export const deleteOrganization = async (req: Request, res: Response) => {
                 select: "-pasword"
             });
 
+        var changes = [`La organización ${organization.name} se activó`];
+
         var client: any = clientsSocketController.getClientByUser(
             body.updated_by._id
         );
 
         var payload = {
             objectType: "organization",
-            object: savedOrganization,
+            object: organization,
+            changes,
             members
         };
 
@@ -255,8 +257,74 @@ export const deleteOrganization = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            `La organización '${savedOrganization.name}' fue dada de baja con éxito`,
-            savedOrganization
+            `La organización '${organization.name}' fue dada de baja con éxito`,
+            organization
+        );
+    } catch (error) {
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
+// Desactivate an organization
+// ==================================================
+export const desactivateOrganization = async (req: Request, res: Response) => {
+    try {
+        var organization_id = req.params.organization;
+        var body = req.body;
+
+        var members = await Member.find({
+            organization: organization_id
+        })
+            .populate({
+                path: "user",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            });
+
+        var organization: any = await Organization.findByIdAndUpdate(
+            organization_id,
+            { deleted_at: body.deleted_at, updated_by: body.updated_by },
+            { new: true }
+        )
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-pasword"
+            })
+            .populate({
+                path: "updated_by",
+                model: "User",
+                select: "-pasword"
+            });
+
+        var changes = [`La organización ${organization.name} se desactivó`];
+
+        var client: any = clientsSocketController.getClientByUser(
+            body.updated_by._id
+        );
+
+        var payload = {
+            objectType: "organization",
+            object: organization,
+            changes,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
+
+        getResponse(
+            res,
+            200,
+            true,
+            "",
+            `La organización '${organization.name}' fue dada de baja con éxito`,
+            organization
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
