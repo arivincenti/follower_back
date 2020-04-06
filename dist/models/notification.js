@@ -13,9 +13,9 @@ var notificationSchema = new mongoose_1.Schema({
     objectType: {
         type: String
     },
-    // objectName: {
-    //     type: String
-    // },
+    operationType: {
+        type: String
+    },
     created_by: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "User"

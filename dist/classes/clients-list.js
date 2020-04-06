@@ -21,7 +21,6 @@ class ClientsList {
                 break;
             }
         }
-        console.log(this.list);
     }
     // ==================================================
     // Get List
@@ -51,7 +50,6 @@ class ClientsList {
                 break;
             }
         }
-        console.log(this.list);
     }
     // ==================================================
     // Delete Client

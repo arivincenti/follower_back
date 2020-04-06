@@ -25,16 +25,10 @@ const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 // ==================================================
 exports.getOrganizations = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        //ID del usuario recibido por URL
         var user_id = req.params.user;
-        // Busca los ID de las organizaciones en las que el usuario es miembro de algun Área
-        // y trae valores únicos en caso de que vengan repetidas
         var userIsMember = yield member_1.default.find({
             user: user_id
         }).distinct("organization");
-        //Busca las organizaciones en base a dos condiciones
-        //1) El usuario puede ser dueño de la organización sin ser miembro de la misma
-        //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
         var userOrganizations = yield organization_1.default.find({
             $or: [
                 {
@@ -143,6 +137,7 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members
@@ -189,6 +184,7 @@ exports.activateOrganization = (req, res) => __awaiter(this, void 0, void 0, fun
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members
@@ -235,6 +231,7 @@ exports.desactivateOrganization = (req, res) => __awaiter(this, void 0, void 0, 
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members

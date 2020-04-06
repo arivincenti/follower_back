@@ -14,18 +14,12 @@ import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket
 // ==================================================
 export const getOrganizations = async (req: Request, res: Response) => {
     try {
-        //ID del usuario recibido por URL
         var user_id = req.params.user;
 
-        // Busca los ID de las organizaciones en las que el usuario es miembro de algun Área
-        // y trae valores únicos en caso de que vengan repetidas
         var userIsMember = await Member.find({
             user: user_id
         }).distinct("organization");
 
-        //Busca las organizaciones en base a dos condiciones
-        //1) El usuario puede ser dueño de la organización sin ser miembro de la misma
-        //2) El usuario puede no ser dueño, pero si ser miembro, en este caso la organización a la que pertenece vendria en la variable 'userIsMember'
         var userOrganizations = await Organization.find({
             $or: [
                 {
@@ -179,6 +173,7 @@ export const updateOrganization = async (req: Request, res: Response) => {
 
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members
@@ -245,6 +240,7 @@ export const activateOrganization = async (req: Request, res: Response) => {
 
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members
@@ -311,6 +307,7 @@ export const desactivateOrganization = async (req: Request, res: Response) => {
 
         var payload = {
             objectType: "organization",
+            operationType: "update",
             object: organization,
             changes,
             members

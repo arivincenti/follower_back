@@ -517,6 +517,7 @@ export const updateTicket = async (req: Request, res: Response) => {
         var payload = {
             objectType: "ticket",
             object: new_ticket,
+            operationType: "update",
             changes,
             members: [...new_ticket.area.members]
         };

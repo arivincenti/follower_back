@@ -39,5 +39,9 @@ areaRouter.post("/areas/create_member", authentication_1.verifyToken, area_contr
 // ==================================================
 // Delete Area Members
 // ==================================================
-areaRouter.put("/areas/delete_member/:member", authentication_1.verifyToken, area_controller_1.deleteAreaMember);
+areaRouter.patch("/areas/delete_member/:area", authentication_1.verifyToken, area_controller_1.deleteAreaMember);
+// ==================================================
+// Delete Area Members
+// ==================================================
+areaRouter.patch("/areas/set_responsible/:area", authentication_1.verifyToken, area_controller_1.setResponsibleAreaMember);
 exports.default = areaRouter;

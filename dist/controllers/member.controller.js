@@ -170,6 +170,31 @@ exports.createMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             path: "organization",
             model: "Organization"
         });
+        var members = yield member_1.default.find({
+            organization: member.organization._id
+        })
+            .populate({
+            path: "user",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        });
+        var changes = [
+            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`
+        ];
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(String(member.created_by._id));
+        var payload = {
+            objectType: "member",
+            object: member,
+            operationType: "create",
+            changes,
+            members
+        };
+        server_1.default.instance.io.to(client.id).emit("create", payload);
         response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se creó con éxito`, member);
     }
     catch (error) {
@@ -216,6 +241,7 @@ exports.activateMember = (req, res) => __awaiter(this, void 0, void 0, function*
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "member",
+            operationType: "update",
             changes,
             object: member,
             members
@@ -267,6 +293,7 @@ exports.desactivateMember = (req, res) => __awaiter(this, void 0, void 0, functi
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "member",
+            operationType: "update",
             changes,
             object: member,
             members

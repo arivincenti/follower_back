@@ -78,7 +78,7 @@ function generateToken(user, res) {
             let token = jsonwebtoken_1.default.sign({
                 user: user
             }, config_1.SEED, {
-                expiresIn: 10800 //3 horas
+                expiresIn: 10800 //3 horas = 10800 segundos
             });
             return res.status(200).json({
                 ok: true,

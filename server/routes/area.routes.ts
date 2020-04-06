@@ -9,7 +9,8 @@ import {
     getAreaMembers,
     getAreasByUser,
     deleteAreaMember,
-    createAreaMember
+    createAreaMember,
+    setResponsibleAreaMember
 } from "../controllers/area.controller";
 
 const areaRouter = Router();
@@ -57,6 +58,15 @@ areaRouter.post("/areas/create_member", verifyToken, createAreaMember);
 // ==================================================
 // Delete Area Members
 // ==================================================
-areaRouter.put("/areas/delete_member/:member", verifyToken, deleteAreaMember);
+areaRouter.patch("/areas/delete_member/:area", verifyToken, deleteAreaMember);
+
+// ==================================================
+// Delete Area Members
+// ==================================================
+areaRouter.patch(
+    "/areas/set_responsible/:area",
+    verifyToken,
+    setResponsibleAreaMember
+);
 
 export default areaRouter;

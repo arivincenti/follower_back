@@ -13,6 +13,7 @@ export class NotificationSocketController {
             objectType: payload.objectType,
             objectName: payload.object.subject,
             created_by: payload.created_by,
+            operationType: payload.operationType,
             users: [...payload.users],
             readed_by: []
         };

@@ -170,6 +170,38 @@ export const createMember = async (req: Request, res: Response) => {
                 model: "Organization"
             });
 
+        var members = await Member.find({
+            organization: member.organization._id
+        })
+            .populate({
+                path: "user",
+                model: "User",
+                select: "-password"
+            })
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password"
+            });
+
+        var changes = [
+            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`
+        ];
+
+        var client: any = clientsSocketController.getClientByUser(
+            String(member.created_by._id)
+        );
+
+        var payload = {
+            objectType: "member",
+            object: member,
+            operationType: "create",
+            changes,
+            members
+        };
+
+        Server.instance.io.to(client.id).emit("create", payload);
+
         getResponse(
             res,
             200,
@@ -235,6 +267,7 @@ export const activateMember = async (req: Request, res: Response) => {
 
         var payload = {
             objectType: "member",
+            operationType: "update",
             changes,
             object: member,
             members
@@ -307,6 +340,7 @@ export const desactivateMember = async (req: Request, res: Response) => {
 
         var payload = {
             objectType: "member",
+            operationType: "update",
             changes,
             object: member,
             members

@@ -485,6 +485,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         var payload = {
             objectType: "ticket",
             object: new_ticket,
+            operationType: "update",
             changes,
             members: [...new_ticket.area.members]
         };

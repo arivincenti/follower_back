@@ -84,7 +84,7 @@ async function generateToken(user: any, res: Response) {
             },
             SEED,
             {
-                expiresIn: 10800 //3 horas
+                expiresIn: 10800 //3 horas = 10800 segundos
             }
         );
 

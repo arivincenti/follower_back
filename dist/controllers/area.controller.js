@@ -226,6 +226,7 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
         var payload = {
             objectType: "area",
             object: saved_area,
+            operationType: "update",
             changes,
             members: saved_area.members
         };
@@ -306,8 +307,7 @@ exports.getAreaMembers = (req, res) => __awaiter(this, void 0, void 0, function*
 exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var body = req.body;
-        console.log(body.updated_by);
-        var find_area = yield area_1.default.findByIdAndUpdate(body.area, {
+        const find_area = yield area_1.default.findByIdAndUpdate(body.area, {
             $push: {
                 members: body.member._id
             },
@@ -338,19 +338,18 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
                 select: "-password"
             }
         });
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
-        var client_join = clientsSocket_1.clientsSocketController.getClientByUser(body.member.user._id);
-        // console.log(client_leave);
-        var changes = [
+        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        const changes = [
             `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue agregado al área "${find_area.name}"`
         ];
-        var payload = {
+        const payload = {
+            memberCreated: body.member,
             objectType: "area",
+            operationType: "update",
             object: find_area,
             changes,
             members: find_area.members
         };
-        server_1.default.instance.io.to(client_join.id).emit("member-created", payload);
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${body.area}' fue modificada con éxito`, find_area);
     }
@@ -400,21 +399,91 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             }
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(updated_by._id);
-        var client_leave = clientsSocket_1.clientsSocketController.getClientByUser(member.user._id);
-        // console.log(client_leave);
         var changes = [
             `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue eliminado del área "${find_area.name}"`
         ];
         var payload = {
-            memberUser: member.user,
+            memberDeleted: member,
             objectType: "area",
+            operationType: "update",
             object: find_area,
             changes,
             members: area.members
         };
-        server_1.default.instance.io.to(client_leave.id).emit("member-deleted", payload);
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${find_area.name}' fue modificada con éxito`, find_area);
+    }
+    catch (error) {
+        console.error(error);
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Update an area
+// ==================================================
+exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var area_id = req.params.area;
+        var body = req.body;
+        var responsible = null;
+        if (body.responsible) {
+            if (body.area.responsible) {
+                if (String(body.area.responsible) !== body.responsible._id) {
+                    responsible = body.responsible;
+                }
+                else {
+                    responsible = undefined;
+                }
+            }
+            else {
+                responsible = body.responsible;
+            }
+        }
+        var saved_area = yield area_1.default.findByIdAndUpdate(area_id, { responsible: responsible }, {
+            new: true
+        })
+            .populate("organization")
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "updated_by",
+            model: "User",
+            select: "-password"
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password"
+            }
+        })
+            .populate({
+            path: "members",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password"
+            }
+        });
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
+        var changes = [
+            `Se asignó a "${body.member.user.name} ${body.member.user.name}" como miembro responsable del área "${body.area.name}"`
+        ];
+        var payload = {
+            objectType: "area",
+            operationType: "update",
+            object: saved_area,
+            changes,
+            members: saved_area.members
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El área '${saved_area.name}' fue modificada con éxito`, saved_area);
     }
     catch (error) {
         console.error(error);
