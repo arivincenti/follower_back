@@ -4,38 +4,41 @@ const mongoose_1 = require("mongoose");
 var notificationSchema = new mongoose_1.Schema({
     changes: [
         {
-            type: String
-        }
+            type: String,
+        },
     ],
     object: {
-        type: String
+        type: String,
     },
     objectType: {
-        type: String
+        type: String,
+    },
+    notificationTitle: {
+        type: String,
     },
     operationType: {
-        type: String
+        type: String,
     },
     created_by: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
     users: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "User"
-        }
+            ref: "User",
+        },
     ],
     readed_by: [
         {
             type: mongoose_1.Schema.Types.ObjectId,
-            ref: "User"
-        }
+            ref: "User",
+        },
     ],
     created_at: {
         type: Date,
         required: true,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 exports.default = mongoose_1.model("Notification", notificationSchema);

@@ -17,24 +17,24 @@ export const getOrganizations = async (req: Request, res: Response) => {
         var user_id = req.params.user;
 
         var userIsMember = await Member.find({
-            user: user_id
+            user: user_id,
         }).distinct("organization");
 
         var userOrganizations = await Organization.find({
             $or: [
                 {
-                    created_by: user_id
+                    created_by: user_id,
                 },
                 {
                     _id: {
-                        $in: userIsMember
-                    }
-                }
-            ]
+                        $in: userIsMember,
+                    },
+                },
+            ],
         }).populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
 
         //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
@@ -63,7 +63,7 @@ export const getOrganization = async (req: Request, res: Response) => {
         ).populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
 
         getResponse(
@@ -88,7 +88,7 @@ export const createOrganization = async (req: Request, res: Response) => {
 
         var savedOrganization = await Organization.create({
             name: body.name,
-            created_by: body.user
+            created_by: body.user,
         });
 
         var organization: any = await Organization.findById(
@@ -96,7 +96,7 @@ export const createOrganization = async (req: Request, res: Response) => {
         ).populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
 
         // var email = `${organization.created_by.email}`;
@@ -105,6 +105,25 @@ export const createOrganization = async (req: Request, res: Response) => {
         // var textPart = `Genial! Creaste a ${organization.name}, buen nombre para tu organización.`;
 
         // EmailController.sendEmail(email, name, subject, textPart, '');
+
+        const members: any[] = [];
+        var changes = [
+            `La organización "${organization.name}" fue creada con éxito`,
+        ];
+
+        var client: any = clientsSocketController.getClientByUser(
+            organization.created_by._id
+        );
+
+        var payload = {
+            objectType: "organization",
+            operationType: "create",
+            object: organization,
+            changes,
+            members,
+        };
+
+        Server.instance.io.to(client.id).emit("create", payload);
 
         getResponse(
             res,
@@ -128,23 +147,23 @@ export const updateOrganization = async (req: Request, res: Response) => {
         var body = req.body;
 
         var members = await Member.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             });
 
         var organization_payload = {
             name: body.name,
             updated_at: new Date(),
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
 
         var organization: any = await Organization.findByIdAndUpdate(
@@ -155,16 +174,16 @@ export const updateOrganization = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             });
 
         var changes = [
-            `La organización ${body.organization.name} ahora se llama ${organization.name}`
+            `La organización "${body.organization.name}" ahora tiene el nombre "${organization.name}"`,
         ];
 
         var client: any = clientsSocketController.getClientByUser(
@@ -176,7 +195,7 @@ export const updateOrganization = async (req: Request, res: Response) => {
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("update", payload);
@@ -203,17 +222,17 @@ export const activateOrganization = async (req: Request, res: Response) => {
         var body = req.body;
 
         var members = await Member.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             });
 
         var organization: any = await Organization.findByIdAndUpdate(
@@ -224,15 +243,15 @@ export const activateOrganization = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             });
 
-        var changes = [`La organización ${organization.name} se activó`];
+        var changes = [`La organización "${organization.name}" fue activada`];
 
         var client: any = clientsSocketController.getClientByUser(
             body.updated_by._id
@@ -243,7 +262,7 @@ export const activateOrganization = async (req: Request, res: Response) => {
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("update", payload);
@@ -253,7 +272,7 @@ export const activateOrganization = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            `La organización '${organization.name}' fue dada de baja con éxito`,
+            `La organización "${organization.name}" fue dada de baja con éxito`,
             organization
         );
     } catch (error) {
@@ -270,17 +289,17 @@ export const desactivateOrganization = async (req: Request, res: Response) => {
         var body = req.body;
 
         var members = await Member.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             });
 
         var organization: any = await Organization.findByIdAndUpdate(
@@ -291,15 +310,17 @@ export const desactivateOrganization = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-pasword"
+                select: "-pasword",
             });
 
-        var changes = [`La organización ${organization.name} se desactivó`];
+        var changes = [
+            `La organización "${organization.name}" fue desactivada`,
+        ];
 
         var client: any = clientsSocketController.getClientByUser(
             body.updated_by._id
@@ -310,7 +331,7 @@ export const desactivateOrganization = async (req: Request, res: Response) => {
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("update", payload);

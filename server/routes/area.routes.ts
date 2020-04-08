@@ -5,12 +5,13 @@ import {
     getArea,
     createArea,
     updateArea,
-    deleteArea,
     getAreaMembers,
     getAreasByUser,
     deleteAreaMember,
     createAreaMember,
-    setResponsibleAreaMember
+    setResponsibleAreaMember,
+    activateArea,
+    desactivateArea,
 } from "../controllers/area.controller";
 
 const areaRouter = Router();
@@ -41,9 +42,14 @@ areaRouter.post("/areas", verifyToken, createArea);
 areaRouter.put("/areas/:area", verifyToken, updateArea);
 
 // ==================================================
-// Delete an area
+// Activate an area
 // ==================================================
-areaRouter.delete("/areas/:area", verifyToken, deleteArea);
+areaRouter.patch("/areas/activate_area/:area", verifyToken, activateArea);
+
+// ==================================================
+// Desactivate an area
+// ==================================================
+areaRouter.patch("/areas/desactivate_area/:area", verifyToken, desactivateArea);
 
 // ==================================================
 // Get Area Members

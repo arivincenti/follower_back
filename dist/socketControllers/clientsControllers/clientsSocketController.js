@@ -26,13 +26,13 @@ class ClientsSocketController {
     // Get List
     // ==================================================
     getList() {
-        return this.list.filter(client => client.user !== null);
+        return this.list.filter((client) => client.user !== null);
     }
     // ==================================================
     // Get a Client
     // ==================================================
     getClient(id) {
-        return this.list.find(client => client.id === id);
+        return this.list.find((client) => client.id === id);
     }
     // ==================================================
     // Get a Client
@@ -53,14 +53,14 @@ class ClientsSocketController {
     // Get a Client by User
     // ==================================================
     getClientByUser(id) {
-        return this.list.find(client => client.user._id === id);
+        return this.list.find((client) => client.user._id === String(id));
     }
     // ==================================================
     // Delete Client
     // ==================================================
     deleteClient(id) {
         const tempClient = this.getClient(id);
-        this.list = this.list.filter(client => client.id !== id);
+        this.list = this.list.filter((client) => client.id !== id);
         return tempClient;
     }
     // ==================================================

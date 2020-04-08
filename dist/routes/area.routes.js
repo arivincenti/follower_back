@@ -25,9 +25,13 @@ areaRouter.post("/areas", authentication_1.verifyToken, area_controller_1.create
 // ==================================================
 areaRouter.put("/areas/:area", authentication_1.verifyToken, area_controller_1.updateArea);
 // ==================================================
-// Delete an area
+// Activate an area
 // ==================================================
-areaRouter.delete("/areas/:area", authentication_1.verifyToken, area_controller_1.deleteArea);
+areaRouter.patch("/areas/activate_area/:area", authentication_1.verifyToken, area_controller_1.activateArea);
+// ==================================================
+// Desactivate an area
+// ==================================================
+areaRouter.patch("/areas/desactivate_area/:area", authentication_1.verifyToken, area_controller_1.desactivateArea);
 // ==================================================
 // Get Area Members
 // ==================================================

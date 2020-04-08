@@ -15,51 +15,51 @@ export const getTickets = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "area.members",
-                    model: "Member"
-                }
+                    model: "Member",
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -82,13 +82,13 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             $or: [
                 { created_by: userId },
                 { responsible: { $in: members } },
-                { area: { $in: areas } }
-            ]
+                { area: { $in: areas } },
+            ],
         })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
@@ -98,45 +98,45 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
                     model: "Member",
                     populate: {
                         path: "user",
-                        model: "User"
-                    }
-                }
+                        model: "User",
+                    },
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -156,7 +156,7 @@ export const getTicketsByResponsible = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
@@ -166,45 +166,45 @@ export const getTicketsByResponsible = async (req: Request, res: Response) => {
                     model: "Member",
                     populate: {
                         path: "user",
-                        model: "User"
-                    }
-                }
+                        model: "User",
+                    },
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -224,7 +224,7 @@ export const getTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
@@ -234,45 +234,45 @@ export const getTicket = async (req: Request, res: Response) => {
                     model: "Member",
                     populate: {
                         path: "user",
-                        model: "User"
-                    }
-                }
+                        model: "User",
+                    },
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
@@ -297,7 +297,7 @@ export const createTicket = async (req: Request, res: Response) => {
             priority: body.priority,
             status: "PENDIENTE",
             created_by: body.created_by,
-            created_at: new Date()
+            created_at: new Date(),
         });
 
         var movement = {
@@ -307,7 +307,7 @@ export const createTicket = async (req: Request, res: Response) => {
             priority: body.priority,
             status: "PENDIENTE",
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.created_by,
         };
 
         ticket.movements.push(movement);
@@ -318,7 +318,7 @@ export const createTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
@@ -328,48 +328,66 @@ export const createTicket = async (req: Request, res: Response) => {
                     model: "Member",
                     populate: {
                         path: "user",
-                        model: "User"
-                    }
-                }
+                        model: "User",
+                    },
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
-        Server.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
+        var client: any = clientsSocketController.getClientByUser(
+            String(ticket.created_by._id)
+        );
+
+        var changes: any = [
+            `Tenés un nuevo ticket "${ticket.subject}" en el área "${ticket.area.name}" de la organización "${ticket.area.organization.name}"`,
+        ];
+
+        var payload = {
+            objectType: "ticket",
+            object: ticket,
+            operationType: "create",
+            changes,
+            members: [...ticket.area.members],
+        };
+
+        Server.instance.io.to(client.id).emit("create", payload);
+
+        // Server.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
 
         getResponse(
             res,
@@ -380,6 +398,7 @@ export const createTicket = async (req: Request, res: Response) => {
             ticket
         );
     } catch (error) {
+        console.log(error);
         getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };
@@ -400,7 +419,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             status: body.status,
             date: body.date,
             updated_by: body.updated_by,
-            updated_at: new Date()
+            updated_at: new Date(),
         };
 
         var movement = {
@@ -411,7 +430,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             status: body.status,
             date: body.date,
             created_at: new Date(),
-            created_by: body.updated_by
+            created_by: body.updated_by,
         };
 
         var new_ticket: any = await Ticket.findByIdAndUpdate(
@@ -419,15 +438,15 @@ export const updateTicket = async (req: Request, res: Response) => {
             {
                 ...payload_ticket,
                 $push: {
-                    movements: movement
-                }
+                    movements: movement,
+                },
             },
             { new: true }
         )
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "area",
@@ -437,50 +456,50 @@ export const updateTicket = async (req: Request, res: Response) => {
                     model: "Member",
                     populate: {
                         path: "user",
-                        model: "User"
-                    }
-                }
+                        model: "User",
+                    },
+                },
             })
             .populate({
                 path: "area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
                     path: "organization",
-                    model: "Organization"
-                }
+                    model: "Organization",
+                },
             })
             .populate({
                 path: "movements.responsible",
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
+                    model: "User",
+                },
             })
             .populate({
                 path: "movements.created_by",
-                model: "User"
+                model: "User",
             });
 
         var client: any = clientsSocketController.getClientByUser(
@@ -488,11 +507,6 @@ export const updateTicket = async (req: Request, res: Response) => {
         );
 
         var oldMovement = body.ticket;
-
-        console.log(body.ticket.responsible);
-        console.log("----------------------------------");
-        console.log("----------------------------------");
-        console.log(new_ticket.responsible);
 
         var changes: any = [];
         var message = "";
@@ -506,11 +520,16 @@ export const updateTicket = async (req: Request, res: Response) => {
             changes.push(message);
         }
 
-        if (
-            String(new_ticket.responsible._id) !==
-            String(body.ticket.responsible._id)
-        ) {
-            message = `El responsable del ticket "${new_ticket.subject}" pasó de "${body.ticket.responsible.user.name} ${body.ticket.responsible.user.last_name}" a "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+        if (body.ticket.responsible) {
+            if (
+                String(new_ticket.responsible._id) !==
+                String(body.ticket.responsible._id)
+            ) {
+                message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+                changes.push(message);
+            }
+        } else {
+            message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
             changes.push(message);
         }
 
@@ -519,7 +538,7 @@ export const updateTicket = async (req: Request, res: Response) => {
             object: new_ticket,
             operationType: "update",
             changes,
-            members: [...new_ticket.area.members]
+            members: [...new_ticket.area.members],
         };
 
         Server.instance.io.to(client.id).emit("update", payload);

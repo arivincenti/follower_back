@@ -21,15 +21,10 @@ exports.getNotifications = (req, res) => __awaiter(this, void 0, void 0, functio
         //ID del usuario recibido por URL
         var user_id = [req.params.user];
         var userNotifications = yield notification_1.default.find({
-            users: { $in: user_id }
-        })
-            .populate({
-            path: "updated_by",
-            model: "User"
-        })
-            .populate({
-            path: "object",
-            model: "Area"
+            users: { $in: user_id },
+        }).populate({
+            path: " created_by",
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userNotifications);
     }

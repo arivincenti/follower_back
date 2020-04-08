@@ -27,23 +27,23 @@ exports.getOrganizations = (req, res) => __awaiter(this, void 0, void 0, functio
     try {
         var user_id = req.params.user;
         var userIsMember = yield member_1.default.find({
-            user: user_id
+            user: user_id,
         }).distinct("organization");
         var userOrganizations = yield organization_1.default.find({
             $or: [
                 {
-                    created_by: user_id
+                    created_by: user_id,
                 },
                 {
                     _id: {
-                        $in: userIsMember
-                    }
-                }
-            ]
+                        $in: userIsMember,
+                    },
+                },
+            ],
         }).populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
         //Devolvemos la colección  n de organizaciones en las que esta involucrado el usuario
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userOrganizations);
@@ -61,7 +61,7 @@ exports.getOrganization = (req, res) => __awaiter(this, void 0, void 0, function
         var organization = yield organization_1.default.findById(organization_id).populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", organization);
     }
@@ -77,18 +77,31 @@ exports.createOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
         var body = req.body;
         var savedOrganization = yield organization_1.default.create({
             name: body.name,
-            created_by: body.user
+            created_by: body.user,
         });
         var organization = yield organization_1.default.findById(savedOrganization._id).populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
         // var email = `${organization.created_by.email}`;
         // var name = `${organization.created_by.name} ${organization.created_by.last_name}`;
         // var subject = `Tu organización se creó con éxito`;
         // var textPart = `Genial! Creaste a ${organization.name}, buen nombre para tu organización.`;
         // EmailController.sendEmail(email, name, subject, textPart, '');
+        const members = [];
+        var changes = [
+            `La organización "${organization.name}" fue creada con éxito`,
+        ];
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(organization.created_by._id);
+        var payload = {
+            objectType: "organization",
+            operationType: "create",
+            object: organization,
+            changes,
+            members,
+        };
+        server_1.default.instance.io.to(client.id).emit("create", payload);
         response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' se creó con éxito`, organization);
     }
     catch (error) {
@@ -103,36 +116,36 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
         var organization_id = req.params.organization;
         var body = req.body;
         var members = yield member_1.default.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         var organization_payload = {
             name: body.name,
             updated_at: new Date(),
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
         var organization = yield organization_1.default.findByIdAndUpdate(organization_id, organization_payload, { new: true })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
         var changes = [
-            `La organización ${body.organization.name} ahora se llama ${organization.name}`
+            `La organización "${body.organization.name}" ahora tiene el nombre "${organization.name}"`,
         ];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
@@ -140,7 +153,7 @@ exports.updateOrganization = (req, res) => __awaiter(this, void 0, void 0, funct
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' se actualizó con éxito`, organization);
@@ -157,40 +170,40 @@ exports.activateOrganization = (req, res) => __awaiter(this, void 0, void 0, fun
         var organization_id = req.params.organization;
         var body = req.body;
         var members = yield member_1.default.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         var organization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: body.deleted_at, updated_by: body.updated_by }, { new: true })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
-        var changes = [`La organización ${organization.name} se activó`];
+        var changes = [`La organización "${organization.name}" fue activada`];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
-        response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' fue dada de baja con éxito`, organization);
+        response_controller_1.getResponse(res, 200, true, "", `La organización "${organization.name}" fue dada de baja con éxito`, organization);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -204,37 +217,39 @@ exports.desactivateOrganization = (req, res) => __awaiter(this, void 0, void 0, 
         var organization_id = req.params.organization;
         var body = req.body;
         var members = yield member_1.default.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         var organization = yield organization_1.default.findByIdAndUpdate(organization_id, { deleted_at: body.deleted_at, updated_by: body.updated_by }, { new: true })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-pasword"
+            select: "-pasword",
         });
-        var changes = [`La organización ${organization.name} se desactivó`];
+        var changes = [
+            `La organización "${organization.name}" fue desactivada`,
+        ];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
             objectType: "organization",
             operationType: "update",
             object: organization,
             changes,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `La organización '${organization.name}' fue dada de baja con éxito`, organization);

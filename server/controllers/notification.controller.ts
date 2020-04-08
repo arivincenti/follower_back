@@ -12,16 +12,11 @@ export const getNotifications = async (req: Request, res: Response) => {
         var user_id = [req.params.user];
 
         var userNotifications = await Notification.find({
-            users: { $in: user_id }
-        })
-            .populate({
-                path: "updated_by",
-                model: "User"
-            })
-            .populate({
-                path: "object",
-                model: "Area"
-            });
+            users: { $in: user_id },
+        }).populate({
+            path: " created_by",
+            model: "User",
+        });
 
         getResponse(
             res,

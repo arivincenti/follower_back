@@ -25,13 +25,13 @@ exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
         var since = Number(req.query.since);
         var size = Number(req.query.size);
         var areas = yield area_1.default.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -39,8 +39,8 @@ exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -48,11 +48,11 @@ exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .sort({
-            name: 1
+            name: 1,
         })
             .skip(since)
             .limit(size)
@@ -70,10 +70,10 @@ exports.getAreasByUser = (req, res) => __awaiter(this, void 0, void 0, function*
     try {
         var user = req.params.user;
         var memers = yield member_1.default.find({
-            user: user
+            user: user,
         });
         var areas = yield area_1.default.find({
-            members: { $in: memers }
+            members: { $in: memers },
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", areas);
     }
@@ -92,7 +92,7 @@ exports.getArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -100,8 +100,8 @@ exports.getArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -109,8 +109,8 @@ exports.getArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
         if (!area)
             throw new Error("No se encontró el área");
@@ -131,14 +131,17 @@ exports.createArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             organization: body.organization,
             members: [],
             responsibles: [],
-            created_by: body.user
+            created_by: body.user,
         });
         var area = yield area_1.default.findById(saved_area._id)
-            .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
+        })
+            .populate({
+            path: "organization",
+            model: "Organization",
         })
             .populate({
             path: "responsible",
@@ -146,8 +149,8 @@ exports.createArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -155,10 +158,35 @@ exports.createArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
-        response_controller_1.getResponse(res, 200, true, "", `El área '${saved_area.name}' se creó con éxito`, area);
+        var members = yield member_1.default.find({
+            organization: area.organization._id,
+        })
+            .populate({
+            path: "user",
+            model: "User",
+            select: "-password",
+        })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password",
+        });
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(area.created_by._id);
+        var changes = [
+            `Se creó el área "${area.name}" en "${area.organization.name}"`,
+        ];
+        var payload = {
+            objectType: "area",
+            object: area,
+            operationType: "create",
+            changes,
+            members,
+        };
+        server_1.default.instance.io.to(client.id).emit("create", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' se creó con éxito`, area);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -174,7 +202,7 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
         var area = {
             name: body.name,
             updated_by: body.updated_by,
-            updated_at: new Date()
+            updated_at: new Date(),
         };
         // if (body.responsible) {
         //     if (area.responsible) {
@@ -188,18 +216,18 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
         //     }
         // }
         var saved_area = yield area_1.default.findByIdAndUpdate(area_id, area, {
-            new: true
+            new: true,
         })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -207,8 +235,8 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -216,19 +244,19 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var changes = [
-            `El área ${body.area.name} ahora se llama ${saved_area.name}`
+            `El área "${body.area.name}" ahora tiene el nombre "${saved_area.name}"`,
         ];
         var payload = {
             objectType: "area",
             object: saved_area,
             operationType: "update",
             changes,
-            members: saved_area.members
+            members: saved_area.members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${saved_area.name}' fue modificada con éxito`, saved_area);
@@ -239,21 +267,23 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
     }
 });
 // ==================================================
-// Delete an area
+// Activate area
 // ==================================================
-exports.deleteArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
+exports.activateArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        var area_id = req.params.area;
-        var area = yield area_1.default.findByIdAndUpdate(area_id, {
-            deleted_at: new Date()
+        const area_id = req.params.area;
+        const body = req.body;
+        const area = yield area_1.default.findByIdAndUpdate(area_id, {
+            deleted_at: undefined,
+            updated_by: body.updated_by,
         }, {
-            new: true
+            new: true,
         })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -261,8 +291,8 @@ exports.deleteArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -270,9 +300,72 @@ exports.deleteArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
+        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
+        const changes = [`El área "${area.name}" se activó"`];
+        const payload = {
+            objectType: "area",
+            object: area,
+            operationType: "update",
+            changes,
+            members: area.members,
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' fue dada de baja con éxito`, area);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Desactivate an area
+// ==================================================
+exports.desactivateArea = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const area_id = req.params.area;
+        const body = req.body;
+        const area = yield area_1.default.findByIdAndUpdate(area_id, {
+            deleted_at: new Date(),
+            updated_by: body.updated_by,
+        }, {
+            new: true,
+        })
+            .populate("organization")
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password",
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password",
+            },
+        })
+            .populate({
+            path: "members",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+                select: "-password",
+            },
+        });
+        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
+        const changes = [`El área "${area.name}" se desactivó"`];
+        const payload = {
+            objectType: "area",
+            object: area,
+            operationType: "update",
+            changes,
+            members: area.members,
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' fue dada de baja con éxito`, area);
     }
     catch (error) {
@@ -288,12 +381,12 @@ exports.getAreaMembers = (req, res) => __awaiter(this, void 0, void 0, function*
         var area = yield area_1.default.findById(area_id);
         var members = yield member_1.default.find({
             _id: {
-                $in: area.members
-            }
+                $in: area.members,
+            },
         }).populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", `La busqueda fue un éxito`, members);
     }
@@ -309,16 +402,16 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
         var body = req.body;
         const find_area = yield area_1.default.findByIdAndUpdate(body.area, {
             $push: {
-                members: body.member._id
+                members: body.member._id,
             },
             updated_by: body.updated_by,
-            updated_at: new Date()
+            updated_at: new Date(),
         }, { new: true })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -326,8 +419,8 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -335,12 +428,13 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
         const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
+        const clientJoin = clientsSocket_1.clientsSocketController.getClientByUser(body.member.user._id);
         const changes = [
-            `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue agregado al área "${find_area.name}"`
+            `"${body.member.user.name} ${body.member.user.last_name}" ahora es miembro del área "${find_area.name}"`,
         ];
         const payload = {
             memberCreated: body.member,
@@ -348,9 +442,14 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             operationType: "update",
             object: find_area,
             changes,
-            members: find_area.members
+            members: find_area.members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
+        if (clientJoin !== undefined) {
+            server_1.default.instance.io
+                .to(clientJoin.id)
+                .emit("member-created", payload);
+        }
         response_controller_1.getResponse(res, 200, true, "", `El área '${body.area}' fue modificada con éxito`, find_area);
     }
     catch (error) {
@@ -369,16 +468,16 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
         var updated_by = body.updated_by;
         var find_area = yield area_1.default.findByIdAndUpdate(area._id, {
             $pull: {
-                members: member._id
+                members: member._id,
             },
             updated_at: new Date(),
-            updated_by: updated_by
+            updated_by: updated_by,
         }, { new: true })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -386,8 +485,8 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -395,12 +494,13 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(updated_by._id);
+        const clientLeave = clientsSocket_1.clientsSocketController.getClientByUser(body.member.user._id);
         var changes = [
-            `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue eliminado del área "${find_area.name}"`
+            `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue eliminado del área "${find_area.name}"`,
         ];
         var payload = {
             memberDeleted: member,
@@ -408,9 +508,14 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             operationType: "update",
             object: find_area,
             changes,
-            members: area.members
+            members: area.members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
+        if (clientLeave !== undefined) {
+            server_1.default.instance.io
+                .to(clientLeave.id)
+                .emit("member-deleted", payload);
+        }
         response_controller_1.getResponse(res, 200, true, "", `El área '${find_area.name}' fue modificada con éxito`, find_area);
     }
     catch (error) {
@@ -440,18 +545,18 @@ exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0,
             }
         }
         var saved_area = yield area_1.default.findByIdAndUpdate(area_id, { responsible: responsible }, {
-            new: true
+            new: true,
         })
             .populate("organization")
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "responsible",
@@ -459,8 +564,8 @@ exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0,
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         })
             .populate({
             path: "members",
@@ -468,19 +573,19 @@ exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0,
             populate: {
                 path: "user",
                 model: "User",
-                select: "-password"
-            }
+                select: "-password",
+            },
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var changes = [
-            `Se asignó a "${body.member.user.name} ${body.member.user.name}" como miembro responsable del área "${body.area.name}"`
+            `Se asignó a "${body.member.user.name} ${body.member.user.name}" como miembro responsable del área "${body.area.name}"`,
         ];
         var payload = {
             objectType: "area",
             operationType: "update",
             object: saved_area,
             changes,
-            members: saved_area.members
+            members: saved_area.members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${saved_area.name}' fue modificada con éxito`, saved_area);

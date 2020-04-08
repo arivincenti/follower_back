@@ -26,51 +26,51 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "area.members",
-                model: "Member"
-            }
+                model: "Member",
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -90,13 +90,13 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
             $or: [
                 { created_by: userId },
                 { responsible: { $in: members } },
-                { area: { $in: areas } }
-            ]
+                { area: { $in: areas } },
+            ],
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
@@ -106,45 +106,45 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
-            }
+                    model: "User",
+                },
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -162,7 +162,7 @@ exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, 
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
@@ -172,45 +172,45 @@ exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, 
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
-            }
+                    model: "User",
+                },
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -228,7 +228,7 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
@@ -238,45 +238,45 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
-            }
+                    model: "User",
+                },
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
     }
@@ -299,7 +299,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             priority: body.priority,
             status: "PENDIENTE",
             created_by: body.created_by,
-            created_at: new Date()
+            created_at: new Date(),
         });
         var movement = {
             area: body.area,
@@ -308,7 +308,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             priority: body.priority,
             status: "PENDIENTE",
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.created_by,
         };
         ticket.movements.push(movement);
         var saved_ticket = yield ticket.save();
@@ -316,7 +316,7 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
@@ -326,50 +326,63 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
-            }
+                    model: "User",
+                },
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
-        server_1.default.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(String(ticket.created_by._id));
+        var changes = [
+            `Tenés un nuevo ticket "${ticket.subject}" en el área "${ticket.area.name}" de la organización "${ticket.area.organization.name}"`,
+        ];
+        var payload = {
+            objectType: "ticket",
+            object: ticket,
+            operationType: "create",
+            changes,
+            members: [...ticket.area.members],
+        };
+        server_1.default.instance.io.to(client.id).emit("create", payload);
+        // Server.instance.io.to(ticket.area._id).emit("new-ticket", ticket);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${ticket._id}' se creó con éxito`, ticket);
     }
     catch (error) {
+        console.log(error);
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 });
@@ -388,7 +401,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             status: body.status,
             date: body.date,
             updated_by: body.updated_by,
-            updated_at: new Date()
+            updated_at: new Date(),
         };
         var movement = {
             area: body.area,
@@ -398,15 +411,15 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             status: body.status,
             date: body.date,
             created_at: new Date(),
-            created_by: body.updated_by
+            created_by: body.updated_by,
         };
         var new_ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, Object.assign({}, payload_ticket, { $push: {
-                movements: movement
+                movements: movement,
             } }), { new: true })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "area",
@@ -416,57 +429,53 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 model: "Member",
                 populate: {
                     path: "user",
-                    model: "User"
-                }
-            }
+                    model: "User",
+                },
+            },
         })
             .populate({
             path: "area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "movements.area",
             model: "Area",
             populate: {
                 path: "organization",
-                model: "Organization"
-            }
+                model: "Organization",
+            },
         })
             .populate({
             path: "movements.responsible",
             model: "Member",
             populate: {
                 path: "user",
-                model: "User"
-            }
+                model: "User",
+            },
         })
             .populate({
             path: "movements.created_by",
-            model: "User"
+            model: "User",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var oldMovement = body.ticket;
-        console.log(body.ticket.responsible);
-        console.log("----------------------------------");
-        console.log("----------------------------------");
-        console.log(new_ticket.responsible);
         var changes = [];
         var message = "";
         if (new_ticket.status !== oldMovement.status) {
@@ -477,9 +486,15 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             message = `La prioridad del ticket "${new_ticket.subject}" pasó de "${oldMovement.priority}" a "${new_ticket.priority}"`;
             changes.push(message);
         }
-        if (String(new_ticket.responsible._id) !==
-            String(body.ticket.responsible._id)) {
-            message = `El responsable del ticket "${new_ticket.subject}" pasó de "${body.ticket.responsible.user.name} ${body.ticket.responsible.user.last_name}" a "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+        if (body.ticket.responsible) {
+            if (String(new_ticket.responsible._id) !==
+                String(body.ticket.responsible._id)) {
+                message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+                changes.push(message);
+            }
+        }
+        else {
+            message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
             changes.push(message);
         }
         var payload = {
@@ -487,7 +502,7 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             object: new_ticket,
             operationType: "update",
             changes,
-            members: [...new_ticket.area.members]
+            members: [...new_ticket.area.members],
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El ticket '${new_ticket._id}' se modificó con éxito`, new_ticket);

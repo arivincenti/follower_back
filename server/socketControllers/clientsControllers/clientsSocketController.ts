@@ -30,14 +30,14 @@ export class ClientsSocketController {
     // Get List
     // ==================================================
     public getList() {
-        return this.list.filter(client => client.user !== null);
+        return this.list.filter((client) => client.user !== null);
     }
 
     // ==================================================
     // Get a Client
     // ==================================================
     public getClient(id: string) {
-        return this.list.find(client => client.id === id);
+        return this.list.find((client) => client.id === id);
     }
 
     // ==================================================
@@ -61,7 +61,7 @@ export class ClientsSocketController {
     // Get a Client by User
     // ==================================================
     public getClientByUser(id: string) {
-        return this.list.find(client => client.user._id === id);
+        return this.list.find((client) => client.user._id === String(id));
     }
 
     // ==================================================
@@ -70,7 +70,7 @@ export class ClientsSocketController {
     public deleteClient(id: string) {
         const tempClient = this.getClient(id);
 
-        this.list = this.list.filter(client => client.id !== id);
+        this.list = this.list.filter((client) => client.id !== id);
 
         return tempClient;
     }

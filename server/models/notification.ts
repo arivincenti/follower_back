@@ -4,6 +4,7 @@ export interface INotification extends Document {
     notification: string;
     object: string;
     objectType: string;
+    notificationTitle: string;
     users: any[];
     readed_by: any[];
     operationType: string;
@@ -14,39 +15,42 @@ export interface INotification extends Document {
 var notificationSchema = new Schema({
     changes: [
         {
-            type: String
-        }
+            type: String,
+        },
     ],
     object: {
-        type: String
+        type: String,
     },
     objectType: {
-        type: String
+        type: String,
+    },
+    notificationTitle: {
+        type: String,
     },
     operationType: {
-        type: String
+        type: String,
     },
     created_by: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
     users: [
         {
             type: Schema.Types.ObjectId,
-            ref: "User"
-        }
+            ref: "User",
+        },
     ],
     readed_by: [
         {
             type: Schema.Types.ObjectId,
-            ref: "User"
-        }
+            ref: "User",
+        },
     ],
     created_at: {
         type: Date,
         required: true,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
 export default model("Notification", notificationSchema);
