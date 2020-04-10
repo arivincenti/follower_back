@@ -13,26 +13,26 @@ export const getMembers = async (req: Request, res: Response) => {
         var organization_id = req.params.organization;
 
         var members = await Member.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
@@ -52,21 +52,21 @@ export const getMember = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", member);
@@ -89,38 +89,38 @@ export const getMemberByEmail = async (req: Request, res: Response) => {
             users = await User.find({
                 email: {
                     $regex: email,
-                    $options: "i"
-                }
+                    $options: "i",
+                },
             }).limit(5);
 
             members = await Member.find({
                 $and: [
                     {
                         user: {
-                            $in: users
-                        }
+                            $in: users,
+                        },
                     },
-                    { organization: organization }
-                ]
+                    { organization: organization },
+                ],
             })
                 .populate({
                     path: "user",
                     model: "User",
-                    select: "-_password"
+                    select: "-_password",
                 })
                 .populate({
                     path: "created_by",
                     model: "User",
-                    select: "-password"
+                    select: "-password",
                 })
                 .populate({
                     path: "updated_by",
                     model: "User",
-                    select: "-password"
+                    select: "-password",
                 })
                 .populate({
                     path: "organization",
-                    model: "Organization"
+                    model: "Organization",
                 })
                 .limit(5);
         }
@@ -142,54 +142,58 @@ export const createMember = async (req: Request, res: Response) => {
             organization: body.organization._id,
             user: body.user,
             created_by: body.created_by,
-            created_at: new Date()
+            created_at: new Date(),
         });
 
         var saved_member = await newMember.save();
 
         var member: any = await Member.findOne({
-            _id: saved_member._id
+            _id: saved_member._id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             });
 
         var members = await Member.find({
-            organization: member.organization._id
+            organization: member.organization._id,
         })
             .populate({
                 path: "user",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             });
 
         var changes = [
-            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`,
         ];
 
         var client: any = clientsSocketController.getClientByUser(
-            String(member.created_by._id)
+            member.created_by._id
+        );
+
+        const clientJoin: any = clientsSocketController.getClientByUser(
+            body.user
         );
 
         var payload = {
@@ -197,10 +201,15 @@ export const createMember = async (req: Request, res: Response) => {
             object: member,
             operationType: "create",
             changes,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("create", payload);
+        if (clientJoin !== undefined) {
+            Server.instance.io
+                .to(clientJoin.id)
+                .emit("member-created", payload);
+        }
 
         getResponse(
             res,
@@ -211,6 +220,7 @@ export const createMember = async (req: Request, res: Response) => {
             member
         );
     } catch (error) {
+        console.log(error);
         getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };
@@ -226,7 +236,7 @@ export const activateMember = async (req: Request, res: Response) => {
         var member_payload = {
             deleted_at: body.deleted_at,
             updated_at: new Date(),
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
 
         var member: any = await Member.findByIdAndUpdate(
@@ -237,28 +247,28 @@ export const activateMember = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             });
 
         var members = [];
         members.push(member);
 
         var changes = [
-            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`,
         ];
 
         var client: any = clientsSocketController.getClientByUser(
@@ -270,7 +280,7 @@ export const activateMember = async (req: Request, res: Response) => {
             operationType: "update",
             changes,
             object: member,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("update", payload);
@@ -299,7 +309,7 @@ export const desactivateMember = async (req: Request, res: Response) => {
         var member_payload = {
             deleted_at: body.deleted_at,
             updated_at: body.deleted_at,
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
 
         var member: any = await Member.findByIdAndUpdate(
@@ -310,28 +320,28 @@ export const desactivateMember = async (req: Request, res: Response) => {
             .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
             .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
             .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             });
 
         var members = [];
         members.push(member);
 
         var changes = [
-            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`,
         ];
 
         var client: any = clientsSocketController.getClientByUser(
@@ -343,7 +353,7 @@ export const desactivateMember = async (req: Request, res: Response) => {
             operationType: "update",
             changes,
             object: member,
-            members
+            members,
         };
 
         Server.instance.io.to(client.id).emit("update", payload);

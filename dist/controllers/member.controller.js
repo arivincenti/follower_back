@@ -23,26 +23,26 @@ exports.getMembers = (req, res) => __awaiter(this, void 0, void 0, function* () 
     try {
         var organization_id = req.params.organization;
         var members = yield member_1.default.find({
-            organization: organization_id
+            organization: organization_id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-_password"
+            select: "-_password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "organization",
-            model: "Organization"
+            model: "Organization",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
     }
@@ -60,21 +60,21 @@ exports.getMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
             .populate({
             path: "user",
             model: "User",
-            select: "-_password"
+            select: "-_password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "organization",
-            model: "Organization"
+            model: "Organization",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", member);
     }
@@ -95,37 +95,37 @@ exports.getMemberByEmail = (req, res) => __awaiter(this, void 0, void 0, functio
             users = yield user_1.default.find({
                 email: {
                     $regex: email,
-                    $options: "i"
-                }
+                    $options: "i",
+                },
             }).limit(5);
             members = yield member_1.default.find({
                 $and: [
                     {
                         user: {
-                            $in: users
-                        }
+                            $in: users,
+                        },
                     },
-                    { organization: organization }
-                ]
+                    { organization: organization },
+                ],
             })
                 .populate({
                 path: "user",
                 model: "User",
-                select: "-_password"
+                select: "-_password",
             })
                 .populate({
                 path: "created_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
                 .populate({
                 path: "updated_by",
                 model: "User",
-                select: "-password"
+                select: "-password",
             })
                 .populate({
                 path: "organization",
-                model: "Organization"
+                model: "Organization",
             })
                 .limit(5);
         }
@@ -145,59 +145,66 @@ exports.createMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             organization: body.organization._id,
             user: body.user,
             created_by: body.created_by,
-            created_at: new Date()
+            created_at: new Date(),
         });
         var saved_member = yield newMember.save();
         var member = yield member_1.default.findOne({
-            _id: saved_member._id
+            _id: saved_member._id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-_password"
+            select: "-_password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "organization",
-            model: "Organization"
+            model: "Organization",
         });
         var members = yield member_1.default.find({
-            organization: member.organization._id
+            organization: member.organization._id,
         })
             .populate({
             path: "user",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         });
         var changes = [
-            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} ahora es miembro de ${member.organization.name}`,
         ];
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(String(member.created_by._id));
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(member.created_by._id);
+        const clientJoin = clientsSocket_1.clientsSocketController.getClientByUser(body.user);
         var payload = {
             objectType: "member",
             object: member,
             operationType: "create",
             changes,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("create", payload);
+        if (clientJoin !== undefined) {
+            server_1.default.instance.io
+                .to(clientJoin.id)
+                .emit("member-created", payload);
+        }
         response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se creó con éxito`, member);
     }
     catch (error) {
+        console.log(error);
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 });
@@ -211,32 +218,32 @@ exports.activateMember = (req, res) => __awaiter(this, void 0, void 0, function*
         var member_payload = {
             deleted_at: body.deleted_at,
             updated_at: new Date(),
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
         var member = yield member_1.default.findByIdAndUpdate(member_id, member_payload, { new: true })
             .populate({
             path: "user",
             model: "User",
-            select: "-_password"
+            select: "-_password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "organization",
-            model: "Organization"
+            model: "Organization",
         });
         var members = [];
         members.push(member);
         var changes = [
-            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} fue activado en ${member.organization.name}`,
         ];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
@@ -244,7 +251,7 @@ exports.activateMember = (req, res) => __awaiter(this, void 0, void 0, function*
             operationType: "update",
             changes,
             object: member,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se modificó con éxito`, member);
@@ -263,32 +270,32 @@ exports.desactivateMember = (req, res) => __awaiter(this, void 0, void 0, functi
         var member_payload = {
             deleted_at: body.deleted_at,
             updated_at: body.deleted_at,
-            updated_by: body.updated_by
+            updated_by: body.updated_by,
         };
         var member = yield member_1.default.findByIdAndUpdate(member_id, member_payload, { new: true })
             .populate({
             path: "user",
             model: "User",
-            select: "-_password"
+            select: "-_password",
         })
             .populate({
             path: "created_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "updated_by",
             model: "User",
-            select: "-password"
+            select: "-password",
         })
             .populate({
             path: "organization",
-            model: "Organization"
+            model: "Organization",
         });
         var members = [];
         members.push(member);
         var changes = [
-            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`
+            `${member.user.name} ${member.user.last_name} fue desactivado en ${member.organization.name}`,
         ];
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         var payload = {
@@ -296,7 +303,7 @@ exports.desactivateMember = (req, res) => __awaiter(this, void 0, void 0, functi
             operationType: "update",
             changes,
             object: member,
-            members
+            members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El miembro '${member._id}' se modificó con éxito`, member);

@@ -33,3 +33,16 @@ export const countClients = (req: Request, res: Response) => {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };
+
+// ==================================================
+// Count room clients
+// ==================================================
+export const getClients = (req: Request, res: Response) => {
+    try {
+        let list = clientsSocketController.getList();
+
+        getResponse(res, 200, true, "", "La búsqueda fue un éxito", list);
+    } catch (error) {
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};

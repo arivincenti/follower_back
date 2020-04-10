@@ -26,3 +26,15 @@ exports.countClients = (req, res) => {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };
+// ==================================================
+// Count room clients
+// ==================================================
+exports.getClients = (req, res) => {
+    try {
+        let list = clientsSocket_1.clientsSocketController.getList();
+        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", list);
+    }
+    catch (error) {
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};

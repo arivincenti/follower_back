@@ -53,7 +53,8 @@ class ClientsSocketController {
     // Get a Client by User
     // ==================================================
     getClientByUser(id) {
-        return this.list.find((client) => client.user._id === String(id));
+        const clients = this.getList();
+        return clients.find((client) => client.user._id === String(id));
     }
     // ==================================================
     // Delete Client
