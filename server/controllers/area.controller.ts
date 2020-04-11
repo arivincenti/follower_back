@@ -4,6 +4,7 @@ import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 import Server from "../classes/server";
+import { NotificationSocketController } from "../socketControllers/notificationControllers/notificationSocketController";
 
 // ==================================================
 // Get all areas

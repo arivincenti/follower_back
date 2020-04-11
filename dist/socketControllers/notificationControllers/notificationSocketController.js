@@ -24,11 +24,6 @@ class NotificationSocketController {
             switch (payload.objectType) {
                 case "ticket":
                     room = payload.object.area._id;
-                    // if (payload.operationType === "create") {
-                    //     room = payload.object.area._id;
-                    // } else {
-                    //     room = payload.object._id;
-                    // }
                     notificationTitle = payload.object.subject;
                     break;
                 case "member":
@@ -37,7 +32,6 @@ class NotificationSocketController {
                     break;
                 case "area":
                     if (payload.operationType === "create") {
-                        console.log(payload.object);
                         room = payload.object.organization._id;
                         notificationTitle = payload.object.organization.name;
                     }
@@ -62,37 +56,17 @@ class NotificationSocketController {
                 readed_by: [],
             };
             var pre_notification = yield notification_1.default.create(newNotification);
-            var notification = yield notification_1.default.findById(pre_notification._id).populate({
+            const notification = yield pre_notification
+                .populate({
                 path: "created_by",
                 model: "User",
                 select: "-password",
-            });
+            })
+                .execPopulate();
             let socketTicketPayload = {
                 object: payload.object,
                 notification,
             };
-            // switch (payload.objectType) {
-            //     case "member":
-            //         room = payload.object.organization._id;
-            //         break;
-            //     case "ticket":
-            //         if (payload.operationType === "create") {
-            //             room = payload.object.area._id;
-            //         } else {
-            //             room = payload.object._id;
-            //         }
-            //         break;
-            //     case "area":
-            //         if (payload.operationType === "create") {
-            //             room = payload.object.organization;
-            //         } else {
-            //             room = payload.object._id;
-            //         }
-            //         break;
-            //     default:
-            //         room = payload.object._id;
-            //         break;
-            // }
             io.to(room) //Ticket room
                 .emit("new-notification", socketTicketPayload);
         });

@@ -18,7 +18,7 @@ export const verifyToken = async (
             return res.status(401).json({
                 ok: false,
                 mensaje: "Token no valido",
-                errors: err
+                errors: err,
             });
         }
 

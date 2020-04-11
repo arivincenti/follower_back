@@ -24,7 +24,7 @@ exports.verifyToken = (req, res, next) => __awaiter(this, void 0, void 0, functi
             return res.status(401).json({
                 ok: false,
                 mensaje: "Token no valido",
-                errors: err
+                errors: err,
             });
         }
         next();
