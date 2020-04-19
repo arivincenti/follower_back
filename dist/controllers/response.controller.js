@@ -12,11 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Get response
 // ==================================================
 exports.getResponse = (res, status, ok, error, message, data) => __awaiter(this, void 0, void 0, function* () {
-    return res.json({
+    return res.status(status).json({
         ok: ok,
         status: status,
         message: message,
         error: error,
-        data: data
+        data: data,
     });
 });

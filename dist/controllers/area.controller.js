@@ -445,7 +445,7 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             members: find_area.members,
         };
         server_1.default.instance.io.to(client.id).emit("update", payload);
-        if (clientJoin !== undefined) {
+        if (clientJoin !== null) {
             server_1.default.instance.io
                 .to(clientJoin.id)
                 .emit("member-created", payload);
@@ -510,12 +510,12 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
             changes,
             members: area.members,
         };
-        server_1.default.instance.io.to(client.id).emit("update", payload);
-        if (clientLeave !== undefined) {
+        if (clientLeave !== null) {
             server_1.default.instance.io
                 .to(clientLeave.id)
                 .emit("member-deleted", payload);
         }
+        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${find_area.name}' fue modificada con éxito`, find_area);
     }
     catch (error) {

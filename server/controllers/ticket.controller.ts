@@ -377,6 +377,11 @@ export const createTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "comments.created_by",
+                model: "User",
+                select: "-password",
             });
 
         var client: any = clientsSocketController.getClientByUser(
@@ -487,11 +492,6 @@ export const updateTicket = async (req: Request, res: Response) => {
                 },
             })
             .populate({
-                path: "updated_by",
-                model: "User",
-                select: "-password",
-            })
-            .populate({
                 path: "movements.area",
                 model: "Area",
                 populate: {
@@ -510,6 +510,11 @@ export const updateTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "comments.created_by",
+                model: "User",
+                select: "-password",
             });
 
         var client: any = clientsSocketController.getClientByUser(
@@ -539,8 +544,10 @@ export const updateTicket = async (req: Request, res: Response) => {
                 changes.push(message);
             }
         } else {
-            message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
-            changes.push(message);
+            if (body.responsible) {
+                message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+                changes.push(message);
+            }
         }
 
         var payload = {

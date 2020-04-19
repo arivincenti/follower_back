@@ -22,10 +22,12 @@ exports.getNotifications = (req, res) => __awaiter(this, void 0, void 0, functio
         var user_id = [req.params.user];
         var userNotifications = yield notification_1.default.find({
             users: { $in: user_id },
-        }).populate({
+        })
+            .populate({
             path: " created_by",
             model: "User",
-        });
+        })
+            .sort({ created_at: -1 });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", userNotifications);
     }
     catch (error) {

@@ -13,10 +13,12 @@ export const getNotifications = async (req: Request, res: Response) => {
 
         var userNotifications = await Notification.find({
             users: { $in: user_id },
-        }).populate({
-            path: " created_by",
-            model: "User",
-        });
+        })
+            .populate({
+                path: " created_by",
+                model: "User",
+            })
+            .sort({ created_at: -1 });
 
         getResponse(
             res,

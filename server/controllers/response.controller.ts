@@ -11,11 +11,11 @@ export const getResponse = async (
     message: string,
     data: any
 ) => {
-    return res.json({
+    return res.status(status).json({
         ok: ok,
         status: status,
         message: message,
         error: error,
-        data: data
+        data: data,
     });
 };

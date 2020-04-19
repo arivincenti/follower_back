@@ -531,7 +531,7 @@ export const createAreaMember = async (req: Request, res: Response) => {
         };
 
         Server.instance.io.to(client.id).emit("update", payload);
-        if (clientJoin !== undefined) {
+        if (clientJoin !== null) {
             Server.instance.io
                 .to(clientJoin.id)
                 .emit("member-created", payload);
@@ -618,12 +618,13 @@ export const deleteAreaMember = async (req: Request, res: Response) => {
             members: area.members,
         };
 
-        Server.instance.io.to(client.id).emit("update", payload);
-        if (clientLeave !== undefined) {
+        if (clientLeave !== null) {
             Server.instance.io
                 .to(clientLeave.id)
                 .emit("member-deleted", payload);
         }
+
+        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,

@@ -375,6 +375,11 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "comments.created_by",
+            model: "User",
+            select: "-password",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(String(ticket.created_by._id));
         var changes = [
@@ -460,11 +465,6 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             },
         })
             .populate({
-            path: "updated_by",
-            model: "User",
-            select: "-password",
-        })
-            .populate({
             path: "movements.area",
             model: "Area",
             populate: {
@@ -483,6 +483,11 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "comments.created_by",
+            model: "User",
+            select: "-password",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var oldMovement = body.ticket;
@@ -504,8 +509,10 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             }
         }
         else {
-            message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
-            changes.push(message);
+            if (body.responsible) {
+                message = `El responsable del ticket "${new_ticket.subject}" ahora es "${new_ticket.responsible.user.name} ${new_ticket.responsible.user.last_name}"`;
+                changes.push(message);
+            }
         }
         var payload = {
             objectType: "ticket",

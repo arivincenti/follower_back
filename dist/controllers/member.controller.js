@@ -196,7 +196,7 @@ exports.createMember = (req, res) => __awaiter(this, void 0, void 0, function* (
             members,
         };
         server_1.default.instance.io.to(client.id).emit("create", payload);
-        if (clientJoin !== undefined) {
+        if (clientJoin !== null) {
             server_1.default.instance.io
                 .to(clientJoin.id)
                 .emit("member-created", payload);

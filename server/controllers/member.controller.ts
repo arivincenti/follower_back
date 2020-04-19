@@ -205,7 +205,8 @@ export const createMember = async (req: Request, res: Response) => {
         };
 
         Server.instance.io.to(client.id).emit("create", payload);
-        if (clientJoin !== undefined) {
+
+        if (clientJoin !== null) {
             Server.instance.io
                 .to(clientJoin.id)
                 .emit("member-created", payload);
