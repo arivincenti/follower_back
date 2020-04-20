@@ -11,12 +11,16 @@ import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket
 export const getComments = async (req: Request, res: Response) => {
     try {
         var ticket_id = req.params.ticket;
-
-        var ticket: any = await Ticket.findById(ticket_id).populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password"
-        });
+        var comments = await Comment.find({ ticket: ticket_id })
+            .populate({
+                path: "ticket",
+                model: "Ticket",
+            })
+            .populate({
+                path: "created_by",
+                model: "User",
+            })
+            .sort({ created_at: -1 });
 
         getResponse(
             res,
@@ -24,7 +28,7 @@ export const getComments = async (req: Request, res: Response) => {
             true,
             "",
             `Busqueda realizada con éxito`,
-            ticket.comments.reverse()
+            comments
         );
     } catch (error) {
         getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -36,45 +40,42 @@ export const getComments = async (req: Request, res: Response) => {
 // ==================================================
 export const addComment = async (req: Request, res: Response) => {
     try {
-        var ticket_id = req.params.ticket;
-        var body = req.body;
+        const body = req.body;
 
-        var comment: any = {
+        const comment_body: any = {
+            ticket: body.ticket,
             message: body.message,
             type: body.type,
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.created_by,
         };
 
-        var ticket: any = await Ticket.findByIdAndUpdate(
-            ticket_id,
-            {
-                $push: {
-                    comments: comment
-                }
-            },
-            { new: true }
-        )
+        let comment: any = await Comment.create(comment_body);
+
+        let comment_saved: any = await Comment.findById(comment._id)
             .populate({
-                path: "responsible",
-                model: "Member",
-                populate: {
-                    path: "user",
-                    model: "User"
-                }
+                path: "ticket",
+                model: "Ticket",
             })
             .populate({
-                path: "comments.created_by",
+                path: "created_by",
                 model: "User",
-                select: "-password"
-            });
+            })
+            .exec();
 
-        var comment: any = await ticket.comments.pop(); //Con pop devuelvo el ultimo elemento del arreglo
+        Server.instance.io
+            .to(comment_saved.ticket._id)
+            .emit("new-comment", comment_saved);
 
-        Server.instance.io.to(ticket._id).emit("new-comment", comment);
-
-        getResponse(res, 200, true, "", "La búsqueda fue un éxito", comment);
+        getResponse(
+            res,
+            200,
+            true,
+            "",
+            "La búsqueda fue un éxito",
+            comment_saved
+        );
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 };

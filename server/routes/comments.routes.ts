@@ -12,6 +12,6 @@ commentsRouter.get("/comments/:ticket", verifyToken, getComments);
 // ==================================================
 // Add comment
 // ==================================================
-commentsRouter.put("/comments/:ticket", verifyToken, addComment);
+commentsRouter.post("/comments", verifyToken, addComment);
 
 export default commentsRouter;

@@ -2,31 +2,35 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 var commentSchema = new mongoose_1.Schema({
+    ticket: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Ticket",
+    },
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
-    comment: {
+    message: {
         type: String,
-        required: [true, "El comentario debe contener un cuerpo"]
+        required: [true, "El comentario debe contener un cuerpo"],
     },
     type: {
-        type: String
+        type: String,
     },
     created_by: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
     created_at: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now,
     },
     updated_at: {
-        type: Date
+        type: Date,
     },
     deleted_at: {
-        type: Date
-    }
+        type: Date,
+    },
 });
 exports.default = mongoose_1.model("Comment", commentSchema);

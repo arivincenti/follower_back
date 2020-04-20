@@ -64,11 +64,6 @@ export const getTickets = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
-            })
-            .populate({
-                path: "comments.created_by",
-                model: "User",
-                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -146,11 +141,6 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
-            })
-            .populate({
-                path: "comments.created_by",
-                model: "User",
-                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -219,11 +209,6 @@ export const getTicketsByResponsible = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
-            })
-            .populate({
-                path: "comments.created_by",
-                model: "User",
-                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -290,13 +275,12 @@ export const getTicket = async (req: Request, res: Response) => {
                 },
             })
             .populate({
-                path: "movements.created_by",
+                path: "followers",
                 model: "User",
             })
             .populate({
-                path: "comments.created_by",
+                path: "movements.created_by",
                 model: "User",
-                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
@@ -391,11 +375,6 @@ export const createTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
-            })
-            .populate({
-                path: "comments.created_by",
-                model: "User",
-                select: "-password",
             });
 
         var client: any = clientsSocketController.getClientByUser(
@@ -524,11 +503,6 @@ export const updateTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
-            })
-            .populate({
-                path: "comments.created_by",
-                model: "User",
-                select: "-password",
             });
 
         var client: any = clientsSocketController.getClientByUser(

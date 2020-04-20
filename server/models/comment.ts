@@ -1,8 +1,9 @@
 import { Schema, model, Document } from "mongoose";
 
 export interface IComment extends Document {
+    ticket: string;
     user: string;
-    comment: string;
+    message: string;
     type: string;
     created_by: string;
     created_at: Date;
@@ -11,32 +12,36 @@ export interface IComment extends Document {
 }
 
 var commentSchema = new Schema({
+    ticket: {
+        type: Schema.Types.ObjectId,
+        ref: "Ticket",
+    },
     user: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
-    comment: {
+    message: {
         type: String,
-        required: [true, "El comentario debe contener un cuerpo"]
+        required: [true, "El comentario debe contener un cuerpo"],
     },
     type: {
-        type: String
+        type: String,
     },
     created_by: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
     created_at: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now,
     },
     updated_at: {
-        type: Date
+        type: Date,
     },
     deleted_at: {
-        type: Date
-    }
+        type: Date,
+    },
 });
 
 export default model("Comment", commentSchema);

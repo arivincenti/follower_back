@@ -645,13 +645,15 @@ export const deleteAreaMember = async (req: Request, res: Response) => {
 // ==================================================
 export const setResponsibleAreaMember = async (req: Request, res: Response) => {
     try {
-        var area_id = req.params.area;
-        var body = req.body;
-        var responsible = null;
+        const area_id = req.params.area;
+        const body = req.body;
+        let responsible = null;
 
         if (body.responsible) {
             if (body.area.responsible) {
-                if (String(body.area.responsible) !== body.responsible._id) {
+                if (
+                    String(body.area.responsible._id) !== body.responsible._id
+                ) {
                     responsible = body.responsible;
                 } else {
                     responsible = undefined;
@@ -663,7 +665,7 @@ export const setResponsibleAreaMember = async (req: Request, res: Response) => {
 
         var saved_area: any = await Area.findByIdAndUpdate(
             area_id,
-            { responsible: responsible },
+            { responsible },
             {
                 new: true,
             }
@@ -702,9 +704,17 @@ export const setResponsibleAreaMember = async (req: Request, res: Response) => {
             body.updated_by
         );
 
-        var changes: string[] = [
-            `Se asignó a "${body.member.user.name} ${body.member.user.name}" como miembro responsable del área "${body.area.name}"`,
-        ];
+        var changes: string[] = [];
+
+        if (responsible !== undefined) {
+            changes.push(
+                `Se asignó a "${body.responsible.user.name} ${body.responsible.user.last_name}" como miembro responsable del área "${body.area.name}"`
+            );
+        } else {
+            changes.push(
+                `El miembro "${body.responsible.user.name} ${body.responsible.user.last_name}" se quitó como responsable del área "${body.area.name}"`
+            );
+        }
 
         var payload = {
             objectType: "area",

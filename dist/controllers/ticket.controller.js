@@ -75,11 +75,6 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
             .populate({
             path: "movements.created_by",
             model: "User",
-        })
-            .populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -154,11 +149,6 @@ exports.getTicketsByUser = (req, res) => __awaiter(this, void 0, void 0, functio
             .populate({
             path: "movements.created_by",
             model: "User",
-        })
-            .populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -225,11 +215,6 @@ exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, 
             .populate({
             path: "movements.created_by",
             model: "User",
-        })
-            .populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -294,13 +279,12 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
             },
         })
             .populate({
-            path: "movements.created_by",
+            path: "followers",
             model: "User",
         })
             .populate({
-            path: "comments.created_by",
+            path: "movements.created_by",
             model: "User",
-            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
     }
@@ -389,11 +373,6 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "movements.created_by",
             model: "User",
-        })
-            .populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(String(ticket.created_by._id));
         var changes = [
@@ -497,11 +476,6 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "movements.created_by",
             model: "User",
-        })
-            .populate({
-            path: "comments.created_by",
-            model: "User",
-            select: "-password",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var oldMovement = body.ticket;

@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ticket_1 = __importDefault(require("../models/ticket"));
+const comment_1 = __importDefault(require("../models/comment"));
 const response_controller_1 = require("./response.controller");
 const server_1 = __importDefault(require("../classes/server"));
 // ==================================================
@@ -20,12 +20,17 @@ const server_1 = __importDefault(require("../classes/server"));
 exports.getComments = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var ticket_id = req.params.ticket;
-        var ticket = yield ticket_1.default.findById(ticket_id).populate({
-            path: "comments.created_by",
+        var comments = yield comment_1.default.find({ ticket: ticket_id })
+            .populate({
+            path: "ticket",
+            model: "Ticket",
+        })
+            .populate({
+            path: "created_by",
             model: "User",
-            select: "-password"
-        });
-        response_controller_1.getResponse(res, 200, true, "", `Busqueda realizada con éxito`, ticket.comments.reverse());
+        })
+            .sort({ created_at: -1 });
+        response_controller_1.getResponse(res, 200, true, "", `Busqueda realizada con éxito`, comments);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
@@ -36,37 +41,31 @@ exports.getComments = (req, res) => __awaiter(this, void 0, void 0, function* ()
 // ==================================================
 exports.addComment = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        var ticket_id = req.params.ticket;
-        var body = req.body;
-        var comment = {
+        const body = req.body;
+        const comment_body = {
+            ticket: body.ticket,
             message: body.message,
             type: body.type,
             created_at: new Date(),
-            created_by: body.created_by
+            created_by: body.created_by,
         };
-        var ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, {
-            $push: {
-                comments: comment
-            }
-        }, { new: true })
+        let comment = yield comment_1.default.create(comment_body);
+        let comment_saved = yield comment_1.default.findById(comment._id)
             .populate({
-            path: "responsible",
-            model: "Member",
-            populate: {
-                path: "user",
-                model: "User"
-            }
+            path: "ticket",
+            model: "Ticket",
         })
             .populate({
-            path: "comments.created_by",
+            path: "created_by",
             model: "User",
-            select: "-password"
-        });
-        var comment = yield ticket.comments.pop(); //Con pop devuelvo el ultimo elemento del arreglo
-        server_1.default.instance.io.to(ticket._id).emit("new-comment", comment);
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", comment);
+        })
+            .exec();
+        server_1.default.instance.io
+            .to(comment_saved.ticket._id)
+            .emit("new-comment", comment_saved);
+        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", comment_saved);
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
     }
 });

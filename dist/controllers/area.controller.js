@@ -528,12 +528,12 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
 // ==================================================
 exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        var area_id = req.params.area;
-        var body = req.body;
-        var responsible = null;
+        const area_id = req.params.area;
+        const body = req.body;
+        let responsible = null;
         if (body.responsible) {
             if (body.area.responsible) {
-                if (String(body.area.responsible) !== body.responsible._id) {
+                if (String(body.area.responsible._id) !== body.responsible._id) {
                     responsible = body.responsible;
                 }
                 else {
@@ -544,7 +544,7 @@ exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0,
                 responsible = body.responsible;
             }
         }
-        var saved_area = yield area_1.default.findByIdAndUpdate(area_id, { responsible: responsible }, {
+        var saved_area = yield area_1.default.findByIdAndUpdate(area_id, { responsible }, {
             new: true,
         })
             .populate("organization")
@@ -577,9 +577,13 @@ exports.setResponsibleAreaMember = (req, res) => __awaiter(this, void 0, void 0,
             },
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
-        var changes = [
-            `Se asignó a "${body.member.user.name} ${body.member.user.name}" como miembro responsable del área "${body.area.name}"`,
-        ];
+        var changes = [];
+        if (responsible !== undefined) {
+            changes.push(`Se asignó a "${body.responsible.user.name} ${body.responsible.user.last_name}" como miembro responsable del área "${body.area.name}"`);
+        }
+        else {
+            changes.push(`El miembro "${body.responsible.user.name} ${body.responsible.user.last_name}" se quitó como responsable del área "${body.area.name}"`);
+        }
         var payload = {
             objectType: "area",
             operationType: "update",
