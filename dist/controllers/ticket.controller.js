@@ -32,8 +32,12 @@ exports.getTickets = (req, res) => __awaiter(this, void 0, void 0, function* () 
             path: "area",
             model: "Area",
             populate: {
-                path: "area.members",
+                path: "members",
                 model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
             },
         })
             .populate({
@@ -221,6 +225,11 @@ exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, 
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "comments.created_by",
+            model: "User",
+            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -287,6 +296,11 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "comments.created_by",
+            model: "User",
+            select: "-password",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
     }

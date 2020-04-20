@@ -21,8 +21,12 @@ export const getTickets = async (req: Request, res: Response) => {
                 path: "area",
                 model: "Area",
                 populate: {
-                    path: "area.members",
+                    path: "members",
                     model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User",
+                    },
                 },
             })
             .populate({
@@ -215,6 +219,11 @@ export const getTicketsByResponsible = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "comments.created_by",
+                model: "User",
+                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -283,6 +292,11 @@ export const getTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "comments.created_by",
+                model: "User",
+                select: "-password",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
