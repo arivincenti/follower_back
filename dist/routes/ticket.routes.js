@@ -28,4 +28,12 @@ ticketRouter.post("/tickets", authentication_1.verifyToken, ticket_controller_1.
 // Update a ticket
 // ==================================================
 ticketRouter.put("/tickets/:ticket", authentication_1.verifyToken, ticket_controller_1.updateTicket);
+// ==================================================
+// Follow a ticket
+// ==================================================
+ticketRouter.patch("/tickets/follow/:ticket", authentication_1.verifyToken, ticket_controller_1.followTicket);
+// ==================================================
+// Unfollow a ticket
+// ==================================================
+ticketRouter.patch("/tickets/unfollow/:ticket", authentication_1.verifyToken, ticket_controller_1.unfollowTicket);
 exports.default = ticketRouter;

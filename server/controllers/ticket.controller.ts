@@ -209,6 +209,10 @@ export const getTicketsByResponsible = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "followers",
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -275,11 +279,11 @@ export const getTicket = async (req: Request, res: Response) => {
                 },
             })
             .populate({
-                path: "followers",
+                path: "movements.created_by",
                 model: "User",
             })
             .populate({
-                path: "movements.created_by",
+                path: "followers",
                 model: "User",
             });
 
@@ -374,6 +378,10 @@ export const createTicket = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.created_by",
+                model: "User",
+            })
+            .populate({
+                path: "followers",
                 model: "User",
             });
 
@@ -503,6 +511,10 @@ export const updateTicket = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "followers",
+                model: "User",
             });
 
         var client: any = clientsSocketController.getClientByUser(
@@ -537,6 +549,248 @@ export const updateTicket = async (req: Request, res: Response) => {
                 changes.push(message);
             }
         }
+
+        var payload = {
+            objectType: "ticket",
+            object: new_ticket,
+            operationType: "update",
+            changes,
+            members: [...new_ticket.area.members],
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
+
+        getResponse(
+            res,
+            200,
+            true,
+            "",
+            `El ticket '${new_ticket._id}' se modificó con éxito`,
+            new_ticket
+        );
+    } catch (error) {
+        console.error(error);
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
+// Update ticket
+// ==================================================
+export const followTicket = async (req: Request, res: Response) => {
+    try {
+        var ticket_id = req.params.ticket;
+        var body: any = req.body;
+
+        var movement = {
+            area: body.ticket.area,
+            responsible: body.ticket.responsible,
+            followers: [...body.ticket.followers],
+            priority: body.ticket.priority,
+            status: body.ticket.status,
+            date: body.ticket.date,
+            created_at: new Date(),
+            created_by: body.user,
+        };
+
+        var new_ticket: any = await Ticket.findByIdAndUpdate(
+            ticket_id,
+            {
+                $push: {
+                    movements: movement,
+                    followers: body.user,
+                },
+            },
+            { new: true }
+        )
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password",
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User",
+                    },
+                },
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization",
+                },
+            })
+            .populate({
+                path: "responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            })
+            .populate({
+                path: "movements.area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization",
+                },
+            })
+            .populate({
+                path: "movements.responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User",
+            })
+            .populate({
+                path: "followers",
+                model: "User",
+            });
+
+        var client: any = clientsSocketController.getClientByUser(
+            body.user._id
+        );
+
+        var changes: any = [
+            `${body.user.name} ${body.user.last_name} ahora sigue el ticket ${new_ticket.subject}`,
+        ];
+
+        var payload = {
+            objectType: "ticket",
+            object: new_ticket,
+            operationType: "update",
+            changes,
+            members: [...new_ticket.area.members],
+        };
+
+        Server.instance.io.to(client.id).emit("update", payload);
+
+        getResponse(
+            res,
+            200,
+            true,
+            "",
+            `El ticket '${new_ticket._id}' se modificó con éxito`,
+            new_ticket
+        );
+    } catch (error) {
+        console.error(error);
+        getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+};
+
+// ==================================================
+// Update ticket
+// ==================================================
+export const unfollowTicket = async (req: Request, res: Response) => {
+    try {
+        var ticket_id = req.params.ticket;
+        var body: any = req.body;
+
+        var movement = {
+            area: body.ticket.area,
+            responsible: body.ticket.responsible,
+            followers: [...body.ticket.followers],
+            priority: body.ticket.priority,
+            status: body.ticket.status,
+            date: body.ticket.date,
+            created_at: new Date(),
+            created_by: body.user,
+        };
+
+        movement.followers.filter((follower) => follower._id !== body.user._id);
+
+        var new_ticket: any = await Ticket.findByIdAndUpdate(
+            ticket_id,
+            {
+                $push: {
+                    movements: movement,
+                },
+                $pull: {
+                    followers: body.user._id,
+                },
+            },
+            { new: true }
+        )
+            .populate({
+                path: "created_by",
+                model: "User",
+                select: "-password",
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "members",
+                    model: "Member",
+                    populate: {
+                        path: "user",
+                        model: "User",
+                    },
+                },
+            })
+            .populate({
+                path: "area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization",
+                },
+            })
+            .populate({
+                path: "responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            })
+            .populate({
+                path: "movements.area",
+                model: "Area",
+                populate: {
+                    path: "organization",
+                    model: "Organization",
+                },
+            })
+            .populate({
+                path: "movements.responsible",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            })
+            .populate({
+                path: "movements.created_by",
+                model: "User",
+            })
+            .populate({
+                path: "followers",
+                model: "User",
+            });
+
+        var client: any = clientsSocketController.getClientByUser(
+            body.user._id
+        );
+
+        var changes: any = [
+            `${body.user.name} ${body.user.last_name} ahora sigue el ticket ${new_ticket.subject}`,
+        ];
 
         var payload = {
             objectType: "ticket",

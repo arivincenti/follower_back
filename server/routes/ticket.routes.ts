@@ -6,7 +6,9 @@ import {
     getTicket,
     createTicket,
     updateTicket,
-    getTicketsByResponsible
+    getTicketsByResponsible,
+    followTicket,
+    unfollowTicket,
 } from "../controllers/ticket.controller";
 
 const ticketRouter = Router();
@@ -44,5 +46,15 @@ ticketRouter.post("/tickets", verifyToken, createTicket);
 // Update a ticket
 // ==================================================
 ticketRouter.put("/tickets/:ticket", verifyToken, updateTicket);
+
+// ==================================================
+// Follow a ticket
+// ==================================================
+ticketRouter.patch("/tickets/follow/:ticket", verifyToken, followTicket);
+
+// ==================================================
+// Unfollow a ticket
+// ==================================================
+ticketRouter.patch("/tickets/unfollow/:ticket", verifyToken, unfollowTicket);
 
 export default ticketRouter;

@@ -215,6 +215,10 @@ exports.getTicketsByResponsible = (req, res) => __awaiter(this, void 0, void 0, 
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "followers",
+            model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
     }
@@ -279,11 +283,11 @@ exports.getTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
             },
         })
             .populate({
-            path: "followers",
+            path: "movements.created_by",
             model: "User",
         })
             .populate({
-            path: "movements.created_by",
+            path: "followers",
             model: "User",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", ticket);
@@ -372,6 +376,10 @@ exports.createTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
         })
             .populate({
             path: "movements.created_by",
+            model: "User",
+        })
+            .populate({
+            path: "followers",
             model: "User",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(String(ticket.created_by._id));
@@ -476,6 +484,10 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
             .populate({
             path: "movements.created_by",
             model: "User",
+        })
+            .populate({
+            path: "followers",
+            model: "User",
         });
         var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var oldMovement = body.ticket;
@@ -502,6 +514,207 @@ exports.updateTicket = (req, res) => __awaiter(this, void 0, void 0, function* (
                 changes.push(message);
             }
         }
+        var payload = {
+            objectType: "ticket",
+            object: new_ticket,
+            operationType: "update",
+            changes,
+            members: [...new_ticket.area.members],
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El ticket '${new_ticket._id}' se modificó con éxito`, new_ticket);
+    }
+    catch (error) {
+        console.error(error);
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Update ticket
+// ==================================================
+exports.followTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var ticket_id = req.params.ticket;
+        var body = req.body;
+        var movement = {
+            area: body.ticket.area,
+            responsible: body.ticket.responsible,
+            followers: [...body.ticket.followers],
+            priority: body.ticket.priority,
+            status: body.ticket.status,
+            date: body.ticket.date,
+            created_at: new Date(),
+            created_by: body.user,
+        };
+        var new_ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, {
+            $push: {
+                movements: movement,
+                followers: body.user,
+            },
+        }, { new: true })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password",
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            },
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization",
+            },
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+            .populate({
+            path: "movements.area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization",
+            },
+        })
+            .populate({
+            path: "movements.responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User",
+        })
+            .populate({
+            path: "followers",
+            model: "User",
+        });
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.user._id);
+        var changes = [
+            `${body.user.name} ${body.user.last_name} ahora sigue el ticket ${new_ticket.subject}`,
+        ];
+        var payload = {
+            objectType: "ticket",
+            object: new_ticket,
+            operationType: "update",
+            changes,
+            members: [...new_ticket.area.members],
+        };
+        server_1.default.instance.io.to(client.id).emit("update", payload);
+        response_controller_1.getResponse(res, 200, true, "", `El ticket '${new_ticket._id}' se modificó con éxito`, new_ticket);
+    }
+    catch (error) {
+        console.error(error);
+        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
+    }
+});
+// ==================================================
+// Update ticket
+// ==================================================
+exports.unfollowTicket = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        var ticket_id = req.params.ticket;
+        var body = req.body;
+        var movement = {
+            area: body.ticket.area,
+            responsible: body.ticket.responsible,
+            followers: [...body.ticket.followers],
+            priority: body.ticket.priority,
+            status: body.ticket.status,
+            date: body.ticket.date,
+            created_at: new Date(),
+            created_by: body.user,
+        };
+        movement.followers.filter((follower) => follower._id !== body.user._id);
+        var new_ticket = yield ticket_1.default.findByIdAndUpdate(ticket_id, {
+            $push: {
+                movements: movement,
+            },
+            $pull: {
+                followers: body.user._id,
+            },
+        }, { new: true })
+            .populate({
+            path: "created_by",
+            model: "User",
+            select: "-password",
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "members",
+                model: "Member",
+                populate: {
+                    path: "user",
+                    model: "User",
+                },
+            },
+        })
+            .populate({
+            path: "area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization",
+            },
+        })
+            .populate({
+            path: "responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+            .populate({
+            path: "movements.area",
+            model: "Area",
+            populate: {
+                path: "organization",
+                model: "Organization",
+            },
+        })
+            .populate({
+            path: "movements.responsible",
+            model: "Member",
+            populate: {
+                path: "user",
+                model: "User",
+            },
+        })
+            .populate({
+            path: "movements.created_by",
+            model: "User",
+        })
+            .populate({
+            path: "followers",
+            model: "User",
+        });
+        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.user._id);
+        var changes = [
+            `${body.user.name} ${body.user.last_name} ahora sigue el ticket ${new_ticket.subject}`,
+        ];
         var payload = {
             objectType: "ticket",
             object: new_ticket,
