@@ -64,6 +64,10 @@ export const getTickets = async (req: Request, res: Response) => {
             .populate({
                 path: "movements.created_by",
                 model: "User",
+            })
+            .populate({
+                path: "followers",
+                model: "User",
             });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", tickets);
@@ -140,6 +144,10 @@ export const getTicketsByUser = async (req: Request, res: Response) => {
             })
             .populate({
                 path: "movements.created_by",
+                model: "User",
+            })
+            .populate({
+                path: "followers",
                 model: "User",
             });
 

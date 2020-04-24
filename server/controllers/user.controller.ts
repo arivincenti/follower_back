@@ -45,8 +45,8 @@ export const getUserByEmail = async (req: Request, res: Response) => {
             users = await User.find({
                 email: {
                     $regex: email,
-                    $options: "i"
-                }
+                    $options: "i",
+                },
             }).limit(5);
         }
 

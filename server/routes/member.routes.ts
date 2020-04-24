@@ -3,10 +3,9 @@ import { verifyToken } from "../middlewares/authentication";
 import {
     getMembers,
     getMember,
-    getMemberByEmail,
     createMember,
     activateMember,
-    desactivateMember
+    desactivateMember,
 } from "../controllers/member.controller";
 
 const memberRouter = Router();
@@ -24,11 +23,6 @@ memberRouter.get(
 // Get one member
 // ==================================================
 memberRouter.get("/members/:member", verifyToken, getMember);
-
-// ==================================================
-// Get member by email
-// ==================================================
-memberRouter.post("/members/by_email", verifyToken, getMemberByEmail);
 
 // ==================================================
 // Create a new member

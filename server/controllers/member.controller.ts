@@ -76,62 +76,6 @@ export const getMember = async (req: Request, res: Response) => {
 };
 
 // ==================================================
-// Get member by email
-// ==================================================
-export const getMemberByEmail = async (req: Request, res: Response) => {
-    try {
-        var email = req.body.email;
-        var organization = req.body.organization;
-        var users = [];
-        var members: any[] = [];
-
-        if (email) {
-            users = await User.find({
-                email: {
-                    $regex: email,
-                    $options: "i",
-                },
-            }).limit(5);
-
-            members = await Member.find({
-                $and: [
-                    {
-                        user: {
-                            $in: users,
-                        },
-                    },
-                    { organization: organization },
-                ],
-            })
-                .populate({
-                    path: "user",
-                    model: "User",
-                    select: "-_password",
-                })
-                .populate({
-                    path: "created_by",
-                    model: "User",
-                    select: "-password",
-                })
-                .populate({
-                    path: "updated_by",
-                    model: "User",
-                    select: "-password",
-                })
-                .populate({
-                    path: "organization",
-                    model: "Organization",
-                })
-                .limit(5);
-        }
-
-        getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
-    } catch (error) {
-        getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-};
-
-// ==================================================
 // Create a member
 // ==================================================
 export const createMember = async (req: Request, res: Response) => {

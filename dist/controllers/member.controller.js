@@ -11,7 +11,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_1 = __importDefault(require("../models/user"));
 const member_1 = __importDefault(require("../models/member"));
 const response_controller_1 = require("./response.controller");
 const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
@@ -77,59 +76,6 @@ exports.getMember = (req, res) => __awaiter(this, void 0, void 0, function* () {
             model: "Organization",
         });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", member);
-    }
-    catch (error) {
-        response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
-    }
-});
-// ==================================================
-// Get member by email
-// ==================================================
-exports.getMemberByEmail = (req, res) => __awaiter(this, void 0, void 0, function* () {
-    try {
-        var email = req.body.email;
-        var organization = req.body.organization;
-        var users = [];
-        var members = [];
-        if (email) {
-            users = yield user_1.default.find({
-                email: {
-                    $regex: email,
-                    $options: "i",
-                },
-            }).limit(5);
-            members = yield member_1.default.find({
-                $and: [
-                    {
-                        user: {
-                            $in: users,
-                        },
-                    },
-                    { organization: organization },
-                ],
-            })
-                .populate({
-                path: "user",
-                model: "User",
-                select: "-_password",
-            })
-                .populate({
-                path: "created_by",
-                model: "User",
-                select: "-password",
-            })
-                .populate({
-                path: "updated_by",
-                model: "User",
-                select: "-password",
-            })
-                .populate({
-                path: "organization",
-                model: "Organization",
-            })
-                .limit(5);
-        }
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", members);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);

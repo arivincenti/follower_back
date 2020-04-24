@@ -13,10 +13,6 @@ memberRouter.get("/members/organization/:organization", authentication_1.verifyT
 // ==================================================
 memberRouter.get("/members/:member", authentication_1.verifyToken, member_controller_1.getMember);
 // ==================================================
-// Get member by email
-// ==================================================
-memberRouter.post("/members/by_email", authentication_1.verifyToken, member_controller_1.getMemberByEmail);
-// ==================================================
 // Create a new member
 // ==================================================
 memberRouter.post("/members", authentication_1.verifyToken, member_controller_1.createMember);

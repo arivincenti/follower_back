@@ -12,8 +12,6 @@ import { NotificationSocketController } from "../socketControllers/notificationC
 export const getAreas = async (req: Request, res: Response) => {
     try {
         var organization_id = req.params.organization;
-        var since = Number(req.query.since);
-        var size = Number(req.query.size);
 
         var areas = await Area.find({
             organization: organization_id,
@@ -44,10 +42,7 @@ export const getAreas = async (req: Request, res: Response) => {
             })
             .sort({
                 name: 1,
-            })
-            .skip(since)
-            .limit(size)
-            .exec();
+            });
 
         getResponse(res, 200, true, "", "La búsqueda fue un éxito", areas);
     } catch (error) {

@@ -51,8 +51,8 @@ exports.getUserByEmail = (req, res) => __awaiter(this, void 0, void 0, function*
             users = yield user_1.default.find({
                 email: {
                     $regex: email,
-                    $options: "i"
-                }
+                    $options: "i",
+                },
             }).limit(5);
         }
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", users);

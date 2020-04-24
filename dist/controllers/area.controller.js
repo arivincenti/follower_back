@@ -22,8 +22,6 @@ const server_1 = __importDefault(require("../classes/server"));
 exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         var organization_id = req.params.organization;
-        var since = Number(req.query.since);
-        var size = Number(req.query.size);
         var areas = yield area_1.default.find({
             organization: organization_id,
         })
@@ -53,10 +51,7 @@ exports.getAreas = (req, res) => __awaiter(this, void 0, void 0, function* () {
         })
             .sort({
             name: 1,
-        })
-            .skip(since)
-            .limit(size)
-            .exec();
+        });
         response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", areas);
     }
     catch (error) {
