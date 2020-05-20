@@ -16,6 +16,7 @@ const member_1 = __importDefault(require("../models/member"));
 const response_controller_1 = require("./response.controller");
 const clientsSocket_1 = require("../sockets/clientsSockets/clientsSocket");
 const server_1 = __importDefault(require("../classes/server"));
+const notificationSocketController_1 = require("../socketControllers/notificationControllers/notificationSocketController");
 // ==================================================
 // Get all areas
 // ==================================================
@@ -156,31 +157,20 @@ exports.createArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
                 select: "-password",
             },
         });
-        var members = yield member_1.default.find({
-            organization: area.organization._id,
-        })
-            .populate({
-            path: "user",
-            model: "User",
-            select: "-password",
-        })
-            .populate({
-            path: "created_by",
-            model: "User",
-            select: "-password",
-        });
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(area.created_by._id);
         var changes = [
             `Se creó el área "${area.name}" en "${area.organization.name}"`,
         ];
+        let users = [];
+        users.push(area.created_by);
         var payload = {
             objectType: "area",
             object: area,
             operationType: "create",
             changes,
-            members,
+            users,
+            created_by: area.created_by,
         };
-        server_1.default.instance.io.to(client.id).emit("create", payload);
+        notificationSocketController_1.createNotification(payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' se creó con éxito`, area);
     }
     catch (error) {
@@ -199,17 +189,6 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
             updated_by: body.updated_by,
             updated_at: new Date(),
         };
-        // if (body.responsible) {
-        //     if (area.responsible) {
-        //         if (String(area.responsible) !== body.responsible._id) {
-        //             area.responsible = body.responsible;
-        //         } else {
-        //             area.responsible = undefined;
-        //         }
-        //     } else {
-        //         area.responsible = body.responsible;
-        //     }
-        // }
         var saved_area = yield area_1.default.findByIdAndUpdate(area_id, area, {
             new: true,
         })
@@ -242,18 +221,19 @@ exports.updateArea = (req, res) => __awaiter(this, void 0, void 0, function* () 
                 select: "-password",
             },
         });
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         var changes = [
             `El área "${body.area.name}" ahora tiene el nombre "${saved_area.name}"`,
         ];
-        var payload = {
+        let users = yield saved_area.members.map((member) => member.user);
+        const payload = {
             objectType: "area",
             object: saved_area,
             operationType: "update",
             changes,
-            members: saved_area.members,
+            users,
+            created_by: body.updated_by,
         };
-        server_1.default.instance.io.to(client.id).emit("update", payload);
+        notificationSocketController_1.createNotification(payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${saved_area.name}' fue modificada con éxito`, saved_area);
     }
     catch (error) {
@@ -298,16 +278,17 @@ exports.activateArea = (req, res) => __awaiter(this, void 0, void 0, function* (
                 select: "-password",
             },
         });
-        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         const changes = [`El área "${area.name}" se activó"`];
+        let users = yield area.members.map((member) => member.user);
         const payload = {
             objectType: "area",
             object: area,
             operationType: "update",
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
-        server_1.default.instance.io.to(client.id).emit("update", payload);
+        notificationSocketController_1.createNotification(payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' fue dada de baja con éxito`, area);
     }
     catch (error) {
@@ -351,16 +332,17 @@ exports.desactivateArea = (req, res) => __awaiter(this, void 0, void 0, function
                 select: "-password",
             },
         });
-        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by);
         const changes = [`El área "${area.name}" se desactivó"`];
+        let users = yield area.members.map((member) => member.user);
         const payload = {
             objectType: "area",
             object: area,
             operationType: "update",
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
-        server_1.default.instance.io.to(client.id).emit("update", payload);
+        notificationSocketController_1.createNotification(payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${area.name}' fue dada de baja con éxito`, area);
     }
     catch (error) {
@@ -426,20 +408,21 @@ exports.createAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
                 select: "-password",
             },
         });
-        const client = clientsSocket_1.clientsSocketController.getClientByUser(body.updated_by._id);
         const clientJoin = clientsSocket_1.clientsSocketController.getClientByUser(body.member.user._id);
         const changes = [
             `"${body.member.user.name} ${body.member.user.last_name}" ahora es miembro del área "${find_area.name}"`,
         ];
+        let users = yield find_area.members.map((member) => member.user);
         const payload = {
             memberCreated: body.member,
             objectType: "area",
             operationType: "update",
             object: find_area,
             changes,
-            members: find_area.members,
+            users,
+            created_by: body.updated_by,
         };
-        server_1.default.instance.io.to(client.id).emit("update", payload);
+        notificationSocketController_1.createNotification(payload);
         if (clientJoin !== null) {
             server_1.default.instance.io
                 .to(clientJoin.id)
@@ -492,25 +475,26 @@ exports.deleteAreaMember = (req, res) => __awaiter(this, void 0, void 0, functio
                 select: "-password",
             },
         });
-        var client = clientsSocket_1.clientsSocketController.getClientByUser(updated_by._id);
         const clientLeave = clientsSocket_1.clientsSocketController.getClientByUser(body.member.user._id);
         var changes = [
             `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue eliminado del área "${find_area.name}"`,
         ];
-        var payload = {
+        let users = yield body.area.members.map((member) => member.user);
+        const payload = {
             memberDeleted: member,
             objectType: "area",
             operationType: "update",
             object: find_area,
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
+        notificationSocketController_1.createNotification(payload);
         if (clientLeave !== null) {
             server_1.default.instance.io
                 .to(clientLeave.id)
                 .emit("member-deleted", payload);
         }
-        server_1.default.instance.io.to(client.id).emit("update", payload);
         response_controller_1.getResponse(res, 200, true, "", `El área '${find_area.name}' fue modificada con éxito`, find_area);
     }
     catch (error) {

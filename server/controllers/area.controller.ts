@@ -4,7 +4,8 @@ import { Response, Request } from "express";
 import { getResponse } from "./response.controller";
 import { clientsSocketController } from "../sockets/clientsSockets/clientsSocket";
 import Server from "../classes/server";
-import { NotificationSocketController } from "../socketControllers/notificationControllers/notificationSocketController";
+import { createNotification } from "../socketControllers/notificationControllers/notificationSocketController";
+import { IUser } from "../models/user";
 
 // ==================================================
 // Get all areas
@@ -156,37 +157,23 @@ export const createArea = async (req: Request, res: Response) => {
                 },
             });
 
-        var members = await Member.find({
-            organization: area.organization._id,
-        })
-            .populate({
-                path: "user",
-                model: "User",
-                select: "-password",
-            })
-            .populate({
-                path: "created_by",
-                model: "User",
-                select: "-password",
-            });
-
-        var client: any = clientsSocketController.getClientByUser(
-            area.created_by._id
-        );
-
         var changes = [
             `Se creó el área "${area.name}" en "${area.organization.name}"`,
         ];
+
+        let users = [];
+        users.push(area.created_by);
 
         var payload = {
             objectType: "area",
             object: area,
             operationType: "create",
             changes,
-            members,
+            users,
+            created_by: area.created_by,
         };
 
-        Server.instance.io.to(client.id).emit("create", payload);
+        createNotification(payload);
 
         getResponse(
             res,
@@ -214,18 +201,6 @@ export const updateArea = async (req: Request, res: Response) => {
             updated_by: body.updated_by,
             updated_at: new Date(),
         };
-
-        // if (body.responsible) {
-        //     if (area.responsible) {
-        //         if (String(area.responsible) !== body.responsible._id) {
-        //             area.responsible = body.responsible;
-        //         } else {
-        //             area.responsible = undefined;
-        //         }
-        //     } else {
-        //         area.responsible = body.responsible;
-        //     }
-        // }
 
         var saved_area: any = await Area.findByIdAndUpdate(area_id, area, {
             new: true,
@@ -260,23 +235,24 @@ export const updateArea = async (req: Request, res: Response) => {
                 },
             });
 
-        var client: any = clientsSocketController.getClientByUser(
-            body.updated_by
-        );
-
         var changes = [
             `El área "${body.area.name}" ahora tiene el nombre "${saved_area.name}"`,
         ];
 
-        var payload = {
+        let users = await saved_area.members.map(
+            (member: IMember) => member.user
+        );
+
+        const payload = {
             objectType: "area",
             object: saved_area,
             operationType: "update",
             changes,
-            members: saved_area.members,
+            users,
+            created_by: body.updated_by,
         };
 
-        Server.instance.io.to(client.id).emit("update", payload);
+        createNotification(payload);
 
         getResponse(
             res,
@@ -335,21 +311,20 @@ export const activateArea = async (req: Request, res: Response) => {
                 },
             });
 
-        const client: any = clientsSocketController.getClientByUser(
-            body.updated_by
-        );
-
         const changes = [`El área "${area.name}" se activó"`];
+
+        let users = await area.members.map((member: IMember) => member.user);
 
         const payload = {
             objectType: "area",
             object: area,
             operationType: "update",
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
 
-        Server.instance.io.to(client.id).emit("update", payload);
+        createNotification(payload);
 
         getResponse(
             res,
@@ -407,21 +382,20 @@ export const desactivateArea = async (req: Request, res: Response) => {
                 },
             });
 
-        const client: any = clientsSocketController.getClientByUser(
-            body.updated_by
-        );
-
         const changes = [`El área "${area.name}" se desactivó"`];
+
+        let users = await area.members.map((member: IMember) => member.user);
 
         const payload = {
             objectType: "area",
             object: area,
             operationType: "update",
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
 
-        Server.instance.io.to(client.id).emit("update", payload);
+        createNotification(payload);
 
         getResponse(
             res,
@@ -504,10 +478,6 @@ export const createAreaMember = async (req: Request, res: Response) => {
                 },
             });
 
-        const client: any = clientsSocketController.getClientByUser(
-            body.updated_by._id
-        );
-
         const clientJoin: any = clientsSocketController.getClientByUser(
             body.member.user._id
         );
@@ -516,16 +486,22 @@ export const createAreaMember = async (req: Request, res: Response) => {
             `"${body.member.user.name} ${body.member.user.last_name}" ahora es miembro del área "${find_area.name}"`,
         ];
 
+        let users = await find_area.members.map(
+            (member: IMember) => member.user
+        );
+
         const payload = {
             memberCreated: body.member,
             objectType: "area",
             operationType: "update",
             object: find_area,
             changes,
-            members: find_area.members,
+            users,
+            created_by: body.updated_by,
         };
 
-        Server.instance.io.to(client.id).emit("update", payload);
+        createNotification(payload);
+
         if (clientJoin !== null) {
             Server.instance.io
                 .to(clientJoin.id)
@@ -592,10 +568,6 @@ export const deleteAreaMember = async (req: Request, res: Response) => {
                 },
             });
 
-        var client: any = clientsSocketController.getClientByUser(
-            updated_by._id
-        );
-
         const clientLeave: any = clientsSocketController.getClientByUser(
             body.member.user._id
         );
@@ -604,22 +576,27 @@ export const deleteAreaMember = async (req: Request, res: Response) => {
             `El miembro "${body.member.user.name} ${body.member.user.last_name}" fue eliminado del área "${find_area.name}"`,
         ];
 
-        var payload = {
+        let users = await body.area.members.map(
+            (member: IMember) => member.user
+        );
+
+        const payload = {
             memberDeleted: member,
             objectType: "area",
             operationType: "update",
             object: find_area,
             changes,
-            members: area.members,
+            users,
+            created_by: body.updated_by,
         };
+
+        createNotification(payload);
 
         if (clientLeave !== null) {
             Server.instance.io
                 .to(clientLeave.id)
                 .emit("member-deleted", payload);
         }
-
-        Server.instance.io.to(client.id).emit("update", payload);
 
         getResponse(
             res,
