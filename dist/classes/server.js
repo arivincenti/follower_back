@@ -27,6 +27,7 @@ const socket_io_1 = __importDefault(require("socket.io"));
 const http_1 = __importDefault(require("http"));
 const environment_1 = require("../config/environment");
 const clientsSocket = __importStar(require("../sockets/clientsSockets/clientsSocket"));
+const ticketSocket = __importStar(require("../sockets/ticketSockets/ticketSocket"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -73,9 +74,9 @@ class Server {
             // organizationsSocket.leaveAnOrganization(socket);
             // organizationsSocket.leaveAllOrganizations(socket);
             // //Tickets
-            // ticketSocket.joinToTicket(socket);
+            ticketSocket.joinToTicket(socket);
             // ticketSocket.joinAllTickets(socket);
-            // ticketSocket.leaveATicket(socket);
+            ticketSocket.leaveATicket(socket);
             // ticketSocket.leaveAllTickets(socket);
             // //Areas
             // areaSocket.joinArea(socket);

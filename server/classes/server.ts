@@ -74,9 +74,9 @@ export default class Server {
             // organizationsSocket.leaveAllOrganizations(socket);
 
             // //Tickets
-            // ticketSocket.joinToTicket(socket);
+            ticketSocket.joinToTicket(socket);
             // ticketSocket.joinAllTickets(socket);
-            // ticketSocket.leaveATicket(socket);
+            ticketSocket.leaveATicket(socket);
             // ticketSocket.leaveAllTickets(socket);
 
             // //Areas

@@ -58,12 +58,11 @@ exports.addComment = (req, res) => __awaiter(this, void 0, void 0, function* () 
             .populate({
             path: "created_by",
             model: "User",
-        })
-            .exec();
+        });
         server_1.default.instance.io
             .to(comment_saved.ticket._id)
             .emit("new-comment", comment_saved);
-        response_controller_1.getResponse(res, 200, true, "", "La búsqueda fue un éxito", comment_saved);
+        response_controller_1.getResponse(res, 200, true, "", "El  comentario se creo con éxito", comment_saved);
     }
     catch (error) {
         response_controller_1.getResponse(res, 500, false, "Error de servidor", error.message, null);
