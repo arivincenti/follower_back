@@ -28,9 +28,6 @@ const http_1 = __importDefault(require("http"));
 const environment_1 = require("../config/environment");
 const clientsSocket = __importStar(require("../sockets/clientsSockets/clientsSocket"));
 const ticketSocket = __importStar(require("../sockets/ticketSockets/ticketSocket"));
-const areaSocket = __importStar(require("../sockets/areaSockets/areaSocket"));
-const notificationSocket = __importStar(require("../sockets/notificationSockets/notificationSockets"));
-const organizationsSocket = __importStar(require("../sockets/organizationSockets/organizationSockets"));
 class Server {
     constructor() {
         this.app = express_1.default();
@@ -52,9 +49,9 @@ class Server {
         this.app.use(cors_1.default({
             origin: [
                 "https://arivincenti.github.io",
-                "http://localhost:4200"
+                "http://localhost:4200",
             ],
-            credentials: true
+            credentials: true,
         }));
         // this.app.use(cors({ origin: true, credentials: true }));
         this.app.use(express_1.default.json());
@@ -64,30 +61,28 @@ class Server {
         this.app.use("/api", routes_1.default);
     }
     escucharSocket() {
-        this.io.on("connection", socket => {
+        this.io.on("connection", (socket) => {
             //Connect client
             clientsSocket.connectClient(socket);
             //Config Client
             clientsSocket.config_client(socket);
             //Disconnect client
             clientsSocket.desconectar(socket);
-            //Organizations
-            organizationsSocket.joinToOrganization(socket);
-            organizationsSocket.joinAllOrganizations(socket);
-            organizationsSocket.leaveAnOrganization(socket);
-            organizationsSocket.leaveAllOrganizations(socket);
-            //Tickets
+            // //Organizations
+            // organizationsSocket.joinToOrganization(socket);
+            // organizationsSocket.joinAllOrganizations(socket);
+            // organizationsSocket.leaveAnOrganization(socket);
+            // organizationsSocket.leaveAllOrganizations(socket);
+            // //Tickets
             ticketSocket.joinToTicket(socket);
-            ticketSocket.joinAllTickets(socket);
+            // ticketSocket.joinAllTickets(socket);
             ticketSocket.leaveATicket(socket);
-            ticketSocket.leaveAllTickets(socket);
-            //Areas
-            areaSocket.joinArea(socket);
-            areaSocket.joinAllAreas(socket);
-            areaSocket.leaveAnArea(socket);
-            areaSocket.leaveAllAreas(socket);
-            //Notifications
-            notificationSocket.createNotification(socket, this.io);
+            // ticketSocket.leaveAllTickets(socket);
+            // //Areas
+            // areaSocket.joinArea(socket);
+            // areaSocket.joinAllAreas(socket);
+            // areaSocket.leaveAnArea(socket);
+            // areaSocket.leaveAllAreas(socket);
         });
     }
     start() {

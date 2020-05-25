@@ -9,7 +9,6 @@ import { SERVER_PORT } from "../config/environment";
 import * as clientsSocket from "../sockets/clientsSockets/clientsSocket";
 import * as ticketSocket from "../sockets/ticketSockets/ticketSocket";
 import * as areaSocket from "../sockets/areaSockets/areaSocket";
-import * as notificationSocket from "../sockets/notificationSockets/notificationSockets";
 import * as organizationsSocket from "../sockets/organizationSockets/organizationSockets";
 
 export default class Server {
@@ -45,9 +44,9 @@ export default class Server {
             cors({
                 origin: [
                     "https://arivincenti.github.io",
-                    "http://localhost:4200"
+                    "http://localhost:4200",
                 ],
-                credentials: true
+                credentials: true,
             })
         );
         // this.app.use(cors({ origin: true, credentials: true }));
@@ -60,7 +59,7 @@ export default class Server {
     }
 
     private escucharSocket() {
-        this.io.on("connection", socket => {
+        this.io.on("connection", (socket) => {
             //Connect client
             clientsSocket.connectClient(socket);
             //Config Client
@@ -68,26 +67,23 @@ export default class Server {
             //Disconnect client
             clientsSocket.desconectar(socket);
 
-            //Organizations
-            organizationsSocket.joinToOrganization(socket);
-            organizationsSocket.joinAllOrganizations(socket);
-            organizationsSocket.leaveAnOrganization(socket);
-            organizationsSocket.leaveAllOrganizations(socket);
+            // //Organizations
+            // organizationsSocket.joinToOrganization(socket);
+            // organizationsSocket.joinAllOrganizations(socket);
+            // organizationsSocket.leaveAnOrganization(socket);
+            // organizationsSocket.leaveAllOrganizations(socket);
 
-            //Tickets
+            // //Tickets
             ticketSocket.joinToTicket(socket);
-            ticketSocket.joinAllTickets(socket);
+            // ticketSocket.joinAllTickets(socket);
             ticketSocket.leaveATicket(socket);
-            ticketSocket.leaveAllTickets(socket);
+            // ticketSocket.leaveAllTickets(socket);
 
-            //Areas
-            areaSocket.joinArea(socket);
-            areaSocket.joinAllAreas(socket);
-            areaSocket.leaveAnArea(socket);
-            areaSocket.leaveAllAreas(socket);
-
-            //Notifications
-            notificationSocket.createNotification(socket, this.io);
+            // //Areas
+            // areaSocket.joinArea(socket);
+            // areaSocket.joinAllAreas(socket);
+            // areaSocket.leaveAnArea(socket);
+            // areaSocket.leaveAllAreas(socket);
         });
     }
 

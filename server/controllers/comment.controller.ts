@@ -60,8 +60,7 @@ export const addComment = async (req: Request, res: Response) => {
             .populate({
                 path: "created_by",
                 model: "User",
-            })
-            .exec();
+            });
 
         Server.instance.io
             .to(comment_saved.ticket._id)
@@ -72,7 +71,7 @@ export const addComment = async (req: Request, res: Response) => {
             200,
             true,
             "",
-            "La búsqueda fue un éxito",
+            "El  comentario se creo con éxito",
             comment_saved
         );
     } catch (error) {
